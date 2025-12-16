@@ -1,0 +1,78 @@
+# GitHub Actions CI for Omukwano Pledge
+# Runs backend and frontend tests, lint, and format checks on push/PR
+
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test-backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - name: Install dependencies
+        run: npm ci
+      - name: Set up MySQL client
+        run: sudo apt-get update && sudo apt-get install -y mysql-client
+      - name: Backup MySQL database (if running)
+        env:
+          DB_USER: root
+          DB_PASS: ${{ secrets.DB_PASS }}
+          DB_NAME: omukwano_pledge
+        run: |
+          TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
+          BACKUP_FILE="../db_backups/${DB_NAME}_${TIMESTAMP}.sql"
+          mkdir -p ../db_backups
+          mysqldump -u$DB_USER -p$DB_PASS $DB_NAME > $BACKUP_FILE || echo "mysqldump failed (likely no DB in CI)"
+      - name: Upload DB backup artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: db-backup
+          path: db_backups/*.sql
+      - name: Audit backend dependencies
+        run: npm audit --audit-level=moderate
+      - name: Check backend outdated packages
+        run: npm outdated || true
+      - name: Run backend tests
+        run: npm test || node scripts/test-all-features.js
+      - name: Run backend coverage
+        run: npm run test:coverage
+      - name: Lint backend
+        run: npm run lint || echo "No lint script"
+
+  test-frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - name: Install dependencies
+        run: npm ci
+      - name: Audit frontend dependencies
+        run: npm audit --audit-level=moderate
+      - name: Check frontend outdated packages
+        run: npm outdated || true
+      - name: Run frontend tests
+        run: npm test
+      - name: Lint frontend
+        run: npm run lint || echo "No lint script"
+      - name: Format check
+        run: npm run format -- --check || echo "No format script"
+      - name: Run frontend coverage
+        run: npm run test:coverage

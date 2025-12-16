@@ -1,0 +1,13 @@
+﻿# Dependency and Security Audit Instructions
+# Run these commands in backend and frontend to check for vulnerabilities and outdated packages
+
+# For backend (Node.js):
+npm audit --audit-level=moderate
+npm outdated
+
+# For frontend (Node.js):
+npm audit --audit-level=moderate
+npm outdated
+
+# For CI: Add these steps to your workflow to fail on vulnerabilities
+

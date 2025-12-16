@@ -1,0 +1,499 @@
+/* ============================================================================
+   MODAL & DIALOG COMPONENTS
+   ============================================================================ */
+
+/* Modal Overlay (backdrop) */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(17, 24, 39, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  z-index: var(--z-modal);
+  animation: fadeIn 150ms ease-out;
+}
+
+/* Modal Dialog */
+.modal-dialog {
+  background-color: var(--color-white);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-2xl);
+  max-width: 90vw;
+  max-height: 90vh;
+  width: 500px;
+  display: flex;
+  flex-direction: column;
+  animation: slideUp 200ms ease-out;
+}
+
+@media (max-width: 640px) {
+  .modal-dialog {
+    width: 100%;
+    max-width: 100%;
+    border-radius: var(--radius-lg);
+  }
+}
+
+/* Modal Header */
+.modal-header {
+  padding: var(--space-6);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.modal-header h1,
+.modal-header h2,
+.modal-header h3 {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: var(--text-xl);
+  font-weight: 600;
+}
+
+/* Modal Close Button */
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 28px;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  transition: all 150ms ease-out;
+}
+
+.modal-close:hover {
+  background-color: var(--color-gray-100);
+  color: var(--color-text-primary);
+}
+
+.modal-close:active {
+  transform: scale(0.95);
+}
+
+/* Modal Body */
+.modal-body {
+  padding: var(--space-6);
+  overflow-y: auto;
+  flex: 1;
+  color: var(--color-text-primary);
+}
+
+.modal-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+  background: var(--color-gray-300);
+  border-radius: 4px;
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+  background: var(--color-gray-400);
+}
+
+/* Modal Footer */
+.modal-footer {
+  padding: var(--space-6);
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  gap: var(--space-3);
+  justify-content: flex-end;
+  flex-shrink: 0;
+}
+
+.modal-footer .btn {
+  min-width: 100px;
+}
+
+/* Small Modal */
+.modal-dialog--sm {
+  width: 360px;
+}
+
+/* Large Modal */
+.modal-dialog--lg {
+  width: 720px;
+}
+
+/* Extra Large Modal */
+.modal-dialog--xl {
+  width: 900px;
+}
+
+/* Full Screen Modal (on mobile) */
+@media (max-width: 768px) {
+  .modal-dialog--fullscreen {
+    width: 100vw;
+    max-width: none;
+    height: 100vh;
+    max-height: none;
+    border-radius: 0;
+    animation: slideUp 250ms ease-out;
+  }
+}
+
+/* Scrollable Modal Body */
+.modal-body--scrollable {
+  overflow-y: auto;
+  max-height: calc(90vh - 160px);
+}
+
+/* Modal Variants */
+
+/* Success Modal */
+.modal-dialog--success .modal-header {
+  border-bottom-color: var(--color-success);
+}
+
+.modal-dialog--success .modal-header h2 {
+  color: var(--color-success);
+}
+
+/* Error Modal */
+.modal-dialog--error .modal-header {
+  border-bottom-color: var(--color-error);
+}
+
+.modal-dialog--error .modal-header h2 {
+  color: var(--color-error);
+}
+
+/* Warning Modal */
+.modal-dialog--warning .modal-header {
+  border-bottom-color: var(--color-warning);
+}
+
+.modal-dialog--warning .modal-header h2 {
+  color: var(--color-warning);
+}
+
+/* Info Modal */
+.modal-dialog--info .modal-header {
+  border-bottom-color: var(--color-info);
+}
+
+.modal-dialog--info .modal-header h2 {
+  color: var(--color-info);
+}
+
+/* ============================================================================
+   DRAWER / SIDE PANEL
+   ============================================================================ */
+
+/* Drawer Container */
+.drawer-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(17, 24, 39, 0.5);
+  z-index: var(--z-drawer);
+  animation: fadeIn 150ms ease-out;
+}
+
+/* Drawer Panel */
+.drawer-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--color-white);
+  width: 400px;
+  max-width: 90vw;
+  box-shadow: var(--shadow-xl);
+  display: flex;
+  flex-direction: column;
+  z-index: var(--z-drawer-panel);
+  animation: slideInRight 250ms ease-out;
+}
+
+@media (max-width: 640px) {
+  .drawer-panel {
+    width: 100%;
+  }
+}
+
+/* Drawer from Left */
+.drawer-panel--left {
+  left: 0;
+  right: auto;
+  animation: slideInLeft 250ms ease-out;
+}
+
+/* Drawer Header */
+.drawer-header {
+  padding: var(--space-6);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.drawer-header h1,
+.drawer-header h2 {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: var(--text-lg);
+  font-weight: 600;
+}
+
+/* Drawer Close Button */
+.drawer-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  transition: all 150ms ease-out;
+}
+
+.drawer-close:hover {
+  background-color: var(--color-gray-100);
+  color: var(--color-text-primary);
+}
+
+/* Drawer Body */
+.drawer-body {
+  padding: var(--space-6);
+  overflow-y: auto;
+  flex: 1;
+  color: var(--color-text-primary);
+}
+
+.drawer-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.drawer-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.drawer-body::-webkit-scrollbar-thumb {
+  background: var(--color-gray-300);
+  border-radius: 4px;
+}
+
+.drawer-body::-webkit-scrollbar-thumb:hover {
+  background: var(--color-gray-400);
+}
+
+/* Drawer Footer */
+.drawer-footer {
+  padding: var(--space-6);
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  gap: var(--space-3);
+  flex-shrink: 0;
+}
+
+.drawer-footer .btn {
+  flex: 1;
+}
+
+/* ============================================================================
+   ANIMATIONS FOR MODALS & DRAWERS
+   ============================================================================ */
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ============================================================================
+   CONFIRMATION DIALOG
+   ============================================================================ */
+
+.confirmation-dialog {
+  max-width: 400px;
+}
+
+.confirmation-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  margin: 0 auto var(--space-6);
+}
+
+.confirmation-icon--warning {
+  background-color: rgba(245, 158, 11, 0.1);
+  color: var(--color-warning);
+}
+
+.confirmation-icon--error {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: var(--color-error);
+}
+
+.confirmation-icon--success {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: var(--color-success);
+}
+
+.confirmation-title {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  text-align: center;
+  margin-bottom: var(--space-3);
+}
+
+.confirmation-message {
+  color: var(--color-text-secondary);
+  text-align: center;
+  margin-bottom: var(--space-6);
+  line-height: 1.5;
+}
+
+.confirmation-actions {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.confirmation-actions .btn {
+  flex: 1;
+}
+
+/* ============================================================================
+   SHEET / BOTTOM PANEL (Mobile-friendly)
+   ============================================================================ */
+
+.sheet-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(17, 24, 39, 0.5);
+  z-index: var(--z-sheet);
+  animation: fadeIn 150ms ease-out;
+}
+
+.sheet-panel {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: var(--color-white);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  z-index: var(--z-sheet-panel);
+  animation: slideUpSheet 250ms ease-out;
+}
+
+.sheet-handle {
+  width: 40px;
+  height: 4px;
+  background-color: var(--color-gray-300);
+  border-radius: 2px;
+  margin: var(--space-3) auto;
+}
+
+.sheet-header {
+  padding: 0 var(--space-6) var(--space-6);
+  text-align: center;
+}
+
+.sheet-header h2 {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: var(--text-lg);
+  font-weight: 600;
+}
+
+.sheet-body {
+  padding: 0 var(--space-6) var(--space-6);
+  overflow-y: auto;
+  flex: 1;
+}
+
+.sheet-footer {
+  padding: var(--space-6);
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  gap: var(--space-3);
+}
+
+.sheet-footer .btn {
+  flex: 1;
+}
+
+@keyframes slideUpSheet {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

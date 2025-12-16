@@ -1,0 +1,318 @@
+.pin-dialog-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+    animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        -webkit-backdrop-filter: blur(0px);
+        backdrop-filter: blur(0px);
+    }
+    to {
+        opacity: 1;
+        -webkit-backdrop-filter: blur(4px);
+        backdrop-filter: blur(4px);
+    }
+}
+
+.pin-dialog {
+    background: white;
+    border-radius: 16px;
+    padding: 32px;
+    max-width: 420px;
+    width: 90%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.pin-dialog-header {
+    margin-bottom: 24px;
+    text-align: center;
+}
+
+.pin-dialog-header h2 {
+    margin: 0 0 8px 0;
+    color: #1a1a1a;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+.pin-dialog-header p {
+    margin: 0;
+    color: #666;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.pin-info {
+    background: linear-gradient(135deg, #f5f7fa 0%, #f0f4f8 100%);
+    padding: 16px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    border-left: 4px solid #1976d2;
+}
+
+.amount-display {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.amount-display .label {
+    color: #666;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.amount-display .amount {
+    color: #d32f2f;
+    font-size: 20px;
+    font-weight: 700;
+    font-family: 'Courier New', monospace;
+}
+
+.pin-notice {
+    margin: 0;
+    color: #1565c0;
+    font-size: 13px;
+    line-height: 1.5;
+    font-weight: 500;
+}
+
+.pin-error {
+    background: #ffebee;
+    color: #c62828;
+    padding: 14px;
+    border-radius: 10px;
+    margin-bottom: 16px;
+    font-size: 13px;
+    border-left: 4px solid #c62828;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-10px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.pin-error .icon {
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.pin-error p {
+    margin: 0;
+    line-height: 1.4;
+}
+
+.pin-error.locked {
+    background: #fff3e0;
+    color: #e65100;
+    border-left-color: #e65100;
+}
+
+.pin-error.locked .icon {
+    font-size: 20px;
+}
+
+.attempts-remaining {
+    margin-top: 6px !important;
+    font-weight: 700;
+    font-size: 12px;
+}
+
+.pin-dialog form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.pin-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.pin-input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 28px;
+    text-align: center;
+    letter-spacing: 12px;
+    font-weight: 900;
+    font-family: 'Courier New', monospace;
+    transition: all 0.3s ease;
+    background: #f9f9f9;
+}
+
+.pin-input:focus {
+    outline: none;
+    border-color: #1976d2;
+    background: #fff;
+    box-shadow: 0 0 0 4px rgba(25, 118, 210, 0.1);
+}
+
+.pin-input:disabled {
+    background: #f5f5f5;
+    color: #bdbdbd;
+    cursor: not-allowed;
+}
+
+.pin-length {
+    position: absolute;
+    right: 16px;
+    color: #999;
+    font-size: 12px;
+    font-weight: 600;
+    pointer-events: none;
+}
+
+.pin-dialog-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+.btn {
+    flex: 1;
+    padding: 12px 16px;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    letter-spacing: 0.3px;
+}
+
+.btn-cancel {
+    background: #f5f5f5;
+    color: #333;
+    border: 1px solid #e0e0e0;
+}
+
+.btn-cancel:hover:not(:disabled) {
+    background: #eeeeee;
+    border-color: #bdbdbd;
+}
+
+.btn-submit {
+    background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
+}
+
+.btn-submit:hover:not(:disabled) {
+    background: linear-gradient(135deg, #1565c0 0%, #0d47a1 100%);
+    box-shadow: 0 6px 16px rgba(25, 118, 210, 0.4);
+    transform: translateY(-2px);
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.pin-info-footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid #e0e0e0;
+    color: #999;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.pin-info-footer .lock-icon {
+    font-size: 14px;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 480px) {
+    .pin-dialog {
+        padding: 24px;
+        border-radius: 12px;
+    }
+
+    .pin-dialog-header h2 {
+        font-size: 20px;
+    }
+
+    .amount-display .amount {
+        font-size: 18px;
+    }
+
+    .pin-input {
+        font-size: 24px;
+        letter-spacing: 8px;
+        padding: 12px;
+    }
+
+    .btn {
+        padding: 11px 14px;
+        font-size: 13px;
+    }
+}

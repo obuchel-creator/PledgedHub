@@ -1,0 +1,12 @@
+﻿# Health Check Example for PledgeHub
+# Add these endpoints to your monitoring system or CI pipeline
+
+# Backend health check (API):
+curl --fail http://localhost:5001/api/ai/status
+curl --fail http://localhost:5001/api/health
+
+# Frontend health check (if deployed):
+curl --fail http://localhost:5173
+
+# Add these as steps in your CI/CD or external monitoring for uptime and integration health.
+

@@ -1,0 +1,45 @@
+﻿PLEDGEHUB - QUICK REFERENCE (Created: 2025-12-14 23:03)
+
+URLS:
+- Backend:  http://localhost:5001
+- Frontend: http://localhost:5173
+- API Docs: http://localhost:5001/api
+
+REMINDER SCHEDULE (Africa/Kampala timezone):
+- Long-Term (2+ months):   Wednesdays 2:00 PM
+- Mid-Term (30-60 days):   Tuesdays & Fridays 10:00 AM
+- Final Week (1-7 days):   Daily 9:00 AM
+- Due Today:               Daily 8:00 AM
+- Overdue:                 Daily 5:00 PM
+- Balance Reminders:       Daily 10:00 AM
+
+TEST CREDENTIALS:
+- Username: testuser
+- Email: testuser@example.com
+- Password: testpass123
+
+COMMANDS:
+- Start servers: .\START-PERSISTENT.bat
+- Run tests: node backend\scripts\test-all-features.js
+- Test reminders: node backend\scripts\test-advanced-reminders.js
+- Full automation: .\scripts\full-automation.ps1
+
+LOGS:
+- Backend: Check minimized PowerShell window or backend\logs\
+- Frontend: Check minimized PowerShell window
+
+STATUS CHECK:
+- Backend health: curl http://localhost:5001/
+- Reminder status: Check backend logs for "Triggered" messages
+- Database: mysql -u [user] -p [database]
+
+TROUBLESHOOTING:
+- If servers stop: Run .\START-PERSISTENT.bat
+- If reminders fail: Check backend\.env for SMS/Email credentials
+- If database errors: Verify DB credentials in backend\.env
+
+DOCUMENTATION:
+- ADVANCED_REMINDER_SYSTEM.md - Full reminder system docs
+- AUTOMATION-GUIDE.md - Automation guide
+- docs\API_DOCUMENTATION.md - API reference
+- docs\TROUBLESHOOTING.md - Common issues

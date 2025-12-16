@@ -1,0 +1,75 @@
+.analytics-dashboard {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+.stat-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  flex: 1 1 160px;
+  min-width: 160px;
+  background: #fff;
+  border: 2px solid #1976d2;
+  border-radius: 10px;
+  padding: 1.2rem 1rem;
+  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.07);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  transition: box-shadow 0.2s;
+}
+
+.stat-card:hover {
+  box-shadow: 0 4px 16px rgba(25, 118, 210, 0.13);
+}
+
+.stat-title {
+  font-size: 1rem;
+  color: #555;
+  margin-bottom: 0.5rem;
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.dashboard-section {
+  margin-bottom: 2.5rem;
+  background: #fafbfc;
+  padding: 1.5rem 1rem 1rem 1rem;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+
+.campaign-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+.campaign-table th, .campaign-table td {
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid #e0e0e0;
+  text-align: left;
+}
+.campaign-table th {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+.campaign-table tr:last-child td {
+  border-bottom: none;
+}
+
+.dashboard-loading, .dashboard-error {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #888;
+  margin: 2rem 0;
+}

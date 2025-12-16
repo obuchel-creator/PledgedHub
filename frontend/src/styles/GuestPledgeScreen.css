@@ -1,0 +1,585 @@
+/* Guest Pledge Screen - Responsive Fundraising Page */
+
+.guest-pledge-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  background: var(--bg-base, #f9fafb);
+  min-height: 100vh;
+}
+
+/* Loading & Error States */
+.loading,
+.error-box {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin: 2rem 0;
+}
+
+.error-box {
+  border-left: 4px solid #ef4444;
+}
+
+.error-box h2 {
+  color: #ef4444;
+  margin: 0 0 1rem 0;
+  font-size: 1.5rem;
+}
+
+.error-box p {
+  color: #6b7280;
+  margin: 0 0 1.5rem 0;
+}
+
+.error-box button {
+  padding: 0.75rem 1.5rem;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.error-box button:hover {
+  background: #2563eb;
+}
+
+/* Campaign Card */
+.campaign-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+}
+
+.campaign-image {
+  width: 100%;
+  height: 300px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  overflow: hidden;
+}
+
+.campaign-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.campaign-info {
+  padding: 2rem;
+}
+
+.campaign-info h1 {
+  margin: 0 0 0.5rem 0;
+  font-size: 2rem;
+  color: #1f2937;
+  line-height: 1.2;
+}
+
+.campaign-description {
+  color: #6b7280;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  margin: 0 0 2rem 0;
+}
+
+/* Progress Section */
+.progress-section {
+  margin: 2rem 0;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 12px;
+  background: #e5e7eb;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  border-radius: 6px;
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.progress-text .raised {
+  color: #059669;
+}
+
+.progress-text .goal {
+  color: #6b7280;
+  font-weight: 400;
+}
+
+.pledge-count {
+  margin: 0;
+  color: #9ca3af;
+  font-size: 0.9rem;
+}
+
+/* Recent Pledges */
+.recent-pledges {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.recent-pledges h3 {
+  margin: 0 0 1rem 0;
+  color: #374151;
+  font-size: 1rem;
+}
+
+.pledge-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+.pledge-item {
+  padding: 1rem;
+  background: #f3f4f6;
+  border-radius: 8px;
+  text-align: center;
+  border: 1px solid #e5e7eb;
+}
+
+.pledge-item .donor {
+  display: block;
+  color: #6b7280;
+  font-size: 0.85rem;
+  margin-bottom: 0.5rem;
+}
+
+.pledge-item .amount {
+  display: block;
+  color: #059669;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+/* Pledge Form Card */
+.pledge-form-card {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+}
+
+.pledge-form-card h2 {
+  margin: 0 0 1.5rem 0;
+  color: #1f2937;
+  font-size: 1.5rem;
+}
+
+/* Form Groups */
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #374151;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: inherit;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-group small {
+  display: block;
+  margin-top: 0.25rem;
+  color: #9ca3af;
+  font-size: 0.85rem;
+}
+
+/* Buttons */
+.submit-button,
+.pay-button {
+  width: 100%;
+  padding: 0.875rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  margin-top: 1rem;
+}
+
+.submit-button:hover:not(:disabled),
+.pay-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.submit-button:disabled,
+.pay-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.back-button {
+  width: 100%;
+  padding: 0.75rem;
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 0.75rem;
+  transition: background 0.2s;
+}
+
+.back-button:hover {
+  background: #e5e7eb;
+}
+
+.form-note {
+  margin-top: 1rem;
+  color: #6b7280;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+/* Error Messages */
+.error-message {
+  padding: 1rem;
+  background: #fee2e2;
+  color: #dc2626;
+  border-left: 4px solid #dc2626;
+  border-radius: 4px;
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+}
+
+/* Receipt Card */
+.receipt-card {
+  background: white;
+  border-radius: 12px;
+  padding: 2.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  max-width: 500px;
+  margin: 2rem auto;
+  text-align: center;
+}
+
+.receipt-header {
+  margin-bottom: 2rem;
+}
+
+.checkmark {
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 1rem;
+  background: #d1fae5;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  color: #059669;
+}
+
+.receipt-header h2 {
+  margin: 0;
+  color: #059669;
+  font-size: 1.75rem;
+}
+
+.receipt-details {
+  padding: 1.5rem;
+  background: #f9fafb;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+}
+
+.receipt-number {
+  margin: 0;
+  color: #6b7280;
+  font-size: 0.95rem;
+  font-family: 'Courier New', monospace;
+  font-weight: 600;
+}
+
+.pledge-amount {
+  margin: 1rem 0 0.5rem;
+  color: #059669;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.campaign-name {
+  margin: 0;
+  color: #374151;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+/* Payment Section */
+.payment-section {
+  margin-top: 2rem;
+  text-align: left;
+}
+
+.payment-section h3 {
+  color: #1f2937;
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
+}
+
+.payment-methods {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.payment-option {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.payment-option:hover {
+  border-color: #667eea;
+  background: #f0f4ff;
+}
+
+.payment-option input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  margin-right: 1rem;
+  cursor: pointer;
+  accent-color: #667eea;
+}
+
+.payment-option span {
+  color: #374151;
+  font-weight: 500;
+  flex: 1;
+}
+
+/* Share Section */
+.share-section {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.share-section p {
+  margin: 0 0 1rem 0;
+  color: #374151;
+  font-size: 1rem;
+}
+
+.event-code {
+  color: #6b7280;
+  font-size: 0.95rem;
+}
+
+.event-code strong {
+  display: block;
+  margin-top: 0.5rem;
+  color: #667eea;
+  font-size: 1.5rem;
+  letter-spacing: 2px;
+  font-family: 'Courier New', monospace;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .guest-pledge-container {
+    padding: 1rem;
+  }
+
+  .campaign-info {
+    padding: 1.5rem;
+  }
+
+  .campaign-info h1 {
+    font-size: 1.5rem;
+  }
+
+  .pledge-form-card,
+  .receipt-card {
+    padding: 1.5rem;
+  }
+
+  .pledge-list {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  }
+
+  .progress-text {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .pledge-amount {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .campaign-image {
+    height: 200px;
+  }
+
+  .campaign-info {
+    padding: 1rem;
+  }
+
+  .campaign-info h1 {
+    font-size: 1.25rem;
+  }
+
+  .campaign-description {
+    font-size: 0.95rem;
+  }
+
+  .pledge-form-card,
+  .receipt-card {
+    padding: 1rem;
+  }
+
+  .pledge-amount {
+    font-size: 1.25rem;
+  }
+
+  .receipt-card {
+    margin: 1.5rem auto;
+  }
+
+  .event-code strong {
+    font-size: 1.25rem;
+  }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .guest-pledge-container {
+    background: #111827;
+  }
+
+  .campaign-card,
+  .pledge-form-card,
+  .receipt-card,
+  .share-section,
+  .error-box,
+  .loading {
+    background: #1f2937;
+    color: #f3f4f6;
+  }
+
+  .campaign-info h1,
+  .pledge-form-card h2,
+  .receipt-header h2 {
+    color: #f3f4f6;
+  }
+
+  .campaign-description,
+  .form-note,
+  .progress-text .goal,
+  .pledge-count {
+    color: #d1d5db;
+  }
+
+  .form-group label {
+    color: #e5e7eb;
+  }
+
+  .form-group input {
+    background: #374151;
+    border-color: #4b5563;
+    color: #f3f4f6;
+  }
+
+  .form-group input:focus {
+    border-color: #8b5cf6;
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+  }
+
+  .pledge-item {
+    background: #374151;
+    border-color: #4b5563;
+    color: #e5e7eb;
+  }
+
+  .back-button {
+    background: #374151;
+    color: #e5e7eb;
+    border-color: #4b5563;
+  }
+
+  .back-button:hover {
+    background: #4b5563;
+  }
+
+  .receipt-details {
+    background: #374151;
+  }
+
+  .payment-option {
+    border-color: #4b5563;
+  }
+
+  .payment-option:hover {
+    background: #1f2937;
+    border-color: #8b5cf6;
+  }
+
+  .payment-option span {
+    color: #e5e7eb;
+  }
+
+  .error-message {
+    background: #7f1d1d;
+    color: #fecaca;
+    border-color: #dc2626;
+  }
+}

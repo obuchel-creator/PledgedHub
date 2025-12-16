@@ -1,0 +1,111 @@
+<#
+  init-db.ps1
+  - Finds backend\sql\init.sql, prompts for DB connection info (avoids reserved $Host),
+    creates a temporary my.cnf client file and runs mysql to import the SQL.
+  - Safe-ish: creates database if SQL contains CREATE DATABASE.
+#>
+
+function Convert-SecureStringToPlain {
+    param([System.Security.SecureString]$ss)
+    if ($null -eq $ss) { return '' }
+    $bstr = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($ss)
+    try { return [Runtime.InteropServices.Marshal]::PtrToStringAuto($bstr) }
+    finally { [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($bstr) }
+}
+
+function Prompt-IfNullOrEmpty {
+    param(
+        [string]$value,
+        [string]$prompt,
+        [bool]$secure = $false
+    )
+    if (-not [string]::IsNullOrEmpty($value)) { return $value }
+    if ($secure) {
+        $ss = Read-Host -Prompt $prompt -AsSecureString
+        return Convert-SecureStringToPlain $ss
+    } else {
+        return Read-Host -Prompt $prompt
+    }
+}
+
+# Locate SQL file (try script dir relative first, then cwd)
+$scriptDir = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $MyInvocation.MyCommand.Definition }
+$tryPaths = @(
+    Join-Path $scriptDir '..\backend\sql\init.sql',
+    Join-Path (Get-Location) 'backend\sql\init.sql',
+    Join-Path $scriptDir 'backend\sql\init.sql'
+)
+$found = $null
+foreach ($p in $tryPaths) {
+    $r = Resolve-Path -Path $p -ErrorAction SilentlyContinue
+    if ($r) { $found = $r.Path; break }
+}
+if (-not $found) {
+    Write-Host "Could not find backend\sql\init.sql. Looked in: $($tryPaths -join '; ')"
+    exit 1
+}
+Write-Host "Found SQL init file: $found"
+
+#region Gather connection info (avoid reserved $Host and similar names)
+$envHost = $env:DATABASE_HOST
+$envName = $env:DATABASE_NAME
+$envUser = $env:DATABASE_USER
+$envPass = $env:DATABASE_PASS
+
+$dbHost = Prompt-IfNullOrEmpty -value $envHost -prompt "Database host (default: localhost)" -secure:$false
+if ([string]::IsNullOrEmpty($dbHost)) { $dbHost = 'localhost' }
+
+$dbName = Prompt-IfNullOrEmpty -value $envName -prompt "Database name" -secure:$false
+if ([string]::IsNullOrEmpty($dbName)) {
+    Write-Host "Database name is required. Aborting."
+    exit 2
+}
+
+$dbUser = Prompt-IfNullOrEmpty -value $envUser -prompt "Database user (default: root)" -secure:$false
+if ([string]::IsNullOrEmpty($dbUser)) { $dbUser = 'root' }
+
+if (-not [string]::IsNullOrEmpty($envPass)) {
+    $dbPassword = $envPass
+} else {
+    $ss = Read-Host -Prompt "Database password (input hidden; leave blank for no password)" -AsSecureString
+    $dbPassword = Convert-SecureStringToPlain $ss
+}
+#endregion
+
+#region Create temporary defaults file and run mysql
+$tempFile = [IO.Path]::Combine([IO.Path]::GetTempPath(), ([IO.Path]::GetRandomFileName() + '.cnf'))
+try {
+    $lines = @("[client]")
+    if ($dbUser)    { $lines += "user=$dbUser" }
+    if ($dbPassword -ne $null -and $dbPassword -ne '') { $lines += "password=$dbPassword" }
+    if ($dbHost)    { $lines += "host=$dbHost" }
+
+    # Write with ASCII to avoid BOM issues
+    Set-Content -Path $tempFile -Value $lines -Encoding ASCII
+
+    Write-Host ""
+    Write-Host "Running SQL file against database '$dbName' on host '$dbHost' as user '$dbUser'..."
+    Write-Host "Please wait..."
+
+    $escapedDefaults = $tempFile -replace '"','\"'
+    $escapedSql = $found -replace '"','\"'
+    $dbArg = if ($dbName) { '"' + ($dbName -replace '"','\"') + '"' } else { '""' }
+
+    $cmd = "mysql --defaults-extra-file=""$escapedDefaults"" $dbArg < ""$escapedSql"""
+    $proc = Start-Process -FilePath "cmd.exe" -ArgumentList "/c", $cmd -NoNewWindow -Wait -PassThru
+
+    if ($proc.ExitCode -eq 0) {
+        Write-Host "Database initialization completed successfully."
+        exit 0
+    } else {
+        Write-Host "mysql exited with code $($proc.ExitCode). Initialization may have failed."
+        exit $proc.ExitCode
+    }
+} catch {
+    Write-Host "An error occurred: $($_.Exception.Message)"
+    exit 3
+} finally {
+    try { Remove-Item -Path $tempFile -ErrorAction SilentlyContinue } catch {}
+    if ($dbPassword) { $dbPassword = $null }
+}
+#endregion

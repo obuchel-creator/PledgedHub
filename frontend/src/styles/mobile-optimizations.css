@@ -1,0 +1,697 @@
+/* ═══════════════════════════════════════════════════════════════
+   MOBILE-FIRST OPTIMIZATIONS
+   Enhanced mobile experience with touch-friendly interactions
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─────────────────────────────────────────────────────────────
+   MOBILE VIEWPORT & SAFE AREAS
+   ────────────────────────────────────────────────────────────── */
+
+/* Support iPhone notch & safe areas */
+html {
+  position: relative;
+  width: 100%;
+}
+
+body {
+  width: 100%;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: transparent;
+  /* Prevent selection on long touch */
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+body.allow-select {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   MOBILE-FIRST TYPOGRAPHY
+   ────────────────────────────────────────────────────────────── */
+
+/* Default mobile font sizes */
+html {
+  font-size: 16px; /* 16px on mobile prevents iOS auto-zoom */
+}
+
+body {
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  letter-spacing: -0.3px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-primary);
+  line-height: var(--line-height-snug);
+  color: var(--text-primary);
+  margin-top: 0;
+}
+
+/* Mobile-optimized heading sizes */
+h1 {
+  font-size: var(--font-size-3xl); /* 30px */
+  margin-bottom: 16px;
+}
+
+h2 {
+  font-size: var(--font-size-2xl); /* 24px */
+  margin-bottom: 12px;
+}
+
+h3 {
+  font-size: var(--font-size-xl); /* 20px */
+  margin-bottom: 12px;
+}
+
+h4 {
+  font-size: var(--font-size-lg); /* 18px */
+  margin-bottom: 8px;
+}
+
+h5 {
+  font-size: var(--font-size-md); /* 17px */
+  margin-bottom: 8px;
+}
+
+h6 {
+  font-size: var(--font-size-base); /* 16px */
+  margin-bottom: 4px;
+}
+
+/* Larger fonts on desktop */
+@media (min-width: 768px) {
+  h1 {
+    font-size: var(--font-size-5xl); /* 48px */
+    margin-bottom: 24px;
+  }
+
+  h2 {
+    font-size: var(--font-size-4xl); /* 36px */
+    margin-bottom: 16px;
+  }
+
+  h3 {
+    font-size: var(--font-size-3xl); /* 30px */
+    margin-bottom: 16px;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   TOUCH-FRIENDLY BUTTONS
+   44x44px minimum tap target
+   ────────────────────────────────────────────────────────────── */
+
+button,
+[role="button"],
+a.btn,
+.btn {
+  /* Minimum touch target (Apple/Google standard) */
+  min-width: 44px;
+  min-height: 44px;
+  padding: 12px 16px;
+  font-size: var(--font-size-sm); /* 14px for readability */
+  line-height: 1.4;
+  
+  /* Remove iOS default styling */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  
+  /* Remove tap highlight */
+  -webkit-tap-highlight-color: transparent;
+  
+  /* Smooth transitions */
+  transition: all 150ms ease-out;
+  
+  /* Ensure buttons are clickable */
+  cursor: pointer;
+  border: none;
+  
+  /* Safe area for edge swipes */
+  margin: 0 4px;
+  
+  /* Prevent double-tap zoom on button */
+  touch-action: manipulation;
+}
+
+/* Hover state only on desktop (no hover on touch) */
+@media (hover: hover) {
+  button:hover,
+  [role="button"]:hover,
+  .btn:hover {
+    opacity: 0.95;
+  }
+}
+
+/* Focus state visible on mobile */
+button:focus,
+[role="button"]:focus,
+.btn:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Active/pressed state for mobile */
+button:active,
+[role="button"]:active,
+.btn:active {
+  transform: scale(0.98);
+}
+
+/* Disabled buttons */
+button:disabled,
+[role="button"][aria-disabled="true"],
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Block button (full width on mobile) */
+.btn-block {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   MOBILE-OPTIMIZED INPUTS & FORMS
+   ────────────────────────────────────────────────────────────── */
+
+input,
+textarea,
+select {
+  /* Prevent iOS auto-zoom (must be 16px+) */
+  font-size: 16px;
+  
+  /* Touch-friendly padding */
+  padding: 12px;
+  min-height: 44px;
+  
+  /* Mobile styling */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  
+  /* Border */
+  border: 1px solid var(--border-default);
+  border-radius: 8px;
+  
+  /* Font family (avoid system fonts that may be too small) */
+  font-family: var(--font-secondary);
+  
+  /* Smooth transitions */
+  transition: all 150ms ease-out;
+  
+  /* Remove default background on iOS */
+  background-color: var(--bg-default);
+  
+  /* Line height for better spacing */
+  line-height: 1.5;
+}
+
+/* Wider input on mobile for easier touching */
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="number"],
+input[type="password"],
+textarea {
+  width: 100%;
+}
+
+/* Focus state */
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-bg);
+  background-color: var(--bg-default);
+}
+
+/* Placeholder styling */
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-muted);
+  opacity: 1;
+}
+
+/* Mobile-friendly select dropdown */
+select {
+  /* Remove default dropdown arrow and let browser render */
+  background-image: url('data:image/svg+xml;utf8,<svg fill="black" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 24px;
+  padding-right: 36px;
+  cursor: pointer;
+}
+
+select::-ms-expand {
+  display: none; /* Remove IE arrow */
+}
+
+/* Checkbox & Radio touch targets */
+input[type="checkbox"],
+input[type="radio"] {
+  width: 20px;
+  height: 20px;
+  margin: 12px 8px 12px 0;
+  cursor: pointer;
+  accent-color: var(--color-primary);
+}
+
+/* Label touch area */
+label {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: var(--font-weight-medium);
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
+  cursor: pointer;
+}
+
+/* Form groups with proper spacing */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  margin-bottom: 8px;
+}
+
+/* Form row (responsive grid) */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr; /* Mobile: single column */
+  gap: 12px;
+}
+
+@media (min-width: 641px) {
+  .form-row {
+    grid-template-columns: repeat(2, 1fr); /* Tablet: 2 columns */
+    gap: 16px;
+  }
+}
+
+@media (min-width: 1025px) {
+  .form-row {
+    gap: 20px;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   MOBILE SPACING & PADDING
+   Reduced on mobile, increased on desktop
+   ────────────────────────────────────────────────────────────── */
+
+/* Default container padding (mobile-first) */
+.container,
+.page-container {
+  width: 100%;
+  max-width: 100%;
+  padding: 0 12px;
+  box-sizing: border-box;
+}
+
+@media (min-width: 641px) {
+  .container,
+  .page-container {
+    padding: 0 16px;
+    max-width: 100%;
+  }
+}
+
+@media (min-width: 1025px) {
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .page-container {
+    max-width: 100%;
+    padding: 0 24px;
+  }
+}
+
+/* Section spacing */
+section {
+  margin: 16px 0;
+  padding: 12px 0;
+}
+
+@media (min-width: 768px) {
+  section {
+    margin: 24px 0;
+    padding: 20px 0;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   MOBILE GRID SYSTEM
+   Single column on mobile, responsive on larger screens
+   ────────────────────────────────────────────────────────────── */
+
+.grid {
+  display: grid;
+  grid-auto-flow: row;
+  gap: 12px;
+  width: 100%;
+}
+
+.grid.grid-cols-1 {
+  grid-template-columns: 1fr;
+}
+
+.grid.grid-cols-2 {
+  grid-template-columns: 1fr; /* Mobile: single column */
+}
+
+.grid.grid-cols-3 {
+  grid-template-columns: 1fr; /* Mobile: single column */
+}
+
+.grid.grid-cols-4 {
+  grid-template-columns: 1fr; /* Mobile: single column */
+}
+
+/* Tablet breakpoint */
+@media (min-width: 641px) {
+  .grid {
+    gap: 16px;
+  }
+
+  .grid.grid-cols-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .grid.grid-cols-3 {
+    grid-template-columns: repeat(2, 1fr); /* Tablet: 2 columns */
+  }
+
+  .grid.grid-cols-4 {
+    grid-template-columns: repeat(2, 1fr); /* Tablet: 2 columns */
+  }
+}
+
+/* Desktop breakpoint */
+@media (min-width: 1025px) {
+  .grid {
+    gap: 20px;
+  }
+
+  .grid.grid-cols-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .grid.grid-cols-4 {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   MOBILE CARDS
+   Full width with proper spacing
+   ────────────────────────────────────────────────────────────── */
+
+.card {
+  width: 100%;
+  padding: 16px;
+  margin: 8px 0;
+  background: var(--bg-default);
+  border: 1px solid var(--border-default);
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 150ms ease-out;
+  box-sizing: border-box;
+}
+
+.card:active {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+@media (min-width: 768px) {
+  .card {
+    padding: 20px;
+    margin: 12px 0;
+  }
+}
+
+@media (min-width: 1025px) {
+  .card {
+    padding: 24px;
+    margin: 16px 0;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   MOBILE NAVIGATION & MENUS
+   Mobile optimized spacing and sizing
+   ────────────────────────────────────────────────────────────── */
+
+/* Navigation items (touch-friendly) */
+nav a,
+.nav-link,
+.menu-item {
+  display: block;
+  padding: 12px 16px;
+  font-size: var(--font-size-sm);
+  color: var(--text-primary);
+  text-decoration: none;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  transition: all 150ms ease-out;
+}
+
+nav a:hover,
+.nav-link:hover,
+.menu-item:hover {
+  background-color: var(--bg-secondary);
+  color: var(--color-primary);
+}
+
+nav a:active,
+.nav-link:active,
+.menu-item:active {
+  background-color: var(--bg-tertiary);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   MOBILE IMAGES & MEDIA
+   Responsive and performant
+   ────────────────────────────────────────────────────────────── */
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 8px;
+}
+
+/* Responsive images in cards */
+.card img,
+.image-container img {
+  width: 100%;
+  max-width: 100%;
+  margin-bottom: 12px;
+  border-radius: 8px;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   MOBILE TABLES
+   Responsive stacked layout on mobile
+   ────────────────────────────────────────────────────────────── */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+  margin: 16px 0;
+}
+
+th, td {
+  padding: 12px 8px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-default);
+}
+
+th {
+  background-color: var(--bg-secondary);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+}
+
+/* Stacked table on mobile */
+@media (max-width: 640px) {
+  table {
+    font-size: var(--font-size-xs);
+  }
+
+  th, td {
+    padding: 8px 4px;
+  }
+
+  /* Hide table headers and display as cards instead */
+  table {
+    display: block;
+    border: none;
+  }
+
+  tr {
+    display: block;
+    margin-bottom: 12px;
+    border: 1px solid var(--border-default);
+    border-radius: 8px;
+    padding: 12px;
+  }
+
+  th {
+    display: none;
+  }
+
+  td {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border: none;
+  }
+
+  td:before {
+    content: attr(data-label);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-secondary);
+    min-width: 100px;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   MOBILE KEYBOARD AWARENESS
+   Prevent content hidden by virtual keyboard
+   ────────────────────────────────────────────────────────────── */
+
+/* Add extra padding when keyboard is visible */
+@media (max-height: 500px) {
+  .form-group {
+    margin-bottom: 12px;
+  }
+
+  input {
+    min-height: 40px;
+  }
+
+  button {
+    min-height: 40px;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   MOBILE TOUCH INTERACTIONS
+   Optimize for touch gestures
+   ────────────────────────────────────────────────────────────── */
+
+/* Swipe-friendly elements */
+.swipe-container {
+  overflow-x: auto;
+  scroll-behavior: smooth;
+}
+
+/* Remove double-tap delay on buttons */
+a, button, input[type="button"], input[type="submit"] {
+  touch-action: manipulation;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   MOBILE SAFE AREAS (iPhone Notch Support)
+   ────────────────────────────────────────────────────────────── */
+
+.safe-area-top {
+  padding-top: max(12px, env(safe-area-inset-top));
+}
+
+.safe-area-bottom {
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
+}
+
+.safe-area-left {
+  padding-left: max(12px, env(safe-area-inset-left));
+}
+
+.safe-area-right {
+  padding-right: max(12px, env(safe-area-inset-right));
+}
+
+/* ─────────────────────────────────────────────────────────────
+   MOBILE LANDSCAPE MODE
+   Optimize for landscape orientation
+   ────────────────────────────────────────────────────────────── */
+
+@media (max-height: 600px) and (orientation: landscape) {
+  h1, h2, h3 {
+    margin-bottom: 8px;
+  }
+
+  .card {
+    padding: 12px;
+  }
+
+  button, input {
+    min-height: 40px;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   MOBILE STATUS BAR & NOTCH
+   Safe area insets
+   ────────────────────────────────────────────────────────────── */
+
+/* iOS status bar padding */
+@supports (padding: max(0px)) {
+  body {
+    padding-left: max(0px, env(safe-area-inset-left));
+    padding-right: max(0px, env(safe-area-inset-right));
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   MOBILE SCROLLING & PERFORMANCE
+   ────────────────────────────────────────────────────────────── */
+
+/* Enable hardware acceleration */
+.scrollable {
+  overflow-y: auto;
+  -webkit-font-smoothing: antialiased;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   PRINT STYLES (Mobile web to print)
+   ────────────────────────────────────────────────────────────── */
+
+@media print {
+  body {
+    background: white;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .card {
+    page-break-inside: avoid;
+    box-shadow: none;
+    border: 1px solid #ddd;
+    margin-bottom: 20px;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════ */

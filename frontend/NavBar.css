@@ -1,0 +1,96 @@
+.qb-navbar {
+  display: flex;
+  align-items: center;
+  background: linear-gradient(90deg, #1976d2 0%, #43a047 100%);
+  color: #fff;
+  padding: 0 2rem;
+  height: 64px;
+  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.07);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.qb-navbar__logo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-right: 2rem;
+  color: #fff;
+}
+.qb-navbar__links {
+  display: flex;
+  gap: 1.5rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  flex: 1;
+}
+.qb-navbar__links li {
+  display: flex;
+  align-items: center;
+  border-bottom: 2px solid transparent;
+  transition: border 0.2s;
+}
+.qb-navbar__links li.active {
+  border-bottom: 2px solid #fff;
+}
+.qb-navbar__links a {
+  display: flex;
+  align-items: center;
+  color: #fff;
+  text-decoration: none;
+  font-size: 1.1rem;
+  font-weight: 500;
+  padding: 0.5rem 0.7rem;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+.qb-navbar__links a:hover {
+  background: rgba(255,255,255,0.12);
+}
+.qb-navbar__icon {
+  font-size: 1.3rem;
+  margin-right: 0.5rem;
+}
+.qb-navbar__user {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+.qb-navbar__avatar {
+  background: #fff;
+  color: #1976d2;
+  font-weight: 700;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+}
+.qb-navbar__username {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #fff;
+}
+.qb-navbar__login {
+  color: #fff;
+  font-weight: 600;
+  text-decoration: underline;
+}
+@media (max-width: 700px) {
+  .qb-navbar {
+    flex-direction: column;
+    height: auto;
+    padding: 0.5rem 1rem;
+  }
+  .qb-navbar__links {
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin: 0.5rem 0;
+  }
+  .qb-navbar__logo {
+    margin-bottom: 0.5rem;
+  }
+}

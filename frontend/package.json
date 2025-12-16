@@ -1,0 +1,52 @@
+{
+    "name": "pledgehub-frontend",
+    "version": "0.1.0",
+    "private": true,
+    "type": "module",
+    "description": "Frontend for PledgeHub built with Vite and React",
+    "engines": {
+        "node": ">=14"
+    },
+    "scripts": {
+        "dev": "vite --host --port 5173",
+        "build": "vite build",
+        "preview": "vite preview --port 5173",
+        "start": "vite preview --port 5173",
+        "test": "jest src --env=jsdom --passWithNoTests",
+        "test:coverage": "jest --coverage",
+        "lint": "eslint src --ext .js,.jsx",
+        "format": "prettier --write src",
+        "cypress:open": "cypress open",
+        "cypress:run": "cypress run",
+        "release": "standard-version"
+    },
+    "dependencies": {
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0",
+        "react-router-dom": "^7.9.4",
+        "recharts": "^3.5.1"
+    },
+    "devDependencies": {
+        "@babel/eslint-parser": "^7.28.5",
+        "@babel/preset-react": "^7.28.5",
+        "@testing-library/jest-dom": "^6.9.1",
+        "@testing-library/react": "^16.3.0",
+        "@testing-library/user-event": "^14.6.1",
+        "@vitejs/plugin-react": "^4.0.0",
+        "autoprefixer": "^10.4.23",
+        "cypress": "^12.17.4",
+        "eslint": "^8.57.1",
+        "eslint-plugin-react": "^7.37.5",
+        "eslint-plugin-react-hooks": "^7.0.1",
+        "identity-obj-proxy": "^3.0.0",
+        "jest": "^29.7.0",
+        "prettier": "^3.6.2",
+        "vite": "^5.0.0"
+    },
+    "keywords": [
+        "vite",
+        "react",
+        "frontend"
+    ],
+    "license": "MIT"
+}

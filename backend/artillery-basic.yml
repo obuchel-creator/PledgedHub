@@ -1,0 +1,11 @@
+config:
+  target: "http://localhost:5001"
+  phases:
+    - duration: 30
+      arrivalRate: 5
+scenarios:
+  - flow:
+      - get:
+          url: "/api/health"
+      - get:
+          url: "/api/ai/status"

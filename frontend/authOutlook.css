@@ -1,0 +1,59 @@
+/* Outlook-style Auth Screens for Omukwano Pledge */
+.auth-bg {
+  background: #f3f6fb;
+  min-height: 100vh;
+}
+.auth-center-card {
+  background: #fff;
+  max-width: 420px;
+  margin: 48px auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 16px 0 rgba(60,72,88,0.10);
+  padding: 40px 36px 32px 36px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.auth-header-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+.auth-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 8px;
+}
+.auth-disclaimer {
+  font-size: 0.95rem;
+  color: #888;
+  margin-bottom: 18px;
+}
+.social-logos-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+.social-logos-row img {
+  height: 28px;
+  width: 28px;
+  object-fit: contain;
+  border-radius: 4px;
+  background: #fff;
+  border: 1px solid #eee;
+  padding: 2px;
+}
+.auth-form {
+  width: 100%;
+}
+.auth-error {
+  background: #f8d7da;
+  color: #842029;
+  border: 1px solid #f5c2c7;
+  border-radius: 4px;
+  padding: 8px 12px;
+  margin-bottom: 16px;
+  width: 100%;
+}

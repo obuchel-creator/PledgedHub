@@ -1,0 +1,46 @@
+# GitHub Actions workflow for staging deployment
+# Replace the deploy step with your actual deployment command (e.g., Azure, Vercel, Netlify, custom script)
+
+name: Deploy to Staging
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy-staging:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - name: Install backend dependencies
+        run: cd backend && npm ci
+      - name: Install frontend dependencies
+        run: cd frontend && npm ci
+      - name: Build frontend
+        run: cd frontend && npm run build
+      - name: Deploy to staging (placeholder)
+        run: echo "Deploying to staging... (replace with real deploy command)"
+      - name: Health check staging API
+        env:
+          STAGING_API_URL: ${{ secrets.STAGING_API_URL }}
+        run: |
+          if [ -z "${STAGING_API_URL}" ]; then
+            echo "STAGING_API_URL secret is not set. Skipping API health check."
+            exit 0
+          fi
+          curl --fail "${STAGING_API_URL}/api/health"
+          curl --fail "${STAGING_API_URL}/api/ai/status"
+      - name: Health check staging frontend
+        env:
+          STAGING_FRONTEND_URL: ${{ secrets.STAGING_FRONTEND_URL }}
+        run: |
+          if [ -z "${STAGING_FRONTEND_URL}" ]; then
+            echo "STAGING_FRONTEND_URL secret is not set. Skipping frontend health check."
+            exit 0
+          fi
+          curl --fail "${STAGING_FRONTEND_URL}"

@@ -1,0 +1,230 @@
+/* Elder-Friendly Button Styles */
+
+.elder-button {
+  /* Size */
+  min-height: 60px;
+  padding: 20px 40px;
+  
+  /* Typography */
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+  
+  /* Visual */
+  border: 3px solid transparent;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  /* Accessibility */
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+  
+  /* Layout */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  
+  /* Shadow for depth */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Primary Button (Green - Success/Pay) */
+.elder-button-primary {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: #ffffff;
+  border-color: #1e7e34;
+}
+
+.elder-button-primary:hover:not(.elder-button-disabled) {
+  background: linear-gradient(135deg, #218838 0%, #1ba57c 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.elder-button-primary:active:not(.elder-button-disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+/* Secondary Button (Blue - Info/Check) */
+.elder-button-secondary {
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  color: #ffffff;
+  border-color: #004085;
+}
+
+.elder-button-secondary:hover:not(.elder-button-disabled) {
+  background: linear-gradient(135deg, #0069d9 0%, #004085 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Warning Button (Orange - Caution) */
+.elder-button-warning {
+  background: linear-gradient(135deg, #fd7e14 0%, #e8590c 100%);
+  color: #ffffff;
+  border-color: #bd4503;
+}
+
+.elder-button-warning:hover:not(.elder-button-disabled) {
+  background: linear-gradient(135deg, #e8590c 0%, #d63384 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Danger Button (Red - Cancel/Delete) */
+.elder-button-danger {
+  background: linear-gradient(135deg, #dc3545 0%, #bd2130 100%);
+  color: #ffffff;
+  border-color: #a71d2a;
+}
+
+.elder-button-danger:hover:not(.elder-button-disabled) {
+  background: linear-gradient(135deg, #c82333 0%, #a71d2a 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Help Button (Purple - Support) */
+.elder-button-help {
+  background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);
+  color: #ffffff;
+  border-color: #4a2885;
+}
+
+.elder-button-help:hover:not(.elder-button-disabled) {
+  background: linear-gradient(135deg, #5a32a3 0%, #4a2885 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Light Button (White - Back/Cancel) */
+.elder-button-light {
+  background: #ffffff;
+  color: #212529;
+  border-color: #dee2e6;
+}
+
+.elder-button-light:hover:not(.elder-button-disabled) {
+  background: #f8f9fa;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Size Variants */
+.elder-button-small {
+  min-height: 50px;
+  padding: 15px 30px;
+  font-size: 20px;
+}
+
+.elder-button-large {
+  min-height: 70px;
+  padding: 25px 50px;
+  font-size: 28px;
+}
+
+.elder-button-xlarge {
+  min-height: 90px;
+  padding: 30px 60px;
+  font-size: 32px;
+}
+
+/* Full Width */
+.elder-button-fullwidth {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Disabled State */
+.elder-button-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Loading State */
+.elder-button-loading {
+  position: relative;
+  color: transparent;
+}
+
+.elder-button-spinner {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 32px;
+  animation: elder-spin 1s linear infinite;
+}
+
+@keyframes elder-spin {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+/* Icon */
+.elder-button-icon {
+  font-size: 1.3em;
+  line-height: 1;
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  .elder-button {
+    border-width: 4px;
+    font-weight: 800;
+  }
+}
+
+/* Touch Devices */
+@media (hover: none) and (pointer: coarse) {
+  .elder-button {
+    min-height: 70px;
+    padding: 25px 45px;
+  }
+}
+
+/* Print (hide buttons) */
+@media print {
+  .elder-button {
+    display: none;
+  }
+}
+
+/* Focus for keyboard navigation */
+.elder-button:focus {
+  outline: 4px solid #ffc107;
+  outline-offset: 4px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .elder-button {
+    min-height: 65px;
+    font-size: 22px;
+    padding: 18px 35px;
+  }
+  
+  .elder-button-large {
+    min-height: 75px;
+    font-size: 26px;
+  }
+}
+
+@media (max-width: 480px) {
+  .elder-button {
+    min-height: 60px;
+    font-size: 20px;
+    padding: 15px 30px;
+  }
+}

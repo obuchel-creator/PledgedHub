@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: omukwano_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASS:-}
+      MYSQL_DATABASE: ${DB_NAME:-omukwano_db}
+      MYSQL_USER: ${DB_USER:-root}
+      MYSQL_PASSWORD: ${DB_PASS:-}
+    ports:
+      - "${DB_PORT:-3306}:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./backend/sql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - omukwano_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  # Uncomment the backend service if you want to run it in Docker too
+  # backend:
+  #   build:
+  #     context: ./backend
+  #     dockerfile: Dockerfile
+  #   container_name: omukwano_backend
+  #   restart: unless-stopped
+  #   environment:
+  #     - NODE_ENV=development
+  #     - PORT=5001
+  #     - DB_HOST=mysql
+  #     - DB_PORT=3306
+  #     - DB_NAME=${DB_NAME:-omukwano_db}
+  #     - DB_USER=${DB_USER:-root}
+  #     - DB_PASS=${DB_PASS:-}
+  #     - SESSION_SECRET=${SESSION_SECRET}
+  #     - JWT_SECRET=${JWT_SECRET}
+  #   ports:
+  #     - "5001:5001"
+  #   depends_on:
+  #     mysql:
+  #       condition: service_healthy
+  #   networks:
+  #     - omukwano_network
+  #   volumes:
+  #     - ./backend:/app
+  #     - /app/node_modules
+
+volumes:
+  mysql_data:
+
+networks:
+  omukwano_network:
+    driver: bridge

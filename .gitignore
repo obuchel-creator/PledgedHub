@@ -1,0 +1,99 @@
+﻿# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+
+# Environment variables (NEVER commit these!)
+.env
+.env.local
+.env.development
+.env.production
+backend/.env
+frontend/.env
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+backend/logs/
+coverage-output.txt
+
+# Test coverage
+coverage/
+.nyc_output/
+backend/coverage/
+
+# Database backups and dumps
+*.sql
+backup_*/
+*_dump.sql
+pledgehub_pledge_dump*.sql
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.settings/
+*.sublime-project
+*.sublime-workspace
+
+# Build output
+dist/
+build/
+out/
+frontend/dist/
+frontend/build/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# PM2 files
+.pm2/
+ecosystem.config.js.backup
+
+# Backup files
+*.bak
+*.backup
+package.json.bak
+pledgeRoutes.js.bak
+init.sql.bak
+
+# Documentation output files (keep source .md files)
+IMPLEMENTATION_SUMMARY.md
+NOTIFICATIONS_COMPLETE.md
+PROJECT_COMPLETION_SUMMARY.md
+
+# Scripts output
+backend/scripts/init-db-output.txt
+
+# Windows specific
+$RECYCLE.BIN/
+
+# MacOS specific
+.AppleDouble
+.LSOverride
+
+# Linux specific
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+

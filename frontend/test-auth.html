@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auth Token Test</title>
+</head>
+<body>
+    <h1>Token Storage Test</h1>
+    <button onclick="testLogin()">Test Login</button>
+    <button onclick="checkToken()">Check Token</button>
+    <button onclick="testAPI()">Test API Call</button>
+    <button onclick="clearToken()">Clear Token</button>
+    <pre id="output"></pre>
+
+    <script>
+        const output = document.getElementById('output');
+        const API_BASE = 'http://localhost:5001/api';
+
+        function log(msg) {
+            output.textContent += msg + '\n';
+            console.log(msg);
+        }
+
+        async function testLogin() {
+            output.textContent = '';
+            log('🔵 Testing login...');
+            
+            try {
+                const response = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: 'admin@pledgehub.com',
+                        password: 'Admin@2024'
+                    })
+                });
+
+                const data = await response.json();
+                log(`✅ Login response: ${JSON.stringify(data, null, 2)}`);
+
+                if (data.success && data.token) {
+                    localStorage.setItem('authToken', data.token);
+                    log(`✅ Token saved: ${data.token.substring(0, 30)}...`);
+                    checkToken();
+                } else {
+                    log('❌ Login failed - no token received');
+                }
+            } catch (err) {
+                log(`❌ Error: ${err.message}`);
+            }
+        }
+
+        function checkToken() {
+            const token = localStorage.getItem('authToken');
+            if (token) {
+                log(`✅ Token found in localStorage: ${token.substring(0, 30)}...`);
+            } else {
+                log('❌ No token in localStorage');
+            }
+        }
+
+        async function testAPI() {
+            output.textContent = '';
+            const token = localStorage.getItem('authToken');
+            
+            if (!token) {
+                log('❌ No token found! Login first.');
+                return;
+            }
+
+            log(`🔑 Using token: ${token.substring(0, 30)}...`);
+            log('🌐 Testing analytics API call...');
+
+            try {
+                const response = await fetch(`${API_BASE}/analytics/overview`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                log(`📊 Response status: ${response.status} ${response.statusText}`);
+                
+                const data = await response.json();
+                log(`📋 Response data: ${JSON.stringify(data, null, 2)}`);
+
+                if (response.ok) {
+                    log('✅ API call successful!');
+                } else {
+                    log('❌ API call failed');
+                }
+            } catch (err) {
+                log(`❌ Error: ${err.message}`);
+            }
+        }
+
+        function clearToken() {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('user');
+            log('🗑️ Token cleared');
+        }
+    </script>
+</body>
+</html>

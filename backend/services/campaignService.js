@@ -56,11 +56,11 @@ async function getAllCampaigns({ status } = {}) {
         let sql = `
             SELECT 
                 c.id,
-                c.name as title,
+                c.title,
                 c.description,
-                c.target_amount as goal_amount,
-                c.target_amount as suggested_amount,
-                COALESCE(SUM(p.amount), 0) as current_amount,
+                c.goal_amount,
+                c.suggested_amount,
+                c.current_amount,
                 c.status,
                 c.created_at,
                 c.updated_at,
@@ -68,7 +68,7 @@ async function getAllCampaigns({ status } = {}) {
                 COALESCE(SUM(p.amount), 0) as total_pledged,
                 COALESCE(SUM(CASE WHEN p.status = 'paid' THEN p.amount ELSE 0 END), 0) as total_paid,
                 COALESCE(SUM(CASE WHEN p.status = 'pending' THEN p.amount ELSE 0 END), 0) as total_pending,
-                ROUND((COALESCE(SUM(p.amount), 0) / c.target_amount) * 100, 2) as progress_percentage
+                ROUND((c.current_amount / c.goal_amount) * 100, 2) as progress_percentage
             FROM campaigns c
             LEFT JOIN pledges p ON c.id = p.campaign_id
         `;

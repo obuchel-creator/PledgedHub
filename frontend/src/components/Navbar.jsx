@@ -51,16 +51,16 @@ export default function Navbar() {
               <Logo size="medium" showText={false} />
               <span
                 style={{
-                  fontFamily: 'Intuit Sans, Segoe UI, Arial, sans-serif',
-                  fontWeight: 400,
+                  fontFamily: 'Roboto, Segoe UI, Arial, sans-serif',
+                  fontWeight: 700,
                   fontSize: '1.25rem',
-                  color: '#2563eb',
+                  color: '#FFCC00',
                   letterSpacing: '0.02em',
                   marginLeft: '0.1rem',
                   opacity: 0.92,
                 }}
               >
-                Omukwano Pledge
+                PledgeHub
               </span>
             </span>
           </Link>

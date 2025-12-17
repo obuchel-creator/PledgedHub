@@ -1,21 +1,33 @@
-/* Modern Africa's Talking-style auth screens */
+/* MTN MoMo Developer-inspired auth screens */
+:root {
+  --mtn-yellow: #FCD116;
+  --mtn-dark: #1a1a1a;
+  --mtn-darker: #0f0f0f;
+  --mtn-light: #f5f5f5;
+  --mtn-border: #333333;
+  --mtn-text: #ffffff;
+  --mtn-text-secondary: #d4d4d4;
+  --mtn-success: #10b981;
+  --mtn-error: #ef4444;
+}
+
 body.auth-bg {
   min-height: 100vh;
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
-  background: var(--bg-base);
-  background-image: var(--gradient-1), var(--gradient-2), var(--gradient-3);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica Neue", Arial, sans-serif;
+  background: linear-gradient(135deg, var(--mtn-darker) 0%, var(--mtn-dark) 50%, #1a1a2e 100%);
   background-attachment: fixed;
+  color: var(--mtn-text);
 }
 
 .auth-center-card {
-  background: var(--surface);
-  border-radius: 16px;
-  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12), 0 4px 8px rgba(15, 23, 42, 0.06);
-  border: 1px solid var(--border);
-  max-width: 440px;
-  margin: 48px auto;
-  padding: 48px 40px 40px 40px;
+  background: linear-gradient(135deg, #1a1a1a 0%, #252525 100%);
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 8px 24px rgba(252, 209, 22, 0.1);
+  border: 1px solid var(--mtn-border);
+  max-width: 420px;
+  margin: 60px auto;
+  padding: 50px 40px;
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -23,61 +35,62 @@ body.auth-bg {
 
 .auth-center-card h1,
 .auth-center-card h2 {
-  color: #ffffff;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  color: var(--mtn-text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica Neue", Arial, sans-serif;
   font-weight: 700;
-  margin: 0 0 8px 0;
-  font-size: 28px;
+  margin: 0 0 12px 0;
+  font-size: 32px;
   text-align: center;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  letter-spacing: -0.5px;
 }
 
 .auth-center-card p,
 .auth-center-card .subtitle {
-  color: #f3f4f6;
-  font-size: 15px;
+  color: var(--mtn-text-secondary);
+  font-size: 14px;
   text-align: center;
-  margin: 0 0 24px 0;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+  margin: 0 0 32px 0;
+  line-height: 1.5;
 }
 
 .auth-center-card label {
-  color: #ffffff;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
-  font-weight: 700;
-  font-size: 14px;
-  margin-bottom: 6px;
+  color: var(--mtn-text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  margin-bottom: 8px;
   display: block;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .auth-center-card input,
 .auth-center-card textarea,
 .auth-center-card select {
   width: 100%;
-  padding: 14px 16px;
-  margin-bottom: 20px;
-  border: 2px solid #e5e7eb;
-  border-radius: 8px;
-  font-size: 16px;
-  background: #ffffff;
-  color: #1a1a1a;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
-  transition: all 0.2s ease;
+  padding: 12px 16px;
+  margin-bottom: 18px;
+  border: 1px solid var(--mtn-border);
+  border-radius: 6px;
+  font-size: 15px;
+  background: #2a2a2a;
+  color: var(--mtn-text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica Neue", Arial, sans-serif;
+  transition: all 0.3s ease;
   box-sizing: border-box;
 }
 
 .auth-center-card input:focus,
 .auth-center-card textarea:focus,
 .auth-center-card select:focus {
-  border-color: #f97316;
+  border-color: var(--mtn-yellow);
   outline: none;
-  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
-  background: #fff;
+  box-shadow: 0 0 0 3px rgba(252, 209, 22, 0.15);
+  background: #333333;
 }
 
 .auth-center-card input::placeholder {
-  color: #9ca3af;
+  color: #808080;
 }
 
 /* Hide browser's native password reveal button */
@@ -94,74 +107,76 @@ body.auth-bg {
 .auth-center-card button,
 .auth-center-card .btn {
   width: 100%;
-  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
-  color: #ffffff;
+  background: linear-gradient(135deg, var(--mtn-yellow) 0%, #f4c430 100%);
+  color: var(--mtn-darker);
   border: none;
-  border-radius: 10px;
-  padding: 16px 24px;
-  font-size: 16px;
+  border-radius: 6px;
+  padding: 14px 24px;
+  font-size: 15px;
   font-weight: 700;
-  margin-top: 8px;
+  margin-top: 10px;
   cursor: pointer;
   transition: all 0.3s ease;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica Neue", Arial, sans-serif;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  box-shadow: 0 4px 14px rgba(249, 115, 22, 0.4);
+  letter-spacing: 0.7px;
+  box-shadow: 0 8px 20px rgba(252, 209, 22, 0.3);
 }
 
 .auth-center-card button:hover,
 .auth-center-card .btn:hover {
-  background: linear-gradient(135deg, #ea580c 0%, #dc2626 100%);
+  background: linear-gradient(135deg, #f4c430 0%, #e5b500 100%);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(249, 115, 22, 0.5);
+  box-shadow: 0 12px 30px rgba(252, 209, 22, 0.4);
 }
 
 .auth-center-card button:active,
 .auth-center-card .btn:active {
   transform: translateY(0);
-  box-shadow: 0 2px 8px rgba(249, 115, 22, 0.4);
+  box-shadow: 0 4px 12px rgba(252, 209, 22, 0.3);
 }
 
 .auth-center-card button:disabled,
 .auth-center-card .btn:disabled {
-  background: #d1d5db;
+  background: #404040;
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
-  color: #9ca3af;
+  color: #666666;
 }
 
 .auth-center-card a {
-  color: #f97316;
+  color: var(--mtn-yellow);
   text-decoration: none;
   font-size: 14px;
   font-weight: 600;
   margin-top: 16px;
   text-align: center;
   display: inline-block;
-  transition: color 0.2s;
+  transition: color 0.2s, text-shadow 0.2s;
 }
 
 .auth-center-card a:hover {
-  color: #ea580c;
-  text-decoration: underline;
+  color: #f4c430;
+  text-shadow: 0 0 8px rgba(252, 209, 22, 0.3);
 }
 
 .auth-divider {
   display: flex;
   align-items: center;
   text-align: center;
-  margin: 24px 0;
-  color: #9ca3af;
-  font-size: 14px;
+  margin: 28px 0;
+  color: var(--mtn-text-secondary);
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .auth-divider::before,
 .auth-divider::after {
   content: '';
   flex: 1;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--mtn-border);
 }
 
 .auth-divider::before {
@@ -173,24 +188,24 @@ body.auth-bg {
 }
 
 .error-message {
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-  color: #dc2626;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #ff6b6b;
   padding: 12px 16px;
-  border-radius: 8px;
+  border-radius: 6px;
   margin-bottom: 20px;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
 }
 
 .success-message {
-  background: #f0fdf4;
-  border: 1px solid #bbf7d0;
-  color: #16a34a;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #10b981;
   padding: 12px 16px;
-  border-radius: 8px;
+  border-radius: 6px;
   margin-bottom: 20px;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
 }
 

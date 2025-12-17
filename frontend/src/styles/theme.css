@@ -1,43 +1,43 @@
 /* Global theme - lightweight, accessible, low-specificity */
 
-/* Variables */
+/* Variables - MTN Brand Colors */
 :root {
   --bg: #ffffff;
-  --text: #111827;
-  --muted: #6b7280;
-  --accent: #2563eb;
-  --accent-hover: #1e40af;
-  --border: #e6e7ea;
+  --text: #000000;
+  --muted: #666666;
+  --accent: #FFCC00;
+  --accent-hover: #FFB800;
+  --border: #FFCC00;
   --input-bg: #ffffff;
-  --focus-rgb: 37, 99, 235; /* for rgba(...) */
+  --focus-rgb: 255, 204, 0; /* for rgba(...) - MTN Golden Yellow */
   --container-max-width: 1100px;
   --radius: 8px;
   --base-line: 1.6;
 }
 
-/* Light Theme */
+/* Light Theme - MTN Brand */
 body.light-theme {
   --bg: #ffffff;
-  --text: #111827;
-  --muted: #6b7280;
-  --accent: #2563eb;
-  --accent-hover: #1e40af;
-  --border: #e6e7ea;
+  --text: #000000;
+  --muted: #666666;
+  --accent: #FFCC00;
+  --accent-hover: #FFB800;
+  --border: #FFCC00;
   --input-bg: #ffffff;
   background: var(--bg);
   color: var(--text);
 }
 
-/* Dark Theme */
+/* Dark Theme - MTN Brand */
 body.dark-theme {
-  --bg: #1a202c;
-  --text: #f7fafc;
-  --muted: #a0aec0;
-  --accent: #63b3ed;
-  --accent-hover: #4299e1;
-  --border: #2d3748;
-  --input-bg: #2d3748;
-  --focus-rgb: 99, 179, 237;
+  --bg: #1a1a1a;
+  --text: #FFCC00;
+  --muted: #999999;
+  --accent: #FFCC00;
+  --accent-hover: #FFB800;
+  --border: #FFCC00;
+  --input-bg: #2a2a2a;
+  --focus-rgb: 255, 204, 0;
   background: var(--bg);
   color: var(--text);
 }
@@ -260,8 +260,9 @@ textarea {
 button {
   cursor: pointer;
   background: var(--accent);
-  color: #fff;
+  color: #000000;
   border: none;
+  font-weight: 600;
 }
 button[disabled],
 input[disabled],

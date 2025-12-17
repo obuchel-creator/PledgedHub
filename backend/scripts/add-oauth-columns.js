@@ -11,7 +11,7 @@ async function addOAuthColumns() {
             port: process.env.DB_PORT || 3306,
             user: process.env.DB_USER || 'root',
             password: process.env.DB_PASS || '',
-            database: process.env.DB_NAME || 'omukwano_db'
+            database: process.env.DB_NAME || 'pledgehub_db'
         });
 
         console.log('✓ Connected to database');
@@ -21,7 +21,7 @@ async function addOAuthColumns() {
             SELECT COLUMN_NAME 
             FROM INFORMATION_SCHEMA.COLUMNS 
             WHERE TABLE_SCHEMA = ? AND TABLE_NAME = 'users'
-        `, [process.env.DB_NAME || 'omukwano_db']);
+        `, [process.env.DB_NAME || 'pledgehub_db']);
 
         const existingColumns = columns.map(row => row.COLUMN_NAME);
         

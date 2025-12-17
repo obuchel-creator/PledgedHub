@@ -129,8 +129,8 @@
 }
 
 .campaign-status.completed {
-  background: #dbeafe;
-  color: #1e40af;
+  background: #FFF9E6;
+  color: #FFB800;
 }
 
 .campaign-status.draft {

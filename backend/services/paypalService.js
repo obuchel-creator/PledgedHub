@@ -51,7 +51,7 @@ async function createOrder(amount, currency = 'UGX', description = 'Pledge Payme
             custom_id: description // Store original description
         }],
         application_context: {
-            brand_name: 'Omukwano Pledge',
+            brand_name: 'PledgeHub Pledge',
             landing_page: 'BILLING',
             user_action: 'PAY_NOW',
             return_url: returnUrl || `${process.env.FRONTEND_URL}/payment/success`,

@@ -1,6 +1,6 @@
 const db = require('../config/db');
 
-const DB_NAME = process.env.DB_NAME || 'omukwano_db';
+const DB_NAME = process.env.DB_NAME || 'pledgehub_db';
 const TABLE = 'pledges';
 
 const columns = [

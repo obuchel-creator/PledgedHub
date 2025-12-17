@@ -57,7 +57,7 @@ When your application is live and users are accessing it, you **CANNOT** make ch
 │  3. PRODUCTION (Live Server - Public)                   │
 │     - Real users access this                            │
 │     - Database: Production database (real data)         │
-│     - Domain: https://omukwano.yourdomain.com           │
+│     - Domain: https://pledgehub.yourdomain.com           │
 │     - Purpose: Serve real users                         │
 │     - ⚠️ NEVER make direct changes here!               │
 └─────────────────────────────────────────────────────────┘
@@ -214,7 +214,7 @@ pm2 reload omukwano-backend
 pm2 logs omukwano-backend --lines 50
 
 # Verify endpoint works
-curl https://omukwano.yourdomain.com/api/donor-portal/my-pledges
+curl https://pledgehub.yourdomain.com/api/donor-portal/my-pledges
 ```
 
 ---
@@ -307,7 +307,7 @@ ssh user@your-production-server.com
 cd /var/www/pledgehub
 
 # 🚨 BACKUP PRODUCTION DATABASE FIRST 🚨
-mysqldump -u omukwano_user -p pledgehub_db > backup_$(date +%Y%m%d_%H%M%S).sql
+mysqldump -u pledgehub_user -p pledgehub_db > backup_$(date +%Y%m%d_%H%M%S).sql
 
 # Pull latest code
 git pull origin main
@@ -316,10 +316,10 @@ git pull origin main
 node backend/scripts/migrations/add_donor_rating_column.js
 
 # Restart server
-pm2 reload omukwano-backend
+pm2 reload pledgehub-backend
 
 # Verify everything works
-pm2 logs omukwano-backend --lines 50
+pm2 logs pledgehub-backend --lines 50
 ```
 
 ---
@@ -457,7 +457,7 @@ jobs:
             git pull origin main
             cd backend
             npm install
-            pm2 reload omukwano-backend
+            pm2 reload pledgehub-backend
             echo "✅ Deployed successfully!"
 ```
 
@@ -507,10 +507,10 @@ pm2 logs omukwano-backend
 ```bash
 # PM2 keeps previous versions
 pm2 list
-pm2 reload omukwano-backend --update-env
+pm2 reload pledgehub-backend --update-env
 
 # If that doesn't work, restart from backup
-pm2 delete omukwano-backend
+pm2 delete pledgehub-backend
 pm2 start ecosystem.config.js
 ```
 
@@ -520,10 +520,10 @@ pm2 start ecosystem.config.js
 # If database migration broke something
 # Restore from backup taken before migration
 
-mysql -u omukwano_user -p pledgehub_db < backup_20251105_090000.sql
+mysql -u pledgehub_user -p pledgehub_db < backup_20251105_090000.sql
 
 # Restart server
-pm2 reload omukwano-backend
+pm2 reload pledgehub-backend
 ```
 
 ---

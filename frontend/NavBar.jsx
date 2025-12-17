@@ -36,7 +36,7 @@ export default function NavBar() {
 
   return (
     <nav className="qb-navbar">
-      <div className="qb-navbar__logo">Omukwano</div>
+      <div className="qb-navbar__logo" style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 700, color: '#FFCC00' }}>PledgeHub</div>
       <ul className="qb-navbar__links">
         {navLinks.map(link => {
           if (link.adminOnly && (!user || (user.role !== 'admin' && user.role !== 'staff'))) return null;

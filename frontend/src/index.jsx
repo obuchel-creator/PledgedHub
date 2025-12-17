@@ -1,16 +1,16 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { createRoot } from 'react-dom/client';
-import App from '../App.jsx';
+import App from './App.jsx';
 import { AuthProvider } from './context/AuthContext';
 import { LanguageProvider } from './i18n/LanguageContext';
-import './styles/theme.css'; // theme styles
-import './styles/globals.css'; // global styles
-import './styles/mobile-optimizations.css'; // mobile-friendly optimizations
+import ErrorBoundary from './components/ErrorBoundary';
+import './styles/theme.css';
+import './styles/globals.css';
+import './styles/mobile-optimizations.css';
 
-// Apply theme on initial load
+console.log('✓ index.jsx loaded');
 const applyInitialTheme = () => {
   const savedTheme = localStorage.getItem('theme') || 'light';
-  
   if (savedTheme === 'auto') {
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     document.body.classList.toggle('dark-theme', prefersDark);
@@ -26,12 +26,31 @@ const applyInitialTheme = () => {
 
 applyInitialTheme();
 
-createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-    <LanguageProvider>
-      <AuthProvider>
-        <App />
-      </AuthProvider>
-    </LanguageProvider>
-  </React.StrictMode>,
-);
+const rootElement = document.getElementById('root');
+console.log('✓ Root element found:', !!rootElement);
+
+if (rootElement) {
+  try {
+    console.log('✓ Creating React root...');
+    const root = createRoot(rootElement);
+    console.log('✓ React root created');
+    
+    root.render(
+      <React.StrictMode>
+        <ErrorBoundary>
+          <LanguageProvider>
+            <AuthProvider>
+              <App />
+            </AuthProvider>
+          </LanguageProvider>
+        </ErrorBoundary>
+      </React.StrictMode>
+    );
+    console.log('✓ App rendered successfully');
+  } catch (error) {
+    console.error('✗ Error rendering app:', error);
+    rootElement.innerHTML = `<div style="padding: 20px; color: red;"><h2>Error Loading App</h2><p>${error.message}</p></div>`;
+  }
+} else {
+  console.error('✗ Root element not found!');
+}

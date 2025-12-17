@@ -1,4 +1,4 @@
-# Code Coverage Policy for Omukwano Pledge
+# Code Coverage Policy for PledgeHub
 # Fails CI if coverage drops below 80% for statements, branches, functions, or lines
 
 coverageThreshold:

@@ -8,7 +8,7 @@ async function migrate() {
         const [columns] = await db.execute(`
             SELECT COLUMN_NAME 
             FROM INFORMATION_SCHEMA.COLUMNS 
-            WHERE TABLE_SCHEMA = 'omukwano_db' 
+            WHERE TABLE_SCHEMA = 'pledgehub_db' 
             AND TABLE_NAME = 'users' 
             AND COLUMN_NAME IN ('password_reset_token', 'password_reset_expires')
         `);

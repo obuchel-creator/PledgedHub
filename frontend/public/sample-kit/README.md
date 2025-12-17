@@ -333,7 +333,7 @@ _"We used Layout #2 (Timeline Storytelling) for our post-event recap. People lov
 
 **Automation:**
 - Schedule social media posts in advance using Buffer/Hootsuite
-- Set up email automation in your Omukwano dashboard
+- Set up email automation in your PledgeHub dashboard
 - Create WhatsApp broadcast lists for bulk messaging
 
 **A/B Testing:**
@@ -347,7 +347,7 @@ _"We used Layout #2 (Timeline Storytelling) for our post-event recap. People lov
 - Create special communications for major donors
 
 **Integration:**
-- Use these templates WITH your Omukwano dashboard
+- Use these templates WITH your PledgeHub dashboard
 - Export supporter lists for mail merges
 - Track which templates drive the most collections
 
@@ -380,7 +380,7 @@ Created by the **PledgeHub Management System**
 
 For questions, support, or feedback:
 - 📧 Email: support@pledgehub.com
-- 🌐 Website: www.omukwano.com
+- 🌐 Website: www.pledgehub.com
 - 📱 WhatsApp: [Your Support Number]
 
 ---
@@ -391,7 +391,7 @@ Used these templates for your event? We'd love to hear about it!
 
 Share your success story:
 - Email us your results
-- Tag us on social media #OmukwanoSuccess  
+- Tag us on social media #PledgeHubSuccess  
 - Leave feedback on our platform
 - Refer friends who are planning events
 
@@ -401,11 +401,11 @@ Share your success story:
 
 May your event be fully funded, beautifully celebrated, and joyfully remembered!
 
-— The Omukwano Team
+— The PledgeHub Team
 
 ---
 
 **Last Updated:** [Date]  
 **Version:** 1.0  
-**License:** Free to use for all Omukwano users
+**License:** Free to use for all PledgeHub users
 

@@ -3,66 +3,67 @@
    Professional, Clean, Accessible
    ═══════════════════════════════════════════════════════════════ */
 
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Open+Sans:wght@300;400;500;600;700&display=swap');
 
 :root {
   /* ═══ TYPOGRAPHY ═══ */
-  --font-primary: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-secondary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  /* Matching MTN Developer Portal Professional Style */
+  --font-primary: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-secondary: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 
-  /* Font Sizes - Mobile First Responsive Scale */
+  /* Font Sizes - Mobile First Responsive Scale (MTN Developer Portal Style) */
   --font-size-xs: 0.75rem;      /* 12px */
-  --font-size-sm: 0.875rem;     /* 14px */
-  --font-size-base: 1rem;        /* 16px */
-  --font-size-md: 1.0625rem;    /* 17px */
-  --font-size-lg: 1.125rem;     /* 18px */
+  --font-size-sm: 0.875rem;     /* 14px - Body text */
+  --font-size-base: 1rem;        /* 16px - Default */
+  --font-size-md: 1.0625rem;    /* 17px - Slightly larger */
+  --font-size-lg: 1.125rem;     /* 18px - Subheading */
   --font-size-xl: 1.25rem;      /* 20px */
-  --font-size-2xl: 1.5rem;      /* 24px */
-  --font-size-3xl: 1.875rem;    /* 30px */
-  --font-size-4xl: 2.25rem;     /* 36px */
-  --font-size-5xl: 3rem;        /* 48px */
+  --font-size-2xl: 1.5rem;      /* 24px - Section heading */
+  --font-size-3xl: 1.875rem;    /* 30px - Large heading */
+  --font-size-4xl: 2.25rem;     /* 36px - Page heading */
+  --font-size-5xl: 3rem;        /* 48px - Hero heading */
 
-  /* Line Heights */
-  --line-height-tight: 1.2;
-  --line-height-snug: 1.375;
-  --line-height-normal: 1.5;
-  --line-height-relaxed: 1.625;
-  --line-height-loose: 1.75;
+  /* Line Heights - Professional & Readable */
+  --line-height-tight: 1.2;     /* Headlines */
+  --line-height-snug: 1.375;    /* Subheadings */
+  --line-height-normal: 1.6;    /* Body text (increased for readability) */
+  --line-height-relaxed: 1.75;  /* Generous spacing */
+  --line-height-loose: 1.9;     /* Extra spacing for hero text */
 
-  /* Font Weights */
-  --font-weight-light: 300;
-  --font-weight-normal: 400;
-  --font-weight-medium: 500;
-  --font-weight-semibold: 600;
-  --font-weight-bold: 700;
-  --font-weight-extrabold: 800;
+  /* Font Weights - Professional Hierarchy */
+  --font-weight-light: 300;          /* Subtle, light text */
+  --font-weight-normal: 400;         /* Body text */
+  --font-weight-medium: 500;         /* Emphasized text, small headings */
+  --font-weight-semibold: 600;       /* Subheadings */
+  --font-weight-bold: 700;           /* Headings, labels */
+  --font-weight-extrabold: 800;      /* Hero text, important titles */
 
-  /* ═══ COLOR PALETTE ═══ */
+  /* ═══ COLOR PALETTE - MTN BRAND ═══ */
   
-  /* Primary Brand Colors */
-  --color-primary: #2563eb;           /* Vibrant Blue */
-  --color-primary-light: #3b82f6;     /* Light Blue */
-  --color-primary-lighter: #60a5fa;   /* Lighter Blue */
-  --color-primary-dark: #1e40af;      /* Dark Blue */
-  --color-primary-darker: #1e3a8a;    /* Darker Blue */
+  /* Primary Brand Colors - MTN Golden Yellow */
+  --color-primary: #FFCC00;           /* MTN Golden Yellow */
+  --color-primary-light: #FFD700;     /* Light Golden */
+  --color-primary-lighter: #FFDD33;   /* Lighter Golden */
+  --color-primary-dark: #FFB800;      /* Dark Golden */
+  --color-primary-darker: #FFA500;    /* Darker Golden */
 
-  /* Secondary Brand Colors */
-  --color-secondary: #10b981;         /* Emerald Green */
-  --color-secondary-light: #34d399;   /* Light Green */
-  --color-secondary-dark: #059669;    /* Dark Green */
+  /* Secondary Brand Colors - Black */
+  --color-secondary: #000000;         /* MTN Black */
+  --color-secondary-light: #333333;   /* Dark Gray */
+  --color-secondary-dark: #1a1a1a;    /* Darker Gray */
 
   /* Accent Colors */
-  --color-accent: #f59e0b;            /* Amber */
-  --color-accent-light: #fcd34d;      /* Light Amber */
-  --color-accent-dark: #d97706;       /* Dark Amber */
+  --color-accent: #FFCC00;            /* Gold */
+  --color-accent-light: #FFD700;      /* Light Gold */
+  --color-accent-dark: #FFB800;       /* Dark Gold */
 
   /* Status Colors */
   --color-success: #10b981;           /* Green */
   --color-success-bg: rgba(16, 185, 129, 0.1);
   --color-error: #ef4444;             /* Red */
   --color-error-bg: rgba(239, 68, 68, 0.1);
-  --color-warning: #f59e0b;           /* Amber */
-  --color-warning-bg: rgba(245, 158, 11, 0.1);
+  --color-warning: #FFCC00;           /* MTN Yellow */
+  --color-warning-bg: rgba(255, 204, 0, 0.1);
   --color-info: #0ea5e9;              /* Sky Blue */
   --color-info-bg: rgba(14, 165, 233, 0.1);
 
@@ -91,80 +92,86 @@
   --text-secondary: #374151;          /* Medium Gray */
   --text-tertiary: #6b7280;           /* Light Gray */
   --text-muted: #9ca3af;              /* Muted Gray */
-  --text-inverse: #ffffff;            /* White */
+  --text-inverse: #000000;            /* Black */
 
   /* Border Colors */
   --border-default: #e5e7eb;
   --border-light: #f3f4f6;
   --border-dark: #d1d5db;
 
-  /* ═══ SPACING SYSTEM (8px base) ═══ */
+  /* ═══ SPACING SYSTEM (8px base - Generous for Professional Look) ═══ */
   --space-0: 0;
-  --space-1: 0.25rem;    /* 4px */
-  --space-2: 0.5rem;     /* 8px */
-  --space-3: 0.75rem;    /* 12px */
-  --space-4: 1rem;       /* 16px */
-  --space-5: 1.25rem;    /* 20px */
-  --space-6: 1.5rem;     /* 24px */
+  --space-1: 0.25rem;    /* 4px - Minimal spacing */
+  --space-2: 0.5rem;     /* 8px - Tight */
+  --space-3: 0.75rem;    /* 12px - Compact */
+  --space-4: 1rem;       /* 16px - Default */
+  --space-5: 1.25rem;    /* 20px - Comfortable */
+  --space-6: 1.5rem;     /* 24px - Spacious (default section padding) */
   --space-7: 1.75rem;    /* 28px */
-  --space-8: 2rem;       /* 32px */
+  --space-8: 2rem;       /* 32px - Section spacing */
   --space-9: 2.25rem;    /* 36px */
-  --space-10: 2.5rem;    /* 40px */
-  --space-12: 3rem;      /* 48px */
-  --space-16: 4rem;      /* 64px */
-  --space-20: 5rem;      /* 80px */
-  --space-24: 6rem;      /* 96px */
+  --space-10: 2.5rem;    /* 40px - Large spacing */
+  --space-12: 3rem;      /* 48px - Hero/major sections */
+  --space-14: 3.5rem;    /* 56px - Extra large */
+  --space-16: 4rem;      /* 64px - Extra extra large */
+  --space-20: 5rem;      /* 80px - Huge spacing */
+  --space-24: 6rem;      /* 96px - Massive spacing */
 
-  /* ═══ BORDER RADIUS ═══ */
+  /* ═══ BORDER RADIUS - Clean & Professional ═══ */
   --radius-none: 0;
-  --radius-sm: 0.375rem;   /* 6px */
-  --radius-base: 0.5rem;   /* 8px */
-  --radius-md: 0.75rem;    /* 12px */
-  --radius-lg: 1rem;       /* 16px */
-  --radius-xl: 1.5rem;     /* 24px */
-  --radius-2xl: 2rem;      /* 32px */
-  --radius-full: 9999px;
+  --radius-sm: 0.25rem;    /* 4px - Minimal rounding */
+  --radius-base: 0.5rem;   /* 8px - Default */
+  --radius-md: 0.75rem;    /* 12px - Medium */
+  --radius-lg: 1rem;       /* 16px - Large (buttons, cards) */
+  --radius-xl: 1.5rem;     /* 24px - Extra large */
+  --radius-2xl: 2rem;      /* 32px - Hero sections */
+  --radius-full: 9999px;   /* Pill-shaped buttons */
 
-  /* ═══ SHADOWS - Elevation System ═══ */
+  /* ═══ SHADOWS - Subtle Elevation (MTN Developer Portal Style) ═══ */
   --shadow-none: 0 0 0 rgba(0, 0, 0, 0);
   
-  /* Subtle elevation */
-  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  /* Very subtle, barely noticeable */
+  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
   
-  /* Small cards, dropdowns */
-  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  /* Subtle for inputs, small cards */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05), 0 1px 3px 0 rgba(0, 0, 0, 0.04);
   
-  /* Default cards, modals */
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  /* Default for cards, form elements */
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.06), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
   
-  /* Elevated components */
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  /* Elevated cards, dropdowns */
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
   
   /* Floating elements, popovers */
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
   
-  /* Dialog, full-screen modals */
-  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  /* Modals, overlays */
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
 
   /* Colored shadows for brand elements */
-  --shadow-primary: 0 10px 25px -5px rgba(37, 99, 235, 0.2);
-  --shadow-success: 0 10px 25px -5px rgba(16, 185, 129, 0.2);
-  --shadow-error: 0 10px 25px -5px rgba(239, 68, 68, 0.2);
+  --shadow-primary: 0 4px 12px -2px rgba(255, 204, 0, 0.15);
+  --shadow-success: 0 4px 12px -2px rgba(16, 185, 129, 0.15);
+  --shadow-error: 0 4px 12px -2px rgba(239, 68, 68, 0.15);
 
-  /* ═══ TRANSITIONS & ANIMATIONS ═══ */
-  --transition-fast: 100ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-base: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-slow: 200ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-slower: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  /* ═══ TRANSITIONS & ANIMATIONS (Smooth, Professional) ═══ */
+  --transition-fast: 100ms cubic-bezier(0.4, 0, 0.2, 1);           /* Quick micro-interactions */
+  --transition-base: 150ms cubic-bezier(0.4, 0, 0.2, 1);          /* Default for hover/focus */
+  --transition-slow: 250ms cubic-bezier(0.3, 0, 0.2, 1);          /* Page transitions */
+  --transition-slower: 350ms cubic-bezier(0.2, 0, 0.2, 1);        /* Complex animations */
+  
+  /* Easing functions for professional feel */
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
 
   /* ═══ GRADIENTS ═══ */
-  --gradient-primary: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+  --gradient-primary: linear-gradient(135deg, #FFCC00 0%, #FFB800 100%);
   --gradient-secondary: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  --gradient-accent: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  --gradient-accent: linear-gradient(135deg, #FFCC00 0%, #FFD700 100%);
   --gradient-info: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
   
   /* Subtle background gradients */
-  --gradient-subtle-primary: linear-gradient(135deg, rgba(37, 99, 235, 0.05) 0%, rgba(59, 130, 246, 0.05) 100%);
+  --gradient-subtle-primary: linear-gradient(135deg, rgba(255, 204, 0, 0.05) 0%, rgba(255, 215, 0, 0.05) 100%);
   --gradient-subtle-secondary: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(52, 211, 153, 0.05) 100%);
 
   /* ═══ Z-INDEX SCALE ═══ */
@@ -212,7 +219,7 @@ body {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   TYPOGRAPHY
+   TYPOGRAPHY - Professional Hierarchy (MTN Developer Portal Style)
    ═══════════════════════════════════════════════════════════════ */
 
 h1, h2, h3, h4, h5, h6 {
@@ -221,59 +228,98 @@ h1, h2, h3, h4, h5, h6 {
   line-height: var(--line-height-tight);
   color: var(--text-primary);
   margin-top: 0;
+  margin-bottom: var(--space-6);
 }
 
 h1 {
   font-size: var(--font-size-5xl);
-  font-weight: var(--font-weight-extrabold);
-  letter-spacing: -0.02em;
+  font-weight: 700;           /* Bold for hero text */
+  line-height: 1.2;           /* Tight for large headings */
+  letter-spacing: -0.02em;    /* Professional tightness */
+  margin-bottom: var(--space-8);
 }
 
 h2 {
   font-size: var(--font-size-4xl);
-  font-weight: var(--font-weight-bold);
+  font-weight: 700;           /* Bold for section headings */
+  line-height: 1.3;
   letter-spacing: -0.01em;
   margin-bottom: var(--space-6);
 }
 
 h3 {
   font-size: var(--font-size-3xl);
-  font-weight: var(--font-weight-bold);
+  font-weight: 600;           /* Semibold for subsections */
+  line-height: 1.4;
   margin-bottom: var(--space-4);
 }
 
 h4 {
   font-size: var(--font-size-2xl);
-  font-weight: var(--font-weight-semibold);
+  font-weight: 600;           /* Semibold for small headings */
+  line-height: 1.4;
   margin-bottom: var(--space-4);
 }
 
 h5 {
   font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-semibold);
+  font-weight: 500;           /* Medium for labels */
+  line-height: 1.5;
   margin-bottom: var(--space-3);
 }
 
 h6 {
   font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-semibold);
+  font-weight: 500;           /* Medium for small labels */
+  line-height: 1.5;
   margin-bottom: var(--space-3);
 }
 
 p {
   margin-bottom: var(--space-4);
   color: var(--text-secondary);
+  line-height: var(--line-height-normal);  /* 1.6 for readability */
+  font-weight: 400;                         /* Normal for body text */
+}
+
+p.lead {
+  font-size: var(--font-size-lg);
+  font-weight: 500;
+  color: var(--text-primary);
+  line-height: var(--line-height-relaxed);
 }
 
 a {
   color: var(--color-primary);
   text-decoration: none;
-  transition: color var(--transition-base);
+  transition: color var(--transition-base), opacity var(--transition-base);
+  font-weight: 500;
 }
 
 a:hover {
   color: var(--color-primary-dark);
-  text-decoration: underline;
+  opacity: 0.8;
+}
+
+a:active {
+  opacity: 0.6;
+}
+
+/* Label & Caption Styles */
+.label, label {
+  font-family: var(--font-primary);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--text-primary);
+  display: block;
+  margin-bottom: var(--space-2);
+}
+
+.caption, .text-caption {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  font-weight: 400;
+  line-height: var(--line-height-normal);
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -358,4 +404,197 @@ a:hover {
 
 .gap-8 {
   gap: var(--space-8);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   COMPONENT BASE STYLES (Professional MTN Developer Portal Inspired)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─── BUTTONS ─── */
+.btn, button {
+  font-family: var(--font-primary);
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  padding: var(--space-3) var(--space-6);
+  border: none;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: 
+    background-color var(--transition-base),
+    transform var(--transition-fast),
+    box-shadow var(--transition-base),
+    opacity var(--transition-base);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn:disabled, button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn:hover:not(:disabled), button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn:active:not(:disabled), button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* Primary Button - MTN Gold */
+.btn-primary {
+  background: var(--gradient-primary);
+  color: #000000;
+  box-shadow: var(--shadow-primary);
+}
+
+.btn-primary:hover:not(:disabled) {
+  filter: brightness(1.1);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Secondary Button */
+.btn-secondary {
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: var(--bg-secondary);
+  border-color: var(--color-primary);
+}
+
+/* ─── CARDS ─── */
+.card {
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  box-shadow: var(--shadow-sm);
+  transition: 
+    box-shadow var(--transition-base),
+    transform var(--transition-base);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.card-elevated {
+  box-shadow: var(--shadow-md);
+}
+
+.card-title {
+  font-family: var(--font-primary);
+  font-size: var(--font-size-xl);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--space-4);
+}
+
+.card-subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin-bottom: var(--space-3);
+}
+
+/* ─── FORMS & INPUTS ─── */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="tel"],
+input[type="date"],
+select,
+textarea {
+  font-family: var(--font-secondary);
+  font-size: var(--font-size-base);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-base);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: 
+    border-color var(--transition-base),
+    box-shadow var(--transition-base);
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="number"]:focus,
+input[type="tel"]:focus,
+input[type="date"]:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(255, 204, 0, 0.1);
+}
+
+input[type="text"]::placeholder,
+input[type="email"]::placeholder,
+input[type="password"]::placeholder,
+input[type="number"]::placeholder,
+input[type="tel"]::placeholder,
+textarea::placeholder {
+  color: var(--text-muted);
+}
+
+/* Form Group */
+.form-group {
+  margin-bottom: var(--space-6);
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  margin-bottom: var(--space-2);
+  font-weight: 500;
+}
+
+/* ─── ALERTS & STATUS ─── */
+.alert {
+  padding: var(--space-4) var(--space-6);
+  border-radius: var(--radius-lg);
+  border-left: 4px solid;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.alert-success {
+  background-color: rgba(16, 185, 129, 0.05);
+  border-left-color: #10b981;
+  color: #059669;
+}
+
+.alert-error {
+  background-color: rgba(239, 68, 68, 0.05);
+  border-left-color: #ef4444;
+  color: #dc2626;
+}
+
+.alert-warning {
+  background-color: rgba(245, 158, 11, 0.05);
+  border-left-color: #f59e0b;
+  color: #d97706;
+}
+
+.alert-info {
+  background-color: rgba(14, 165, 233, 0.05);
+  border-left-color: #0ea5e9;
+  color: #0369a1;
 }

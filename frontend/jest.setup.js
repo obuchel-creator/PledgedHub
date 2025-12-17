@@ -9,7 +9,7 @@ if (typeof global.TextEncoder === 'undefined') {
 // Instead of using import.meta, define a global for getViteEnv fallback
 globalThis.__VITE_ENV__ = {
   VITE_API_URL: 'http://localhost:5001/api',
-  VITE_APP_NAME: 'Omukwano Pledge',
+  VITE_APP_NAME: 'PledgeHub',
   VITE_APP_VERSION: '1.0.0',
   MODE: 'test',
 };

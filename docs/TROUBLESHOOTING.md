@@ -285,7 +285,7 @@ curl http://localhost:5001/api/analytics/top-donors?limit=5
 
 3. **Restart Server**:
 ```bash
-pm2 restart omukwano-backend
+pm2 restart pledgehub-backend
 ```
 
 ---
@@ -486,7 +486,7 @@ console.log('Found', pledges.length, 'pledges needing reminders');
 
 **Symptoms**:
 ```
-Error: Access denied for user 'omukwano_user'@'localhost'
+Error: Access denied for user 'pledgehub_user'@'localhost'
 ```
 
 **Solutions**:
@@ -500,7 +500,7 @@ mysql -h $DB_HOST -u $DB_USER -p
 
 2. **Grant Permissions**:
 ```sql
-GRANT ALL PRIVILEGES ON pledgehub_db.* TO 'omukwano_user'@'%';
+GRANT ALL PRIVILEGES ON pledgehub_db.* TO 'pledgehub_user'@'%';
 FLUSH PRIVILEGES;
 ```
 
@@ -719,7 +719,7 @@ PORT=5002
 
 3. **Find and Stop Server**:
 ```bash
-pm2 stop omukwano-backend
+pm2 stop pledgehub-backend
 # or
 pkill -f "node server.js"
 ```
@@ -736,7 +736,7 @@ pkill -f "node server.js"
 
 1. **Check Logs**:
 ```bash
-pm2 logs omukwano-backend --lines 100
+pm2 logs pledgehub-backend --lines 100
 ```
 
 2. **Run in Debug Mode**:
@@ -774,7 +774,7 @@ try {
 
 1. **Restart Server**:
 ```bash
-pm2 restart omukwano-backend
+pm2 restart pledgehub-backend
 ```
 
 2. **Clear Node Cache**:
@@ -785,7 +785,7 @@ npm install
 
 3. **Check Correct File Being Run**:
 ```bash
-pm2 describe omukwano-backend | grep script
+pm2 describe pledgehub-backend | grep script
 ```
 
 ---

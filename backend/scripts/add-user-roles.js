@@ -51,7 +51,7 @@ async function addUserRoles() {
                 VALUES (?, ?, ?, ?, ?, ?, NOW())
             `, [
                 'admin',
-                'admin@omukwano.com',
+                'admin@pledgehub.com',
                 hashedPassword,
                 'System Administrator',
                 'admin',
@@ -60,7 +60,7 @@ async function addUserRoles() {
 
             console.log('✅ Created default admin user');
             console.log('\n📧 Admin Credentials:');
-            console.log('   Email: admin@omukwano.com');
+            console.log('   Email: admin@pledgehub.com');
             console.log('   Password: Admin@2024');
             console.log('   ⚠️  CHANGE THIS PASSWORD IMMEDIATELY AFTER FIRST LOGIN\n');
         } else {

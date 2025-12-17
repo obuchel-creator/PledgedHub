@@ -247,7 +247,7 @@ export default function Footer() {
                 padding: '0 0.2rem',
               }}
             >
-              Omukwano Pledge
+              PledgeHub
             </span>
             <span
               style={{
@@ -260,7 +260,7 @@ export default function Footer() {
                 padding: '0 0.2rem',
               }}
             >
-              © {year} Omukwano. All rights reserved.
+              © {year} PledgeHub Team. All rights reserved.
             </span>
           </div>
           <div style={{ display: 'flex', gap: '1.5rem', fontSize: '1rem' }}>

@@ -70,7 +70,8 @@ class MonetizationService {
         campaigns_count: 0, 
         sms_sent: 0, 
         emails_sent: 0,
-        ai_requests: 0 
+        ai_requests: 0,
+        cash_payments_count: 0  // Add cash payments tracking
       }];
     }
 
@@ -87,7 +88,8 @@ class MonetizationService {
       activeCampaigns: campaignsResult[0].count || 0,
       smsThisMonth: usage.sms_sent || 0,
       emailsThisMonth: usage.emails_sent || 0,
-      aiRequestsThisMonth: usage.ai_requests || 0
+      aiRequestsThisMonth: usage.ai_requests || 0,
+      cashPaymentsThisMonth: usage.cash_payments_count || 0  // Track cash payments
     };
   }
 
@@ -103,7 +105,8 @@ class MonetizationService {
       sms: 'sms_sent',
       email: 'emails_sent',
       ai: 'ai_requests',
-      api: 'api_calls'
+      api: 'api_calls',
+      cash_payment: 'cash_payments_count'  // For cash payment tracking
     };
 
     const column = columnMap[usageType];

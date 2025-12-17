@@ -36,8 +36,8 @@
 
 .error-box button {
   padding: 0.75rem 1.5rem;
-  background: #3b82f6;
-  color: white;
+  background: #FFCC00;
+  color: #000000;
   border: none;
   border-radius: 8px;
   cursor: pointer;
@@ -46,7 +46,7 @@
 }
 
 .error-box button:hover {
-  background: #2563eb;
+  background: #FFB800;
 }
 
 /* Campaign Card */

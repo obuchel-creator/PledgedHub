@@ -1,6 +1,7 @@
 const cron = require('node-cron');
 const advancedReminderService = require('./advancedReminderService');
 const paymentTrackingService = require('./paymentTrackingService');
+const payoutService = require('./payoutService');
 
 /**
  * Advanced Cron Scheduler with Intelligent Reminder Frequencies
@@ -13,6 +14,7 @@ const paymentTrackingService = require('./paymentTrackingService');
  * - Daily 8 AM: Due today reminders
  * - Daily 5 PM: Overdue reminders
  * - Daily 10 AM: Balance reminders
+ * - Monthly (1st) 6 AM: Calculate monthly earnings & process payouts
  * 
  * Timezone: Africa/Kampala (EAT)
  */
@@ -178,6 +180,80 @@ function initializeJobs() {
         description: 'Reminders for pledges with outstanding balances',
         job: balanceReminderJob
     });
+
+    // 8. Monthly payout processing - 1st of every month at 6:00 AM
+    const monthlyPayoutJob = cron.schedule('0 6 1 * *', async () => {
+        console.log('\n[INFO] ===== Monthly Payout Processing Job Triggered =====');
+        console.log('[INFO] Time:', new Date().toLocaleString('en-US', { timeZone: 'Africa/Kampala' }));
+        try {
+            const now = new Date();
+            const previousMonth = now.getMonth() === 0 ? 12 : now.getMonth();
+            const previousYear = now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear();
+            
+            console.log(`[INFO] Processing payouts for: ${previousYear}-${String(previousMonth).padStart(2, '0')}`);
+            
+            // Get all creators
+            const creatorsResult = await payoutService.getAllCreatorEarnings();
+            if (!creatorsResult.success) {
+                throw new Error(creatorsResult.error);
+            }
+
+            const creators = creatorsResult.data || [];
+            let processed = 0;
+            let errors = 0;
+
+            // Process each creator
+            for (const creator of creators) {
+                try {
+                    // Calculate monthly earnings
+                    const earningsResult = await payoutService.calculateMonthlyEarnings(
+                        creator.id,
+                        previousYear,
+                        previousMonth
+                    );
+
+                    if (earningsResult.success && earningsResult.data) {
+                        const earnings = earningsResult.data;
+                        
+                        // Auto-create payout if amount > 0 and auto-payout enabled
+                        if (earnings.netEarnings > 0) {
+                            const payoutResult = await payoutService.createPayout(
+                                creator.id,
+                                earnings.netEarnings,
+                                creator.preferred_bank || 'EXIM',
+                                'bank_transfer'
+                            );
+
+                            if (payoutResult.success) {
+                                console.log(`[OK] Payout created for ${creator.name}: ${earnings.netEarnings.toLocaleString()} UGX`);
+                                processed++;
+                            } else {
+                                console.error(`[ERROR] Failed to create payout for ${creator.name}:`, payoutResult.error);
+                                errors++;
+                            }
+                        }
+                    }
+                } catch (error) {
+                    console.error(`[ERROR] Processing creator ${creator.id}:`, error.message);
+                    errors++;
+                }
+            }
+
+            console.log(`[OK] Monthly payout processing complete: ${processed} processed, ${errors} errors`);
+        } catch (error) {
+            console.error('[ERROR] Monthly payout job failed:', error);
+        }
+    }, {
+        scheduled: false,
+        timezone: "Africa/Kampala"
+    });
+
+    jobs.push({
+        name: 'Monthly Payout Processing',
+        schedule: 'Monthly (1st of month) at 6:00 AM',
+        description: 'Calculate creator earnings & create monthly payouts',
+        job: monthlyPayoutJob
+    });
     
     console.log(`[OK] Initialized ${jobs.length} cron jobs\n`);
 }
@@ -255,6 +331,7 @@ function displayScheduleSummary() {
     
     console.log('OTHER:');
     console.log('  - Balance Reminders: Daily at 10:00 AM');
+    console.log('  - Monthly Payout Processing: 1st of month at 6:00 AM');
     console.log('========================================\n');
 }
 
@@ -289,8 +366,45 @@ async function runManually(jobType) {
             case 'balance':
                 result = await paymentTrackingService.sendAllBalanceReminders();
                 break;
+            case 'payout':
+            case 'monthly-payout':
+                const now = new Date();
+                const previousMonth = now.getMonth() === 0 ? 12 : now.getMonth();
+                const previousYear = now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear();
+                
+                const creatorsResult = await payoutService.getAllCreatorEarnings();
+                if (!creatorsResult.success) {
+                    throw new Error(creatorsResult.error);
+                }
+
+                const creators = creatorsResult.data || [];
+                let processed = 0;
+
+                for (const creator of creators) {
+                    const earningsResult = await payoutService.calculateMonthlyEarnings(
+                        creator.id,
+                        previousYear,
+                        previousMonth
+                    );
+
+                    if (earningsResult.success && earningsResult.data?.netEarnings > 0) {
+                        const payoutResult = await payoutService.createPayout(
+                            creator.id,
+                            earningsResult.data.netEarnings,
+                            creator.preferred_bank || 'EXIM',
+                            'bank_transfer'
+                        );
+
+                        if (payoutResult.success) {
+                            processed++;
+                        }
+                    }
+                }
+
+                result = { processed, total: creators.length };
+                break;
             default:
-                console.error('[ERROR] Invalid job type. Options: weekly, bi-weekly, final-week, due-today, overdue, balance');
+                console.error('[ERROR] Invalid job type. Options: weekly, bi-weekly, final-week, due-today, overdue, balance, payout');
                 return;
         }
         

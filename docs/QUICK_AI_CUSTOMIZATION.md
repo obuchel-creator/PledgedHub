@@ -74,7 +74,7 @@ Requirements:
 - Tone: ${tone}, respectful, and culturally appropriate for Uganda
 - Use appropriate emojis (🙏 for respect, 💙 for unity, 🇺🇬 for pride)
 - Reference community/family values and collective mission
-- Include subtle mention of 'Omukwano' (friendship/unity) values
+- Include subtle mention of 'PledgeHub' (community-focused fundraising) values
 - Make it personal and warm`
 ```
 
@@ -102,7 +102,7 @@ You now have these ready-to-use configurations in `backend/config/promptConfig.j
 
 **THANK YOU MESSAGES:**
 - `default` - General appreciation
-- `ugandan_cultural` - Community-focused with Omukwano values
+- `community_focused` - Community-focused with PledgeHub values
 - `impact_focused` - Emphasizes donation impact
 
 **ANALYSIS:**

@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { resetPassword } from '../services/api';
 import Logo from '../components/Logo';
+import '../authOutlook.css';
 
 export default function ResetPasswordScreen() {
   const { token } = useParams();

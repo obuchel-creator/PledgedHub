@@ -272,7 +272,7 @@ npm run build                       # Production build
 ```bash
 # PM2 (Recommended)
 npm install -g pm2
-pm2 start backend/server.js --name omukwano-backend
+pm2 start backend/server.js --name pledgehub-backend
 pm2 save
 pm2 startup
 
@@ -344,7 +344,7 @@ See [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) for solutions.
 
 **Documentation**: Read guides in `/docs` folder  
 **Testing**: Run test scripts in `backend/scripts/`  
-**Logs**: Check `pm2 logs omukwano-backend`
+**Logs**: Check `pm2 logs pledgehub-backend`
 
 ---
 

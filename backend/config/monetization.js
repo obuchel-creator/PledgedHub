@@ -37,7 +37,11 @@ const PRICING_TIERS = {
       exportData: true,
       customBranding: false,
       apiAccess: false,
-      support: 'community'
+      support: 'community',
+      // Cash payment monetization
+      cashPaymentsPerMonth: 5,        // Very limited for free tier
+      cashPaymentFeePercentage: 5.0,  // 5% fee on cash payments
+      cashPaymentMaxAmount: 100000    // Max 100,000 UGX per transaction
     },
     features: [
       'Up to 50 pledges per month',
@@ -45,7 +49,8 @@ const PRICING_TIERS = {
       '2 active campaigns',
       'Email notifications',
       'Standard templates',
-      'Community support'
+      'Community support',
+      '5 cash payments/month (5% fee)'
     ]
   },
   
@@ -64,7 +69,11 @@ const PRICING_TIERS = {
       exportData: true,
       customBranding: false,
       apiAccess: false,
-      support: 'email'
+      support: 'email',
+      // Cash payment monetization
+      cashPaymentsPerMonth: 50,       // Moderate limit for starter
+      cashPaymentFeePercentage: 3.0,  // 3% fee on cash payments
+      cashPaymentMaxAmount: 500000    // Max 500,000 UGX per transaction
     },
     features: [
       'Up to 500 pledges per month',
@@ -73,7 +82,8 @@ const PRICING_TIERS = {
       'SMS & Email notifications',
       'Advanced analytics',
       'Export to CSV/PDF',
-      'Email support'
+      'Email support',
+      '50 cash payments/month (3% fee)'
     ]
   },
   
@@ -92,7 +102,11 @@ const PRICING_TIERS = {
       exportData: true,
       customBranding: true,
       apiAccess: true,
-      support: 'priority'
+      support: 'priority',
+      // Cash payment monetization
+      cashPaymentsPerMonth: 200,      // Higher limit for pro tier
+      cashPaymentFeePercentage: 1.5,  // 1.5% fee on cash payments
+      cashPaymentMaxAmount: 2000000   // Max 2,000,000 UGX per transaction
     },
     features: [
       'Up to 2,000 pledges per month',
@@ -102,7 +116,8 @@ const PRICING_TIERS = {
       'Custom branding',
       'API access',
       'Priority support',
-      'White-label reports'
+      'White-label reports',
+      '200 cash payments/month (1.5% fee)'
     ]
   },
   
@@ -121,7 +136,11 @@ const PRICING_TIERS = {
       exportData: true,
       customBranding: true,
       apiAccess: true,
-      support: '24/7'
+      support: '24/7',
+      // Cash payment monetization
+      cashPaymentsPerMonth: -1,       // Unlimited cash payments
+      cashPaymentFeePercentage: 0.5,  // Only 0.5% fee (minimal)
+      cashPaymentMaxAmount: -1        // Unlimited transaction amount
     },
     features: [
       'Unlimited pledges',
@@ -132,7 +151,8 @@ const PRICING_TIERS = {
       'Custom integrations',
       '24/7 phone support',
       'SLA guarantee',
-      'On-premise option'
+      'On-premise option',
+      'Unlimited cash payments (0.5% fee)'
     ]
   }
 };

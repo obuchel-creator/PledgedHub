@@ -172,21 +172,21 @@ async function getCampaignPerformance(userId, dateRange = {}) {
     const query = `
       SELECT 
         c.id,
-        c.title,
-        c.goal_amount,
-        c.current_amount,
+        c.name as title,
+        c.target_amount as goal_amount,
+        COALESCE(SUM(p.amount), 0) as current_amount,
         c.status,
         c.created_at,
         COUNT(DISTINCT p.id) as pledge_count,
         COUNT(DISTINCT p.donor_email) as unique_donors,
         SUM(CASE WHEN p.status = 'paid' THEN p.amount ELSE 0 END) as paid_amount,
-        (c.current_amount / NULLIF(c.goal_amount, 0) * 100) as completion_percentage,
+        (COALESCE(SUM(p.amount), 0) / NULLIF(c.target_amount, 0) * 100) as completion_percentage,
         DATEDIFF(NOW(), c.created_at) as days_active
       FROM campaigns c
       LEFT JOIN pledges p ON c.id = p.campaign_id
       WHERE c.user_id = ? AND c.created_at BETWEEN ? AND ?
-      GROUP BY c.id, c.title, c.goal_amount, c.current_amount, c.status, c.created_at
-      ORDER BY c.current_amount DESC
+      GROUP BY c.id, c.name, c.target_amount, c.status, c.created_at
+      ORDER BY COALESCE(SUM(p.amount), 0) DESC
     `;
 
     const [results] = await db.query(query, [userId, startDate, endDate]);
@@ -447,18 +447,18 @@ async function getTopCampaigns(userId, limit = 10, metric = 'revenue') {
     const query = `
       SELECT 
         c.id,
-        c.title,
-        c.goal_amount,
-        c.current_amount,
-        (c.current_amount / NULLIF(c.goal_amount, 0) * 100) as completion_rate,
+        c.name as title,
+        c.target_amount as goal_amount,
+        COALESCE(SUM(p.amount), 0) as current_amount,
+        (COALESCE(SUM(p.amount), 0) / NULLIF(c.target_amount, 0) * 100) as completion_rate,
         COUNT(DISTINCT p.donor_email) as unique_donors,
         COUNT(p.id) as pledge_count,
         DATEDIFF(NOW(), c.created_at) as days_active,
-        (c.current_amount / NULLIF(DATEDIFF(NOW(), c.created_at), 0)) as daily_velocity
+        (COALESCE(SUM(p.amount), 0) / NULLIF(DATEDIFF(NOW(), c.created_at), 0)) as daily_velocity
       FROM campaigns c
       LEFT JOIN pledges p ON c.id = p.campaign_id
       WHERE c.user_id = ?
-      GROUP BY c.id, c.title, c.goal_amount, c.current_amount, c.created_at
+      GROUP BY c.id, c.name, c.target_amount, c.created_at
       ORDER BY ${orderBy[metric] || orderBy.revenue}
       LIMIT ?
     `;

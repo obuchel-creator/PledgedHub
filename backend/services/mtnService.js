@@ -64,7 +64,7 @@ async function getAccessToken() {
  * @param {string} payeeNote - Note for payee (merchant)
  * @returns {Promise<object>} Payment request result
  */
-async function requestPayment(phoneNumber, amount, externalId, payerMessage = 'Pledge Payment', payeeNote = 'Omukwano Pledge Payment') {
+async function requestPayment(phoneNumber, amount, externalId, payerMessage = 'Pledge Payment', payeeNote = 'PledgeHub Pledge Payment') {
     if (!MTN_COLLECTION_USER_ID || !MTN_COLLECTION_API_KEY || !MTN_SUBSCRIPTION_KEY) {
         throw new Error('MTN Mobile Money not configured. Please add credentials to .env');
     }

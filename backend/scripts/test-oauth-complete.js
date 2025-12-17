@@ -40,7 +40,7 @@ async function testOAuthImplementation() {
             SELECT COLUMN_NAME 
             FROM INFORMATION_SCHEMA.COLUMNS 
             WHERE TABLE_SCHEMA = ? AND TABLE_NAME = 'users'
-        `, [process.env.DB_NAME || 'omukwano_db']);
+        `, [process.env.DB_NAME || 'pledgehub_db']);
 
         const columnNames = columns.map(row => row.COLUMN_NAME);
         const hasOAuthProvider = columnNames.includes('oauth_provider');

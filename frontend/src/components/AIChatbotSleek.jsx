@@ -13,7 +13,7 @@ export default function AIChatbot() {
     const path = location.pathname;
 
     const messages = {
-      '/': "👋 Welcome to Omukwano Pledge! I'm your AI assistant. I can help you:\n\n• Learn about pledge management\n• Understand how to create pledges\n• Get started with the platform\n• Answer questions about features\n\nHow can I assist you today?",
+      '/': "👋 Welcome to PledgeHub! I'm your AI assistant. I can help you:\n\n• Learn about pledge management\n• Understand how to create pledges\n• Get started with the platform\n• Answer questions about features\n\nHow can I assist you today?",
       '/dashboard':
         "📊 Hi! I'm your AI dashboard assistant. I can help you:\n\n• Analyze your pledge performance\n• Generate personalized reminder messages\n• Suggest collection strategies\n• Provide insights on trends\n\nWhat would you like to know about your pledges?",
       '/create':
@@ -151,7 +151,7 @@ export default function AIChatbot() {
     const actions = {
       '/': [
         { label: '🚀 Get Started', prompt: 'How do I create my first pledge?', icon: '🚀' },
-        { label: '📊 Features', prompt: 'What features does Omukwano Pledge offer?', icon: '📊' },
+        { label: '📊 Features', prompt: 'What features does PledgeHub offer?', icon: '📊' },
         {
           label: '💡 Best Practices',
           prompt: 'What are best practices for pledge management?',

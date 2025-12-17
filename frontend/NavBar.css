@@ -1,11 +1,11 @@
 .qb-navbar {
   display: flex;
   align-items: center;
-  background: linear-gradient(90deg, #1976d2 0%, #43a047 100%);
-  color: #fff;
+  background: #003D82;
+  color: #ffffff;
   padding: 0 2rem;
   height: 64px;
-  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.07);
+  box-shadow: 0 2px 8px rgba(0, 61, 130, 0.15);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -13,13 +13,14 @@
 .qb-navbar__logo {
   font-size: 1.5rem;
   font-weight: 700;
-  letter-spacing: 1px;
+  letter-spacing: 0.02em;
   margin-right: 2rem;
-  color: #fff;
+  color: #FFCC00;
+  font-family: 'Roboto', 'Segoe UI', Arial, sans-serif;
 }
 .qb-navbar__links {
   display: flex;
-  gap: 1.5rem;
+  gap: 2.4rem;
   list-style: none;
   margin: 0;
   padding: 0;
@@ -29,24 +30,25 @@
   display: flex;
   align-items: center;
   border-bottom: 2px solid transparent;
-  transition: border 0.2s;
+  transition: all 0.2s;
 }
 .qb-navbar__links li.active {
-  border-bottom: 2px solid #fff;
+  border-bottom: 2px solid #FFCC00;
 }
 .qb-navbar__links a {
   display: flex;
   align-items: center;
-  color: #fff;
+  color: #ffffff;
   text-decoration: none;
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 500;
   padding: 0.5rem 0.7rem;
   border-radius: 4px;
-  transition: background 0.2s;
+  transition: all 0.2s;
+  font-family: 'Roboto', 'Segoe UI', Arial, sans-serif;
 }
 .qb-navbar__links a:hover {
-  background: rgba(255,255,255,0.12);
+  color: #FFCC00;
 }
 .qb-navbar__icon {
   font-size: 1.3rem;
@@ -58,8 +60,8 @@
   gap: 0.7rem;
 }
 .qb-navbar__avatar {
-  background: #fff;
-  color: #1976d2;
+  background: #FFCC00;
+  color: #003D82;
   font-weight: 700;
   border-radius: 50%;
   width: 36px;
@@ -72,12 +74,17 @@
 .qb-navbar__username {
   font-size: 1rem;
   font-weight: 500;
-  color: #fff;
+  color: #ffffff;
 }
 .qb-navbar__login {
-  color: #fff;
+  color: #FFCC00;
   font-weight: 600;
   text-decoration: underline;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.qb-navbar__login:hover {
+  color: #FFD700;
 }
 @media (max-width: 700px) {
   .qb-navbar {
@@ -87,7 +94,7 @@
   }
   .qb-navbar__links {
     flex-wrap: wrap;
-    gap: 1rem;
+    gap: 1.5rem;
     margin: 0.5rem 0;
   }
   .qb-navbar__logo {

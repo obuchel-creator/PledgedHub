@@ -18,7 +18,7 @@ try {
 
 
 const authRoutes = require('./routes/auth');
-const campaignRoutes = require('./routes/campaigns');
+const campaignRoutes = require('./routes/campaignRoutes');
 const registerRoute = require('./routes/register');
 
 // Import all route modules
@@ -43,6 +43,9 @@ const securityRoutes = require('./routes/securityRoutes');
 const simplePaymentRoutes = require('./routes/simplePaymentRoutes');
 const commissionRoutes = require('./routes/commissionRoutes');
 const publicRoutes = require('./routes/publicRoutes');
+const bankSettingsRoutes = require('./routes/bankSettingsRoutes');
+const payoutRoutes = require('./routes/payoutRoutes');
+const cashPaymentRoutes = require('./routes/cashPaymentRoutes');
 
 // Import middleware
 const { authenticateToken, requireAdmin, requireStaff } = require('./middleware/authMiddleware');
@@ -226,13 +229,19 @@ app.use('/api/security',
   securityRoutes
 );
 
+app.use('/api/bank-settings', bankSettingsRoutes);
+
+app.use('/api/payouts',
+  authenticateToken,
+  payoutRoutes
+);
+
+app.use('/api/cash-payments',
+  authenticateToken,
+  cashPaymentRoutes
+);
+
 // Campaigns routes
-app.get('/api/campaigns', (req, res) => {
-  res.json([
-    { id: 1, name: 'Education Fund', goal: 10000 },
-    { id: 2, name: 'Health Drive', goal: 5000 }
-  ]);
-});
 app.use('/api/campaigns', campaignRoutes);
 
 // ========================================

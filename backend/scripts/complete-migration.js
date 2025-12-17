@@ -5,7 +5,7 @@ const db = require('../config/db');
  * This migration adds donor tracking, reminders, and collection date columns
  */
 
-const DB_NAME = process.env.DB_NAME || 'omukwano_db';
+const DB_NAME = process.env.DB_NAME || 'pledgehub_db';
 
 async function runMigration() {
     console.log('🔄 Starting comprehensive database migration...\n');

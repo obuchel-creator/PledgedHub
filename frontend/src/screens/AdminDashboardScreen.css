@@ -495,7 +495,6 @@
 
   .admin-tabs {
     overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
   }
 
   .admin-table {

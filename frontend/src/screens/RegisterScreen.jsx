@@ -57,15 +57,20 @@ function RegisterScreen({ disableRequired = false }) {
         phone: form.phone.trim(),
         password: form.password,
       };
+      console.log('📝 RegisterScreen: Submitting registration with payload:', payload);
       const result = await registerUser(payload);
+      console.log('✅ RegisterScreen: Registration result:', result);
       if (result && result.token) {
+        console.log('✅ RegisterScreen: Token received, redirecting to dashboard');
         localStorage.setItem('pledgehub_token', result.token);
         navigate('/dashboard');
       } else {
+        console.log('❌ RegisterScreen: No token in result:', result);
         setError(result?.error || 'Registration failed. Please try again.');
       }
     } catch (err) {
       // If the error has a specific message, use it; otherwise, use 'Server error'
+      console.error('❌ RegisterScreen: Catch error:', err);
       const msg = err?.response?.data?.message || err?.message;
       if (msg && (
         msg.toLowerCase().includes('invalid email address') ||
@@ -74,7 +79,7 @@ function RegisterScreen({ disableRequired = false }) {
       )) {
         setError(msg);
       } else {
-        setError('Server error');
+        setError('Server error: ' + (err?.message || 'Unknown error'));
       }
     } finally {
       setLoading(false);

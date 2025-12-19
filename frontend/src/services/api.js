@@ -42,187 +42,147 @@ function buildUrl(path, params) {
 let clientPromise;
 
 async function createHttpClient() {
-  try {
-    const { default: axios } = await import('axios');
-    const client = axios.create({
-      baseURL: BASE_URL || undefined,
-      headers: { 'Content-Type': 'application/json' },
-    });
+  // Use fetch API directly - no axios dependency
+  const client = {
+    async get(path, config = {}) {
+      const url = buildUrl(path, config.params);
+      const headers = { 'Content-Type': 'application/json', ...(config.headers || {}) };
+      
+      // Add auth token if available
+      const token = localStorage.getItem('pledgehub_token');
+      console.debug('[API] GET Token:', token ? `${token.substring(0, 20)}...` : 'NOT FOUND');
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
 
-    // Add request interceptor to attach token to every request
-    client.interceptors.request.use(
-      (config) => {
-        const token = localStorage.getItem('pledgehub_token');
-        if (token) {
-          config.headers['Authorization'] = `Bearer ${token}`;
-          console.debug('🔑 [AXIOS] Token attached to request:', token.substring(0, 20) + '...');
-        } else {
-          console.debug('⚠️ [AXIOS] No token found in localStorage');
-        }
-        console.debug('🌐 [AXIOS] Request:', config.method?.toUpperCase(), config.url);
-        return config;
-      },
-      (error) => {
-        console.error('❌ [AXIOS] Request error:', error);
-        return Promise.reject(error);
-      },
-    );
-
-    // Add response interceptor for better error handling
-    client.interceptors.response.use(
-      (response) => {
-        console.log('✅ [AXIOS] Response:', response.status, response.config.url);
-        return response;
-      },
-      (error) => {
-        // Only redirect on auth errors if we're not already on login/register pages
-        // AND skip if we just logged in (within last 5 seconds)
-        const isAuthPage =
-          window.location.pathname.includes('/login') ||
-          window.location.pathname.includes('/register') ||
-          error.config?.url?.includes('/auth/login');
-
-        const lastLoginTime = parseInt(localStorage.getItem('lastLoginTime') || '0');
-        const timeSinceLogin = Date.now() - lastLoginTime;
-        const justLoggedIn = timeSinceLogin < 5000; // Within 5 seconds
-
-        if (
-          (error.response?.status === 401 || error.response?.status === 403) &&
-          !isAuthPage &&
-          !justLoggedIn
-        ) {
-          console.error(
-            '❌ [AXIOS] Auth error:',
-            error.response.status,
-            '- Token expired or invalid',
-          );
-          // Clear invalid token
-          localStorage.removeItem('authToken');
-          localStorage.removeItem('user');
-          localStorage.removeItem('lastLoginTime');
-          // Redirect to login
-          console.warn('🔄 [AXIOS] Redirecting to login...');
-          setTimeout(() => {
-            window.location.href = '/login';
-          }, 100);
-        }
-        console.error('❌ [AXIOS] Response error:', error.message);
-        return Promise.reject(error);
-      },
-    );
-
-    return client;
-  } catch (error) {
-    return {
-      async get(path, config = {}) {
-        const url = buildUrl(path, config.params);
-        const headers = { 'Content-Type': 'application/json', ...(config.headers || {}) };
-
-        // Add auth token if available
-        const token = localStorage.getItem('authToken');
-        console.debug(
-          '🔑 [API] Token from localStorage:',
-          token ? `${token.substring(0, 20)}...` : 'NOT FOUND',
-        );
-        if (token) {
-          headers['Authorization'] = `Bearer ${token}`;
-        }
-
-        console.debug('🌐 [API] GET Request:', url);
-        console.debug('📋 [API] Headers:', headers);
-        try {
-          const res = await fetch(url, { method: 'GET', headers });
-          const text = await res.text();
-          let data;
-          try {
-            data = text ? JSON.parse(text) : null;
-          } catch {
-            data = text;
-          }
-          if (!res.ok) {
-            const msg =
-              data && typeof data === 'object' && data.message ? data.message : res.statusText;
-            throw new Error(`Request failed: ${res.status} ${msg || 'Error'}`);
-          }
-          console.log('Response:', data);
-          return { data };
-        } catch (err) {
-          console.error('Fetch error:', err);
-          throw err;
-        }
-      },
-
-      async post(path, payload, config = {}) {
-        const url = buildUrl(path);
-        const headers = { 'Content-Type': 'application/json', ...(config.headers || {}) };
-
-        // Add auth token if available
-        const token = localStorage.getItem('authToken');
-        console.debug(
-          '🔑 [API] Token from localStorage:',
-          token ? `${token.substring(0, 20)}...` : 'NOT FOUND',
-        );
-        if (token) {
-          headers['Authorization'] = `Bearer ${token}`;
-        }
-
-        console.debug('🔵 [API] POST Request:', {
-          url,
-          headers: {
-            ...headers,
-            Authorization: headers.Authorization ? `Bearer ${token.substring(0, 20)}...` : 'none',
-          },
-          payload: JSON.stringify(payload, null, 2),
-        });
-
-        const res = await fetch(url, {
-          method: 'POST',
-          headers,
-          body: payload === undefined ? null : JSON.stringify(payload),
-        });
-
+      console.debug('🌐 [API] GET Request:', url, { headers });
+      try {
+        const res = await fetch(url, { method: 'GET', headers });
         const text = await res.text();
-        console.debug('🔵 [API] Response status:', res.status);
-        console.debug('🔵 [API] Response text:', text);
-
         let data;
         try {
           data = text ? JSON.parse(text) : null;
         } catch {
           data = text;
         }
-
         if (!res.ok) {
-          console.error('❌ [API] Request failed:', {
-            status: res.status,
-            statusText: res.statusText,
-            responseData: data,
-            url,
-          });
-
-          let errorMessage = `Request failed: ${res.status}`;
-
-          if (data && typeof data === 'object') {
-            if (data.error) {
-              errorMessage += ` - ${data.error}`;
-              if (data.details) {
-                errorMessage += ` (Details: ${JSON.stringify(data.details)})`;
-              }
-            } else if (data.message) {
-              errorMessage += ` - ${data.message}`;
-            }
-          } else if (res.statusText) {
-            errorMessage += ` - ${res.statusText}`;
-          }
-
-          throw new Error(errorMessage);
+          const msg = data?.error || data?.message || res.statusText;
+          throw new Error(`${res.status}: ${msg || 'Error'}`);
         }
-
-        console.debug('✅ [API] Request successful:', data);
+        console.log('✅ [API] GET Response:', data);
         return { data };
-      },
-    };
-  }
+      } catch (err) {
+        console.error('❌ [API] GET Error:', err);
+        throw err;
+      }
+    },
+
+    async post(path, body, config = {}) {
+      const url = buildUrl(path, config.params);
+      const headers = { 'Content-Type': 'application/json', ...(config.headers || {}) };
+      
+      // Add auth token if available
+      const token = localStorage.getItem('pledgehub_token');
+      console.debug('[API] POST Token:', token ? `${token.substring(0, 20)}...` : 'NOT FOUND');
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      console.debug('🌐 [API] POST Request:', url, { body, headers });
+      try {
+        const res = await fetch(url, {
+          method: 'POST',
+          headers,
+          body: body ? JSON.stringify(body) : undefined
+        });
+        const text = await res.text();
+        let data;
+        try {
+          data = text ? JSON.parse(text) : null;
+        } catch {
+          data = text;
+        }
+        if (!res.ok) {
+          const msg = data?.error || data?.message || res.statusText;
+          console.error('❌ [API] POST Error Response:', { status: res.status, msg, data });
+          throw new Error(`${res.status}: ${msg || 'Error'}`);
+        }
+        console.log('✅ [API] POST Response:', data);
+        return { data };
+      } catch (err) {
+        console.error('❌ [API] POST Error:', err);
+        throw err;
+      }
+    },
+
+    async put(path, body, config = {}) {
+      const url = buildUrl(path, config.params);
+      const headers = { 'Content-Type': 'application/json', ...(config.headers || {}) };
+      
+      const token = localStorage.getItem('pledgehub_token');
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      console.debug('🌐 [API] PUT Request:', url);
+      try {
+        const res = await fetch(url, {
+          method: 'PUT',
+          headers,
+          body: body ? JSON.stringify(body) : undefined
+        });
+        const text = await res.text();
+        let data;
+        try {
+          data = text ? JSON.parse(text) : null;
+        } catch {
+          data = text;
+        }
+        if (!res.ok) {
+          const msg = data?.error || data?.message || res.statusText;
+          throw new Error(`${res.status}: ${msg || 'Error'}`);
+        }
+        console.log('✅ [API] PUT Response:', data);
+        return { data };
+      } catch (err) {
+        console.error('❌ [API] PUT Error:', err);
+        throw err;
+      }
+    },
+
+    async delete(path, config = {}) {
+      const url = buildUrl(path, config.params);
+      const headers = { 'Content-Type': 'application/json', ...(config.headers || {}) };
+      
+      const token = localStorage.getItem('pledgehub_token');
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      console.debug('🌐 [API] DELETE Request:', url);
+      try {
+        const res = await fetch(url, { method: 'DELETE', headers });
+        const text = await res.text();
+        let data;
+        try {
+          data = text ? JSON.parse(text) : null;
+        } catch {
+          data = text;
+        }
+        if (!res.ok) {
+          const msg = data?.error || data?.message || res.statusText;
+          throw new Error(`${res.status}: ${msg || 'Error'}`);
+        }
+        console.log('✅ [API] DELETE Response:', data);
+        return { data };
+      } catch (err) {
+        console.error('❌ [API] DELETE Error:', err);
+        throw err;
+      }
+    }
+  };
+  
+  return client;
 }
 
 async function getClient() {

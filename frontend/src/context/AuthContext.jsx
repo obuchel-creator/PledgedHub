@@ -16,7 +16,8 @@ const AuthContext = createContext({
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(() => localStorage.getItem(TOKEN_KEY) || null);
-  const [loading, setLoading] = useState(!!token);
+  const [loading, setLoading] = useState(true); // Always start as true to verify token validity
+  const [initialized, setInitialized] = useState(false); // Track if auth check complete
 
   console.log('🔐 AuthContext: Initialized with token:', token ? '✓' : '✗');
 
@@ -25,14 +26,16 @@ export function AuthProvider({ children }) {
       console.log('🔐 AuthContext: No token, clearing user');
       setUser(null);
       setLoading(false);
+      setInitialized(true);
       return null;
     }
-    setLoading(true);
     try {
       console.log('🔐 AuthContext: Fetching user data...');
       const data = await getCurrentUser();
       console.log('🔐 AuthContext: User fetched successfully:', data?.user?.username || data?.username);
       setUser(data && data.user ? data.user : data);
+      setLoading(false);
+      setInitialized(true);
       return data;
     } catch (err) {
       console.error('🔐 AuthContext: Error refreshing user:', err.message);
@@ -40,19 +43,20 @@ export function AuthProvider({ children }) {
       setUser(null);
       setToken(null);
       localStorage.removeItem(TOKEN_KEY);
-      return null;
-    } finally {
       setLoading(false);
+      setInitialized(true);
+      return null;
     }
   }
 
   useEffect(() => {
-    // on mount, try to load user if token exists
+    // on mount, verify token validity if token exists
     console.log('🔐 AuthContext: useEffect mounting, token:', token ? '✓' : '✗');
     if (token) {
       refreshUser();
     } else {
       setLoading(false);
+      setInitialized(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

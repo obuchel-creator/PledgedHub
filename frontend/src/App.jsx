@@ -43,7 +43,11 @@ function App() {
         <Route path="/register" element={<RegisterScreen />} />
         <Route path="/forgot-password" element={<ForgotPasswordScreen />} />
         <Route path="/reset-password" element={<ResetPasswordScreen />} />
-        <Route path="/create" element={<CreatePledgeScreen />} />
+        <Route path="/create" element={
+          <ProtectedRoute>
+            <CreatePledgeScreen />
+          </ProtectedRoute>
+        } />
         <Route
           path="/campaigns"
           element={
@@ -55,7 +59,11 @@ function App() {
         <Route path="/about" element={<AboutScreen />} />
         <Route path="/fundraising" element={<FundraisingScreen />} />
         <Route path="/campaign/:slug" element={<GuestPledgeScreen />} />
-        <Route path="/pledges/:id" element={<PledgeDetailScreen />} />
+        <Route path="/pledges/:id" element={
+          <ProtectedRoute>
+            <PledgeDetailScreen />
+          </ProtectedRoute>
+        } />
         <Route
           path="/dashboard"
           element={
@@ -120,14 +128,11 @@ function App() {
             </ProtectedRoute>
           }
         />
-        <Route
-          path="/payment"
-          element={
-            <ProtectedRoute>
-              <PaymentInitiationScreen />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/payment" element={
+          <ProtectedRoute>
+            <PaymentInitiationScreen />
+          </ProtectedRoute>
+        } />
         <Route path="/help" element={<HelpScreen />} />
         <Route path="/privacy" element={<PrivacyScreen />} />
         <Route path="/terms" element={<TermsScreen />} />

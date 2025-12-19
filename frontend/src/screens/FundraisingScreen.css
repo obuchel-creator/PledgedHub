@@ -1,5 +1,5 @@
 .fundraising-page {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
   min-height: 100vh;
   padding-top: 4.5rem;
   padding-bottom: 3rem;
@@ -7,11 +7,11 @@
 
 /* Header Section */
 .fundraising-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 50%, #3b82f6 100%);
   color: white;
   padding: 3rem 2rem;
   text-align: center;
-  box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 10px 30px rgba(37, 99, 235, 0.3);
 }
 
 .fundraising-header-content h1 {
@@ -48,7 +48,7 @@
   background: rgba(255, 255, 255, 0.95);
   border-radius: 8px;
   margin: 2rem;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
   flex-wrap: wrap;
 }
 
@@ -77,13 +77,13 @@
 }
 
 .control-select:hover {
-  border-color: #667eea;
+  border-color: #2563eb;
 }
 
 .control-select:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 /* Loading State */
@@ -178,7 +178,7 @@
 
 .campaign-card:hover {
   transform: translateY(-8px);
-  box-shadow: 0 12px 24px rgba(102, 126, 234, 0.25);
+  box-shadow: 0 12px 24px rgba(37, 99, 235, 0.25);
 }
 
 .campaign-image {
@@ -186,7 +186,7 @@
   width: 100%;
   height: 200px;
   overflow: hidden;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
 }
 
 .campaign-image img {
@@ -256,7 +256,7 @@
 }
 
 .progress-percent {
-  color: #667eea;
+  color: #2563eb;
   font-weight: 700;
   font-size: 1rem;
 }
@@ -271,7 +271,7 @@
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(90deg, #2563eb 0%, #1e40af 100%);
   border-radius: 10px;
   transition: width 0.3s ease;
 }
@@ -351,14 +351,14 @@
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
   color: white;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
 }
 
 .btn-primary:active {
@@ -455,3 +455,5 @@
     font-size: 0.95rem;
   }
 }
+
+

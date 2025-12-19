@@ -93,7 +93,15 @@ function StatCard({ title, value, color }) {
 }
 
 export default function AnalyticsDashboard() {
+    const navigate = useNavigate();
     const { t } = useLanguage();
+    
+    // Date state
+    const today = new Date().toISOString().split('T')[0];
+    const oneMonthAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+    const [startDate, setStartDate] = useState(oneMonthAgo);
+    const [endDate, setEndDate] = useState(today);
+    
     // Dark mode state
     const [darkMode, setDarkMode] = useState(() => {
       const stored = localStorage.getItem('dashboardDarkMode');
@@ -103,15 +111,112 @@ export default function AnalyticsDashboard() {
       document.body.classList.toggle('dark-mode', darkMode);
       localStorage.setItem('dashboardDarkMode', darkMode);
     }, [darkMode]);
+    
   const [summary, setSummary] = useState(null);
   const [trends, setTrends] = useState([]);
   const [campaigns, setCampaigns] = useState([]);
   const [topDonors, setTopDonors] = useState([]);
   const [purposeBreakdown, setPurposeBreakdown] = useState([]);
+  const [paymentMethods, setPaymentMethods] = useState([]);
+  const [creditMetrics, setCreditMetrics] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [atRisk, setAtRisk] = useState([]);
+  const [datePreset, setDatePreset] = useState('month');
+  const [showCustomDates, setShowCustomDates] = useState(false);
+
+  // Handle date preset changes
+  const handleDatePreset = (preset) => {
+    const today = new Date();
+    const end = today.toISOString().split('T')[0];
+    let start;
+    
+    switch(preset) {
+      case 'today':
+        start = end;
+        break;
+      case 'week':
+        start = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+        break;
+      case 'month':
+        start = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+        break;
+      case 'quarter':
+        start = new Date(today.getTime() - 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+        break;
+      case 'year':
+        start = new Date(today.getTime() - 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+        break;
+      default:
+        start = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+    }
+    
+    setDatePreset(preset);
+    setStartDate(start);
+    setEndDate(end);
+    setShowCustomDates(false);
+  };
+  
   // AI Insights state
   const [insights, setInsights] = useState(null);
   const [insightsLoading, setInsightsLoading] = useState(true);
   const [insightsError, setInsightsError] = useState(null);
+
+  useEffect(() => {
+    async function fetchAnalyticsData() {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await axios.get(`${API}/summary?start=${startDate}&end=${endDate}`);
+        setSummary(response.data.data || response.data);
+        
+        const trendsRes = await axios.get(`${API}/trends?start=${startDate}&end=${endDate}`);
+        setTrends(trendsRes.data.data || []);
+        
+        const campaignsRes = await axios.get(`${API}/campaigns?start=${startDate}&end=${endDate}`);
+        setCampaigns(campaignsRes.data.data || []);
+        
+        const donorsRes = await axios.get(`${API}/top-donors?start=${startDate}&end=${endDate}`);
+        setTopDonors(donorsRes.data.data || []);
+        
+        const purposeRes = await axios.get(`${API}/purpose-breakdown?start=${startDate}&end=${endDate}`);
+        setPurposeBreakdown(purposeRes.data.data || []);
+        
+        // NEW: Fetch payment methods
+        try {
+          const paymentRes = await axios.get(`${API}/payment-methods?start=${startDate}&end=${endDate}`);
+          setPaymentMethods(paymentRes.data.data || []);
+        } catch (err) {
+          console.warn('Payment methods data unavailable:', err);
+          setPaymentMethods([]);
+        }
+        
+        // NEW: Fetch credit metrics
+        try {
+          const creditRes = await axios.get(`${API}/credit-metrics?start=${startDate}&end=${endDate}`);
+          setCreditMetrics(creditRes.data.data || null);
+        } catch (err) {
+          console.warn('Credit metrics unavailable:', err);
+          setCreditMetrics(null);
+        }
+
+        // NEW: Fetch at-risk pledges
+        try {
+          const atRiskRes = await axios.get(`${API}/at-risk?start=${startDate}&end=${endDate}`);
+          setAtRisk(atRiskRes.data.data || []);
+        } catch (err) {
+          console.warn('At-risk data unavailable:', err);
+          setAtRisk([]);
+        }
+      } catch (err) {
+        console.error('Error fetching analytics:', err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchAnalyticsData();
+  }, [startDate, endDate]);
 
   useEffect(() => {
     async function fetchInsights() {
@@ -127,7 +232,7 @@ export default function AnalyticsDashboard() {
       }
     }
     fetchInsights();
-  }, [/* optionally add dependencies */]);
+  }, [startDate, endDate]);
   if (loading) return <div className="dashboard-loading">{t('analytics.loading')}</div>;
   if (error) return <div className="dashboard-error">{t('analytics.error')}: {error}</div>;
 
@@ -144,37 +249,143 @@ export default function AnalyticsDashboard() {
           {darkMode ? `${'🌙'} ${t('analytics.darkModeOn')}` : `${'☀️'} ${t('analytics.lightModeOn')}`}
         </button>
       </div>
-      {/* AI Insights Section */}
-      <div className="dashboard-section" style={{ marginBottom: 24, background: darkMode ? '#23272f' : '#f5f7fa', color: darkMode ? '#f5f7fa' : '#23272f', borderRadius: 8, padding: 20, boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-        <h3 style={{ marginTop: 0 }}>{t('analytics.aiInsights')}</h3>
+      {/* AI Insights Section - PROMINENT */}
+      <div className="dashboard-section" style={{ 
+        marginBottom: 24, 
+        background: 'linear-gradient(135deg, #dbeafe 0%, #f3e8ff 100%)',
+        borderLeft: '6px solid #2563eb',
+        borderRadius: '12px',
+        padding: '2rem',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.08)'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+          <div style={{ fontSize: '2rem' }}>💡</div>
+          <h3 style={{ margin: 0, color: '#1e40af' }}>AI-Powered Insights & Recommendations</h3>
+        </div>
+        
         {insightsLoading ? (
-          <div style={{ color: '#888' }}>{t('analytics.loadingInsights')}</div>
+          <div style={{ color: '#1e40af', fontStyle: 'italic' }}>🔄 Analyzing your data...</div>
         ) : insightsError ? (
-          <div style={{ color: '#e53935' }}>{insightsError}</div>
-        ) : insights && (insights.summary || insights.recommendations || insights.trends) ? (
-          <div>
-            {insights.summary && <div style={{ marginBottom: 8 }}><strong>{t('analytics.summary')}:</strong> {insights.summary}</div>}
-            {insights.trends && <div style={{ marginBottom: 8 }}><strong>{t('analytics.trends')}:</strong> {insights.trends}</div>}
-            {insights.anomalies && <div style={{ marginBottom: 8 }}><strong>{t('analytics.anomalies')}:</strong> {insights.anomalies}</div>}
-            {insights.recommendations && <div style={{ marginBottom: 8 }}><strong>{t('analytics.recommendations')}:</strong> {insights.recommendations}</div>}
+          <div style={{ color: '#dc2626' }}>⚠️ {insightsError}</div>
+        ) : insights && (insights.summary || insights.recommendations || insights.trends || insights.anomalies) ? (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem' }}>
+            {insights.summary && (
+              <div style={{ 
+                background: 'white', 
+                padding: '1rem', 
+                borderRadius: '8px',
+                borderLeft: '4px solid #10b981'
+              }}>
+                <div style={{ fontSize: '0.85rem', color: '#059669', fontWeight: '600', marginBottom: '0.5rem' }}>📊 SUMMARY</div>
+                <div style={{ color: '#1f2937' }}>{insights.summary}</div>
+              </div>
+            )}
+            
+            {insights.trends && (
+              <div style={{ 
+                background: 'white', 
+                padding: '1rem', 
+                borderRadius: '8px',
+                borderLeft: '4px solid #2563eb'
+              }}>
+                <div style={{ fontSize: '0.85rem', color: '#1e40af', fontWeight: '600', marginBottom: '0.5rem' }}>📈 TRENDS</div>
+                <div style={{ color: '#1f2937' }}>{insights.trends}</div>
+              </div>
+            )}
+            
+            {insights.anomalies && (
+              <div style={{ 
+                background: 'white', 
+                padding: '1rem', 
+                borderRadius: '8px',
+                borderLeft: '4px solid #f59e0b'
+              }}>
+                <div style={{ fontSize: '0.85rem', color: '#d97706', fontWeight: '600', marginBottom: '0.5rem' }}>⚠️ ANOMALIES</div>
+                <div style={{ color: '#1f2937' }}>{insights.anomalies}</div>
+              </div>
+            )}
+            
+            {insights.recommendations && (
+              <div style={{ 
+                background: 'white', 
+                padding: '1rem', 
+                borderRadius: '8px',
+                borderLeft: '4px solid #8b5cf6',
+                gridColumn: 'span 1'
+              }}>
+                <div style={{ fontSize: '0.85rem', color: '#7c3aed', fontWeight: '600', marginBottom: '0.5rem' }}>💡 RECOMMENDATIONS</div>
+                <div style={{ color: '#1f2937' }}>{insights.recommendations}</div>
+              </div>
+            )}
           </div>
         ) : (
-          <div style={{ color: '#888' }}>{t('analytics.noInsights')}</div>
+          <div style={{ color: '#6b7280', fontStyle: 'italic' }}>No insights available yet. Continue using PledgeHub to generate AI insights.</div>
         )}
       </div>
       <div className={"analytics-dashboard" + (darkMode ? ' dark' : '')}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
           <h2>{t('analytics.title')}</h2>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <label style={{ fontWeight: 500 }}>
-              {t('analytics.startDate')}:
-              <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} style={{ marginLeft: 4, marginRight: 12 }} />
-            </label>
-            <label style={{ fontWeight: 500 }}>
-              {t('analytics.endDate')}:
-              <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} style={{ marginLeft: 4 }} />
-            </label>
-            <button className="btn btn-secondary" style={{ fontSize: '1rem', padding: '0.5rem 1.2rem' }} onClick={() => navigate('/admin')}>← {t('analytics.backToDashboard')}</button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+            {/* Mobile-Friendly Date Preset Dropdown */}
+            <select 
+              value={showCustomDates ? 'custom' : datePreset}
+              onChange={(e) => {
+                if (e.target.value === 'custom') {
+                  setShowCustomDates(true);
+                } else {
+                  handleDatePreset(e.target.value);
+                }
+              }}
+              style={{
+                padding: '0.65rem 1rem',
+                borderRadius: '6px',
+                border: '1px solid #d1d5db',
+                fontSize: '0.95rem',
+                fontWeight: '500',
+                cursor: 'pointer',
+                backgroundColor: '#ffffff',
+                color: '#374151'
+              }}
+            >
+              <option value="today">📅 Today</option>
+              <option value="week">📅 Last 7 Days</option>
+              <option value="month">📅 Last 30 Days</option>
+              <option value="quarter">📅 Last 3 Months</option>
+              <option value="year">📅 Last Year</option>
+              <option value="custom">🗓️ Custom Range</option>
+            </select>
+
+            {/* Custom Date Inputs (shown only when selected) */}
+            {showCustomDates && (
+              <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                <label style={{ fontSize: '0.9rem', fontWeight: '500' }}>
+                  From:
+                  <input 
+                    type="date" 
+                    value={startDate} 
+                    onChange={(e) => setStartDate(e.target.value)}
+                    style={{ marginLeft: '0.5rem', padding: '0.5rem', borderRadius: '4px', border: '1px solid #d1d5db' }} 
+                  />
+                </label>
+                <label style={{ fontSize: '0.9rem', fontWeight: '500' }}>
+                  To:
+                  <input 
+                    type="date" 
+                    value={endDate} 
+                    onChange={(e) => setEndDate(e.target.value)}
+                    style={{ marginLeft: '0.5rem', padding: '0.5rem', borderRadius: '4px', border: '1px solid #d1d5db' }} 
+                  />
+                </label>
+              </div>
+            )}
+
+            <button 
+              className="btn btn-secondary" 
+              style={{ fontSize: '0.9rem', padding: '0.65rem 1.2rem', whiteSpace: 'nowrap' }} 
+              onClick={() => navigate('/admin')}
+            >
+              ← Dashboard
+            </button>
           </div>
         </div>
         <div className="stat-cards">
@@ -185,6 +396,52 @@ export default function AnalyticsDashboard() {
           <StatCard title={t('analytics.overdue')} value={summary.overdue} color="#e53935" />
           <StatCard title={t('analytics.collectionRate')} value={`${summary.collectionRate}%`} color="#0288d1" />
         </div>
+
+        {/* NEW: Mobile Money Payment Methods */}
+        {paymentMethods && paymentMethods.length > 0 && (
+          <div className="stat-cards" style={{ marginBottom: '1.5rem' }}>
+            <h3 style={{ width: '100%', margin: '1rem 0 0.5rem 0' }}>📱 Payment Methods (This Period)</h3>
+            {paymentMethods.map((method, idx) => {
+              const colors = ['#FFB300', '#E41C13', '#1976d2', '#388e3c'];
+              const icons = ['📱', '📲', '🏦', '💵'];
+              return (
+                <StatCard 
+                  key={idx}
+                  title={method.provider || method.method || 'Unknown'} 
+                  value={`UGX ${(method.amount || 0).toLocaleString()}`}
+                  color={colors[idx % colors.length]}
+                />
+              );
+            })}
+          </div>
+        )}
+
+        {/* NEW: Credit System Metrics */}
+        {creditMetrics && (
+          <div className="stat-cards" style={{ marginBottom: '1.5rem' }}>
+            <h3 style={{ width: '100%', margin: '1rem 0 0.5rem 0' }}>💳 Monetization Metrics</h3>
+            <StatCard 
+              title="👤 Free Users" 
+              value={creditMetrics.freeUsers || 0} 
+              color="#6B7280"
+            />
+            <StatCard 
+              title="💰 SMS Credits Loaded" 
+              value={`UGX ${(creditMetrics.totalCreditsLoaded || 0).toLocaleString()}`}
+              color="#F59E0B"
+            />
+            <StatCard 
+              title="🎯 Campaign Tier" 
+              value={creditMetrics.campaignTierSubscribers || 0}
+              color="#2563EB"
+            />
+            <StatCard 
+              title="👑 Premium Tier" 
+              value={creditMetrics.premiumTierSubscribers || 0}
+              color="#8B5CF6"
+            />
+          </div>
+        )}
 
         <div className="dashboard-section">
           <h3>{t('analytics.pledgeTrendsMonthly')}</h3>
@@ -263,6 +520,108 @@ export default function AnalyticsDashboard() {
           </table>
         </div>
 
+        {/* NEW: Conversion Funnel */}
+        <div className="dashboard-section" style={{ marginBottom: '2rem' }}>
+          <h3>🔄 Free → Paid Conversion Funnel</h3>
+          <p style={{ color: '#666', marginBottom: '1rem' }}>Track how users progress from free tier through monetization</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
+            {/* Free Users Stage */}
+            <div style={{ 
+              background: '#f3f4f6', 
+              padding: '1.5rem', 
+              borderRadius: '8px', 
+              borderLeft: '4px solid #6B7280',
+              textAlign: 'center'
+            }}>
+              <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>📊</div>
+              <div style={{ fontSize: '0.85rem', color: '#666', marginBottom: '0.5rem' }}>Free Users</div>
+              <div style={{ fontSize: '1.75rem', fontWeight: '700', color: '#1f2937' }}>
+                {creditMetrics?.freeUsers || 0}
+              </div>
+              <div style={{ fontSize: '0.85rem', color: '#666', marginTop: '0.5rem' }}>100%</div>
+            </div>
+
+            {/* Arrow Down */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem' }}>↓</div>
+
+            {/* SMS Pay-As-You-Go Stage */}
+            <div style={{ 
+              background: '#fef3c7', 
+              padding: '1.5rem', 
+              borderRadius: '8px', 
+              borderLeft: '4px solid #F59E0B',
+              textAlign: 'center'
+            }}>
+              <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>💳</div>
+              <div style={{ fontSize: '0.85rem', color: '#666', marginBottom: '0.5rem' }}>SMS Pay-As-You-Go</div>
+              <div style={{ fontSize: '1.75rem', fontWeight: '700', color: '#1f2937' }}>
+                {creditMetrics?.payAsYouGoUsers || 0}
+              </div>
+              <div style={{ fontSize: '0.85rem', color: '#666', marginTop: '0.5rem' }}>
+                {creditMetrics?.freeUsers > 0 ? ((creditMetrics?.payAsYouGoUsers || 0) / creditMetrics.freeUsers * 100).toFixed(1) : 0}%
+              </div>
+            </div>
+
+            {/* Arrow Down */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem' }}>↓</div>
+
+            {/* Campaign Tier Stage */}
+            <div style={{ 
+              background: '#dbeafe', 
+              padding: '1.5rem', 
+              borderRadius: '8px', 
+              borderLeft: '4px solid #2563EB',
+              textAlign: 'center'
+            }}>
+              <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>🎯</div>
+              <div style={{ fontSize: '0.85rem', color: '#666', marginBottom: '0.5rem' }}>Campaign Tier</div>
+              <div style={{ fontSize: '1.75rem', fontWeight: '700', color: '#1f2937' }}>
+                {creditMetrics?.campaignTierSubscribers || 0}
+              </div>
+              <div style={{ fontSize: '0.85rem', color: '#666', marginTop: '0.5rem' }}>
+                {creditMetrics?.payAsYouGoUsers > 0 ? ((creditMetrics?.campaignTierSubscribers || 0) / creditMetrics.payAsYouGoUsers * 100).toFixed(1) : 0}%
+              </div>
+            </div>
+
+            {/* Arrow Down */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem' }}>↓</div>
+
+            {/* Premium Tier Stage */}
+            <div style={{ 
+              background: '#ede9fe', 
+              padding: '1.5rem', 
+              borderRadius: '8px', 
+              borderLeft: '4px solid #8B5CF6',
+              textAlign: 'center'
+            }}>
+              <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>👑</div>
+              <div style={{ fontSize: '0.85rem', color: '#666', marginBottom: '0.5rem' }}>Premium Tier</div>
+              <div style={{ fontSize: '1.75rem', fontWeight: '700', color: '#1f2937' }}>
+                {creditMetrics?.premiumTierSubscribers || 0}
+              </div>
+              <div style={{ fontSize: '0.85rem', color: '#666', marginTop: '0.5rem' }}>
+                {creditMetrics?.campaignTierSubscribers > 0 ? ((creditMetrics?.premiumTierSubscribers || 0) / creditMetrics.campaignTierSubscribers * 100).toFixed(1) : 0}%
+              </div>
+            </div>
+          </div>
+          
+          {/* Conversion Summary */}
+          <div style={{ 
+            marginTop: '1.5rem', 
+            padding: '1rem', 
+            background: '#f0fdf4',
+            borderRadius: '8px',
+            borderLeft: '4px solid #10b981'
+          }}>
+            <strong style={{ color: '#059669' }}>Conversion Summary:</strong>
+            <div style={{ marginTop: '0.5rem', color: '#666', fontSize: '0.9rem' }}>
+              <div>Free → Pay-As-You-Go: {creditMetrics?.freeUsers > 0 ? ((creditMetrics?.payAsYouGoUsers || 0) / creditMetrics.freeUsers * 100).toFixed(1) : 0}%</div>
+              <div>Pay-As-You-Go → Campaign: {creditMetrics?.payAsYouGoUsers > 0 ? ((creditMetrics?.campaignTierSubscribers || 0) / creditMetrics.payAsYouGoUsers * 100).toFixed(1) : 0}%</div>
+              <div>Campaign → Premium: {creditMetrics?.campaignTierSubscribers > 0 ? ((creditMetrics?.premiumTierSubscribers || 0) / creditMetrics.campaignTierSubscribers * 100).toFixed(1) : 0}%</div>
+            </div>
+          </div>
+        </div>
+
         {/* Purpose Breakdown */}
         <div className="dashboard-section">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -298,37 +657,59 @@ export default function AnalyticsDashboard() {
         </div>
 
         {/* At-Risk/Overdue Pledges */}
-        <div className="dashboard-section">
+        <div className="dashboard-section" style={{ marginBottom: '2rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h3>{t('analytics.atRiskOverdue')}</h3>
-            <button className="btn btn-secondary" onClick={() => exportCSV(atRisk, 'at_risk_pledges.csv')}>{t('analytics.exportCSV')}</button>
+            <h3>⚠️ At-Risk & Overdue Pledges</h3>
+            {atRisk.length > 0 && (
+              <button className="btn btn-secondary" onClick={() => exportCSV(atRisk, 'at_risk_pledges.csv')}>📥 Export CSV</button>
+            )}
           </div>
-          <table className="campaign-table">
-            <thead>
-              <tr>
-                <th>{t('analytics.donor')}</th>
-                <th>{t('analytics.amount')}</th>
-                <th>{t('analytics.purpose')}</th>
-                <th>{t('analytics.collectionDate')}</th>
-                <th>{t('analytics.status')}</th>
-                <th>{t('analytics.daysOverdue')}</th>
-                <th>{t('analytics.riskLevel')}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {atRisk.map(p => (
-                <tr key={p.id} style={{ color: p.riskLevel === 'high' ? '#e53935' : p.riskLevel === 'medium' ? '#fbc02d' : '#1976d2' }}>
-                  <td>{p.donorName}</td>
-                  <td>{p.amount.toLocaleString()}</td>
-                  <td>{p.purpose}</td>
-                  <td>{p.collectionDate}</td>
-                  <td>{p.status}</td>
-                  <td>{p.daysOverdue}</td>
-                  <td>{p.riskLevel}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          
+          {atRisk.length === 0 ? (
+            <div style={{ 
+              padding: '2rem', 
+              textAlign: 'center', 
+              background: '#f0fdf4', 
+              borderRadius: '8px',
+              color: '#059669'
+            }}>
+              <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>✅</div>
+              <strong>Great news!</strong> No pledges at risk. All collections on track.
+            </div>
+          ) : (
+            <div style={{ overflowX: 'auto' }}>
+              <table className="campaign-table" style={{ width: '100%' }}>
+                <thead>
+                  <tr style={{ background: '#fef3c7' }}>
+                    <th>Donor</th>
+                    <th>Amount (UGX)</th>
+                    <th>Purpose</th>
+                    <th>Due Date</th>
+                    <th>Days Overdue</th>
+                    <th>Status</th>
+                    <th>Risk Level</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {atRisk.map((pledge, idx) => {
+                    const riskColor = pledge.daysOverdue > 30 ? '#e53935' : pledge.daysOverdue > 10 ? '#fbc02d' : '#ff9800';
+                    const riskLabel = pledge.daysOverdue > 30 ? '🔴 CRITICAL' : pledge.daysOverdue > 10 ? '🟡 HIGH' : '🟠 MEDIUM';
+                    return (
+                      <tr key={idx} style={{ borderLeft: `4px solid ${riskColor}` }}>
+                        <td style={{ fontWeight: '600' }}>{pledge.donorName}</td>
+                        <td>{(pledge.amount || 0).toLocaleString()}</td>
+                        <td>{pledge.purpose}</td>
+                        <td>{pledge.dueDate}</td>
+                        <td style={{ color: riskColor, fontWeight: '600' }}>{pledge.daysOverdue || 0} days</td>
+                        <td>{pledge.status}</td>
+                        <td style={{ color: riskColor }}>{riskLabel}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
 
         {/* Export/Print All */}
@@ -366,3 +747,5 @@ export default function AnalyticsDashboard() {
     </div>
   );
 }
+
+

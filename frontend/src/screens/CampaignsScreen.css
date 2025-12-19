@@ -27,7 +27,7 @@
 
 .campaigns-header .btn-primary {
   padding: 14px 28px;
-  background: linear-gradient(135deg, #FCD116, #f4c430);
+  background: linear-gradient(135deg, #f59e0b, #d97706);
   color: #0f0f0f;
   border: none;
   border-radius: 8px;
@@ -35,19 +35,19 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 8px 20px rgba(252, 209, 22, 0.25);
+  box-shadow: 0 8px 20px rgba(245, 158, 11, 0.25);
   letter-spacing: 0.5px;
 }
 
 .campaigns-header .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 12px 30px rgba(252, 209, 22, 0.35);
-  background: linear-gradient(135deg, #f4c430, #FCD116);
+  box-shadow: 0 12px 30px rgba(245, 158, 11, 0.35);
+  background: linear-gradient(135deg, #d97706, #f59e0b);
 }
 
 .campaigns-header .btn-primary:active {
   transform: translateY(0);
-  box-shadow: 0 4px 15px rgba(252, 209, 22, 0.2);
+  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.2);
 }
 
 /* Campaign Creation Form */
@@ -106,9 +106,9 @@
 .form-group input:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: #FCD116;
+  border-color: #f59e0b;
   background-color: #333333;
-  box-shadow: 0 0 0 3px rgba(252, 209, 22, 0.15);
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
 }
 
 .form-group textarea {
@@ -142,9 +142,9 @@
 }
 
 .campaign-card:hover {
-  border-color: #FCD116;
+  border-color: #f59e0b;
   transform: translateY(-4px);
-  box-shadow: 0 12px 40px rgba(252, 209, 22, 0.15), 0 20px 60px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 12px 40px rgba(245, 158, 11, 0.15), 0 20px 60px rgba(0, 0, 0, 0.5);
 }
 
 .campaign-header {
@@ -224,7 +224,7 @@
 
 .stat .value {
   font-size: 16px;
-  color: #FCD116;
+  color: #f59e0b;
   font-weight: 700;
 }
 
@@ -346,3 +346,5 @@
     font-size: 16px; /* Prevent iOS zoom on focus */
   }
 }
+
+

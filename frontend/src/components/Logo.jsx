@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import logoImage from '../assets/pledgehub-logo.png';
 
 export default function Logo({ size = 'medium', showText = true, textSize, onlyImage = false }) {
@@ -51,4 +51,6 @@ export default function Logo({ size = 'medium', showText = true, textSize, onlyI
     </div>
   );
 }
+
+
 

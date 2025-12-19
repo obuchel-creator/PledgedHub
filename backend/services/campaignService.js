@@ -72,12 +72,13 @@ async function getAllCampaigns({ status } = {}) {
                 COALESCE(SUM(CASE WHEN p.status = 'pending' THEN p.amount ELSE 0 END), 0) as total_pending,
                 ROUND((COALESCE(SUM(p.amount), 0) / c.target_amount) * 100, 2) as progress_percentage
             FROM campaigns c
-            LEFT JOIN pledges p ON c.id = p.campaign_id WHERE c.deleted = 0
+            LEFT JOIN pledges p ON c.id = p.campaign_id
+            WHERE c.deleted = 0
         `;
 
         const params = [];
         if (status) {
-            sql += ' WHERE c.status = ?';
+            sql += ' AND c.status = ?';
             params.push(status);
         }
 

@@ -42,7 +42,7 @@ const AuthCallback = () => {
         );
 
         // Save token to localStorage
-        localStorage.setItem('authToken', token);
+        localStorage.setItem('pledgehub_token', token);
         localStorage.setItem('authProvider', provider || 'unknown');
 
         // Verify token with backend
@@ -77,7 +77,7 @@ const AuthCallback = () => {
           setMessage(data.message || 'Token verification failed');
 
           // Clear invalid token
-          localStorage.removeItem('authToken');
+          localStorage.removeItem('pledgehub_token');
           localStorage.removeItem('authProvider');
 
           setTimeout(() => navigate('/login?error=verification_failed'), 3000);
@@ -88,7 +88,7 @@ const AuthCallback = () => {
         setMessage('An error occurred during authentication');
 
         // Clear potentially invalid token
-        localStorage.removeItem('authToken');
+        localStorage.removeItem('pledgehub_token');
         localStorage.removeItem('authProvider');
 
         setTimeout(() => navigate('/login?error=callback_error'), 3000);
@@ -250,3 +250,5 @@ const AuthCallback = () => {
 };
 
 export default AuthCallback;
+
+

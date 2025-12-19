@@ -19,7 +19,7 @@ const ReferralShare = ({ style = 'card' }) => {
     // Fetch referral stats from API
     const fetchReferralStats = async () => {
       try {
-        const response = await fetch('/api/referrals/stats', {
+        const response = await fetch('/api/analytics/referrals/stats', {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('pledgehub_token')}`,
           },
@@ -51,7 +51,7 @@ const ReferralShare = ({ style = 'card' }) => {
           alignItems: 'center',
           gap: '1rem',
           padding: '1rem',
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
           borderRadius: '12px',
           color: 'white',
         }}
@@ -91,7 +91,7 @@ const ReferralShare = ({ style = 'card' }) => {
             margin: '0 0 0.5rem 0',
             fontSize: '1.5rem',
             fontWeight: '700',
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             backgroundClip: 'text',
@@ -116,12 +116,12 @@ const ReferralShare = ({ style = 'card' }) => {
         <div
           style={{
             padding: '1rem',
-            background: 'linear-gradient(135deg, #667eea15, #764ba215)',
+            background: 'linear-gradient(135deg, #2563eb15, #1e40af15)',
             borderRadius: '12px',
             textAlign: 'center',
           }}
         >
-          <div style={{ fontSize: '2rem', fontWeight: '700', color: '#667eea' }}>
+          <div style={{ fontSize: '2rem', fontWeight: '700', color: '#2563eb' }}>
             {referralStats.invitesSent}
           </div>
           <div style={{ fontSize: '0.85rem', color: '#6b7280', marginTop: '0.25rem' }}>
@@ -233,9 +233,9 @@ const ReferralShare = ({ style = 'card' }) => {
       <div
         style={{
           padding: '1rem',
-          background: 'linear-gradient(135deg, #667eea10, #764ba210)',
+          background: 'linear-gradient(135deg, #2563eb10, #1e40af10)',
           borderRadius: '12px',
-          border: '1px solid #667eea30',
+          border: '1px solid #2563eb30',
         }}
       >
         <p
@@ -243,7 +243,7 @@ const ReferralShare = ({ style = 'card' }) => {
             margin: '0 0 0.5rem 0',
             fontSize: '0.85rem',
             fontWeight: '600',
-            color: '#667eea',
+            color: '#2563eb',
           }}
         >
           ✨ Why share PledgeHub?
@@ -267,3 +267,5 @@ const ReferralShare = ({ style = 'card' }) => {
 };
 
 export default ReferralShare;
+
+

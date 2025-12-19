@@ -1,14 +1,14 @@
 /* AboutScreen - About Us Page Styling */
 
 :root {
-  --bg-base: #f8fafc;
+  --bg-base: #f9fafb;
   --surface: #ffffff;
-  --border: #e2e8f0;
-  --text: #1e293b;
-  --text-muted: #64748b;
-  --gradient-1: linear-gradient(135deg, rgba(34, 197, 94, 0.05) 0%, transparent 50%);
-  --gradient-2: linear-gradient(-135deg, rgba(59, 130, 246, 0.05) 0%, transparent 50%);
-  --gradient-3: linear-gradient(45deg, rgba(168, 85, 247, 0.03) 0%, transparent 50%);
+  --border: #e5e7eb;
+  --text: #1f2937;
+  --text-muted: #6b7280;
+  --gradient-1: linear-gradient(135deg, rgba(37, 99, 235, 0.05) 0%, transparent 50%);
+  --gradient-2: linear-gradient(-135deg, rgba(16, 185, 129, 0.05) 0%, transparent 50%);
+  --gradient-3: linear-gradient(45deg, rgba(245, 158, 11, 0.03) 0%, transparent 50%);
 }
 
 .about-screen {
@@ -39,7 +39,7 @@
 }
 
 .page-header__eyebrow {
-  color: rgba(22, 163, 74, 0.9);
+  color: rgba(37, 99, 235, 0.9);
   font-weight: 600;
   font-size: 0.875rem;
   letter-spacing: 0.05em;
@@ -298,3 +298,5 @@ footer p {
     border-color: rgba(34, 197, 94, 0.5);
   }
 }
+
+

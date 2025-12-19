@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 
 export default function About() {
   return (
@@ -36,7 +36,7 @@ export default function About() {
             The app uses <code>getViteEnv().API_URL</code> to access this value.
           </li>
           <li>Run backend from backend/ with npm install && npm start.</li>
-          <li>This page is informational — use the app UI to create and view pledges.</li>
+          <li>This page is informational � use the app UI to create and view pledges.</li>
         </ol>
       </section>
 
@@ -47,4 +47,6 @@ export default function About() {
     </main>
   );
 }
+
+
 

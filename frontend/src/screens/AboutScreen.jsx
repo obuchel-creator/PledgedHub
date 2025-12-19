@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import './AboutScreen.css';
 
 export default function AboutScreen() {
@@ -142,4 +142,6 @@ export default function AboutScreen() {
     </div>
   );
 }
+
+
 

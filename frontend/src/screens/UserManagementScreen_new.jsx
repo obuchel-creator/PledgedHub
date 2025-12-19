@@ -138,7 +138,7 @@ export default function UserManagementScreen() {
   return (
     <div
       style={{
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
         minHeight: '100vh',
         paddingTop: '2rem',
         paddingBottom: '3rem',
@@ -168,7 +168,7 @@ export default function UserManagementScreen() {
               <p
                 className="page-header__eyebrow"
                 style={{
-                  color: '#667eea',
+                  color: '#2563eb',
                   fontWeight: '700',
                   fontSize: '0.95rem',
                   marginBottom: '0.5rem',
@@ -196,9 +196,9 @@ export default function UserManagementScreen() {
                 display: 'flex',
                 gap: '1rem',
                 padding: '1.5rem',
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
                 borderRadius: '16px',
-                boxShadow: '0 4px 20px rgba(102, 126, 234, 0.3)',
+                boxShadow: '0 4px 20px rgba(37, 99, 235, 0.3)',
               }}
             >
               <div
@@ -440,7 +440,7 @@ export default function UserManagementScreen() {
               type="submit"
               className="btn btn-primary"
               style={{
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
                 border: 'none',
                 borderRadius: '12px',
                 padding: '0.75rem 1.5rem',
@@ -1101,3 +1101,5 @@ export default function UserManagementScreen() {
     </div>
   );
 }
+
+

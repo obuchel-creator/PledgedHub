@@ -1,7 +1,7 @@
 /* ModalStyles.css - MTN Theme Modal/Dialog Components */
 
 :root {
-  --mtn-primary: #FCD116;
+  --mtn-primary: #f59e0b;
   --mtn-dark-bg: #0f0f0f;
   --mtn-bg-primary: #1a1a1a;
   --mtn-bg-secondary: #252525;
@@ -152,14 +152,14 @@
 }
 
 .modal-btn-primary {
-  background: linear-gradient(135deg, var(--mtn-primary), #f4c430);
+  background: linear-gradient(135deg, var(--mtn-primary), #d97706);
   color: var(--mtn-dark-bg);
-  box-shadow: 0 4px 12px rgba(252, 209, 22, 0.25);
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.25);
 }
 
 .modal-btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(252, 209, 22, 0.35);
+  box-shadow: 0 6px 16px rgba(245, 158, 11, 0.35);
 }
 
 .modal-btn-secondary {
@@ -256,8 +256,8 @@
 .modal-form-select:focus {
   outline: none;
   border-color: var(--mtn-primary);
-  background-color: rgba(252, 209, 22, 0.05);
-  box-shadow: 0 0 0 3px rgba(252, 209, 22, 0.15);
+  background-color: rgba(245, 158, 11, 0.05);
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
 }
 
 .modal-form-textarea {
@@ -358,3 +358,5 @@
   color: var(--mtn-text-secondary);
   font-size: 14px;
 }
+
+

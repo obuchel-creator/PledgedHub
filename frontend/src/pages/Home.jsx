@@ -1,4 +1,4 @@
-ï»¿// ...existing code...
+// ...existing code...
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getPledges } from '../services/api';
@@ -62,11 +62,11 @@ export default function Home() {
       <section>
         <h2>Recent pledges</h2>
 
-        {loading && <p>Loading pledgesâ€¦</p>}
+        {loading && <p>Loading pledges…</p>}
         {error && <p style={{ color: 'crimson' }}>Error: {error}</p>}
 
         {!loading && !error && pledges.length === 0 && (
-          <p>No pledges yet â€” be the first to create one.</p>
+          <p>No pledges yet — be the first to create one.</p>
         )}
 
         {!loading && !error && pledges.length > 0 && (
@@ -109,4 +109,6 @@ export default function Home() {
   );
 }
 // ...existing code...
+
+
 

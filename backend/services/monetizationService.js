@@ -3,7 +3,8 @@
  * Handles subscription management, billing, and usage tracking
  */
 
-const db = require('../config/db');
+const { pool } = require('../config/db');
+const db = { query: pool.query.bind(pool), execute: pool.execute.bind(pool) };
 const {
   isMonetizationActive,
   getSubscriptionStatus,

@@ -5,8 +5,8 @@
 
 :root {
   /* MTN Brand Colors */
-  --mtn-yellow-primary: #FCD116;
-  --mtn-yellow-light: #f4c430;
+  --mtn-yellow-primary: #f59e0b;
+  --mtn-yellow-light: #d97706;
   --mtn-yellow-dark: #e5b500;
   
   /* Dark Theme */
@@ -37,7 +37,7 @@
   --mtn-shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.3);
   --mtn-shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
   --mtn-shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.5);
-  --mtn-shadow-yellow: 0 8px 20px rgba(252, 209, 22, 0.3);
+  --mtn-shadow-yellow: 0 8px 20px rgba(245, 158, 11, 0.3);
   
   /* Typography */
   --font-family-primary: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica Neue", Arial, sans-serif;
@@ -128,7 +128,7 @@ select:focus {
   outline: none;
   border-color: var(--mtn-yellow-primary);
   background-color: var(--mtn-dark-4);
-  box-shadow: 0 0 0 3px rgba(252, 209, 22, 0.15);
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
 }
 
 input:disabled,
@@ -170,13 +170,13 @@ button:not(.btn-secondary):not(.btn-ghost) {
 button:not(.btn-secondary):not(.btn-ghost):hover {
   background: linear-gradient(135deg, var(--mtn-yellow-light) 0%, var(--mtn-yellow-dark) 100%);
   transform: translateY(-2px);
-  box-shadow: 0 12px 30px rgba(252, 209, 22, 0.4);
+  box-shadow: 0 12px 30px rgba(245, 158, 11, 0.4);
 }
 
 .btn-primary:active,
 button:not(.btn-secondary):not(.btn-ghost):active {
   transform: translateY(0);
-  box-shadow: 0 4px 12px rgba(252, 209, 22, 0.3);
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
 }
 
 /* Secondary Button */
@@ -199,7 +199,7 @@ button:not(.btn-secondary):not(.btn-ghost):active {
 }
 
 .btn-ghost:hover {
-  background-color: rgba(252, 209, 22, 0.1);
+  background-color: rgba(245, 158, 11, 0.1);
   border-color: var(--mtn-yellow-light);
 }
 
@@ -226,7 +226,7 @@ button:disabled,
 
 .card:hover {
   border-color: var(--mtn-yellow-primary);
-  box-shadow: 0 8px 24px rgba(252, 209, 22, 0.15);
+  box-shadow: 0 8px 24px rgba(245, 158, 11, 0.15);
 }
 
 .container {
@@ -291,7 +291,7 @@ nav a {
 nav a:hover,
 nav a.active {
   color: var(--mtn-yellow-primary);
-  background-color: rgba(252, 209, 22, 0.1);
+  background-color: rgba(245, 158, 11, 0.1);
 }
 
 /* ========================================
@@ -329,7 +329,7 @@ nav a.active {
 }
 
 .badge-mtn {
-  background-color: rgba(252, 209, 22, 0.2);
+  background-color: rgba(245, 158, 11, 0.2);
   color: var(--mtn-yellow-primary);
 }
 
@@ -414,3 +414,5 @@ nav a.active {
 
 .hidden { display: none !important; }
 .visible { display: block !important; }
+
+

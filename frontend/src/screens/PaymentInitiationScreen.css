@@ -1,6 +1,6 @@
 .payment-initiation-screen {
     min-height: 100vh;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -40,7 +40,7 @@
 
 /* Header */
 .payment-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
     color: white;
     padding: 32px 24px;
     position: relative;
@@ -159,15 +159,15 @@
 }
 
 .payment-method-card:hover:not(:disabled) {
-    border-color: #667eea;
+    border-color: #2563eb;
     background: #f9f7ff;
     transform: translateX(4px);
 }
 
 .payment-method-card.selected {
-    border-color: #667eea;
+    border-color: #2563eb;
     background: #f9f7ff;
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
 }
 
 .payment-method-card:disabled {
@@ -200,7 +200,7 @@
 
 .method-check {
     font-size: 24px;
-    color: #667eea;
+    color: #2563eb;
     flex-shrink: 0;
     font-weight: 700;
 }
@@ -235,8 +235,8 @@
 }
 
 .phone-input-wrapper:focus-within {
-    border-color: #667eea;
-    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    border-color: #2563eb;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
 }
 
 .country-code {
@@ -278,13 +278,13 @@
     background: #f0f4ff;
     padding: 12px 16px;
     border-radius: 8px;
-    border-left: 3px solid #667eea;
+    border-left: 3px solid #2563eb;
 }
 
 .input-hint p {
     margin: 0;
     font-size: 13px;
-    color: #667eea;
+    color: #2563eb;
     font-weight: 500;
 }
 
@@ -367,13 +367,13 @@
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
     color: white;
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
 }
 
 .btn-primary:hover:not(:disabled) {
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
     transform: translateY(-2px);
 }
 
@@ -445,3 +445,5 @@
         font-size: 14px;
     }
 }
+
+

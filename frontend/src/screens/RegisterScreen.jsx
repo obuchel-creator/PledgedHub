@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Link, useNavigate } from 'react-router-dom';
 import '../authOutlook.css';
@@ -59,7 +59,7 @@ function RegisterScreen({ disableRequired = false }) {
       };
       const result = await registerUser(payload);
       if (result && result.token) {
-        localStorage.setItem('authToken', result.token);
+        localStorage.setItem('pledgehub_token', result.token);
         navigate('/dashboard');
       } else {
         setError(result?.error || 'Registration failed. Please try again.');
@@ -202,7 +202,7 @@ function RegisterScreen({ disableRequired = false }) {
                     margin: '0'
                   }}
                 >
-                  {showPassword ? '👁️ Hide' : '👁️ Show'}
+                  {showPassword ? '??? Hide' : '??? Show'}
                 </button>
               </div>
             </div>
@@ -248,7 +248,7 @@ function RegisterScreen({ disableRequired = false }) {
                     margin: '0'
                   }}
                 >
-                  {showConfirmPassword ? '👁️ Hide' : '👁️ Show'}
+                  {showConfirmPassword ? '??? Hide' : '??? Show'}
                 </button>
               </div>
             </div>
@@ -279,4 +279,6 @@ RegisterScreen.propTypes = {
 };
 
 export default RegisterScreen;
+
+
 

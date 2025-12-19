@@ -115,7 +115,7 @@ const AdvancedAnalyticsScreen = () => {
     return `UGX ${parseFloat(value || 0).toLocaleString()}`;
   };
 
-  const COLORS = ['#667eea', '#764ba2', '#f093fb', '#4facfe', '#43e97b', '#fa709a'];
+  const COLORS = ['#2563eb', '#1e40af', '#f093fb', '#4facfe', '#43e97b', '#fa709a'];
 
   if (loading) {
     return (
@@ -124,17 +124,36 @@ const AdvancedAnalyticsScreen = () => {
         display: 'flex', 
         alignItems: 'center', 
         justifyContent: 'center',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: 'linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%)',
       }}>
         <div style={{ 
           background: 'white', 
-          padding: '2rem', 
-          borderRadius: '12px',
+          padding: '3rem', 
+          borderRadius: '16px',
           textAlign: 'center',
+          boxShadow: '0 20px 60px rgba(0,0,0,0.1)',
         }}>
-          <h2 style={{ margin: '0 0 1rem 0', color: '#667eea' }}>Loading Analytics...</h2>
-          <p style={{ margin: 0, color: '#6b7280' }}>Crunching the numbers 📊</p>
+          <div style={{
+            width: '60px',
+            height: '60px',
+            borderRadius: '50%',
+            background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
+            margin: '0 auto 1.5rem',
+            animation: 'spin 1s linear infinite',
+          }}></div>
+          <h2 style={{ margin: '0 0 0.75rem 0', color: '#1f2937', fontSize: '1.5rem', fontWeight: '700' }}>
+            Analyzing Your Data
+          </h2>
+          <p style={{ margin: 0, color: '#6b7280', fontSize: '0.95rem' }}>
+            Processing advanced metrics and insights...
+          </p>
         </div>
+        <style>{`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}</style>
       </div>
     );
   }
@@ -165,7 +184,7 @@ const AdvancedAnalyticsScreen = () => {
               <h1 style={{ 
                 margin: '0 0 0.5rem 0', 
                 fontSize: '2rem', 
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
               }}>
@@ -201,7 +220,7 @@ const AdvancedAnalyticsScreen = () => {
                 onClick={() => handleExport('dashboard')}
                 style={{
                   padding: '0.75rem 1.5rem',
-                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
                   color: 'white',
                   border: 'none',
                   borderRadius: '8px',
@@ -236,7 +255,7 @@ const AdvancedAnalyticsScreen = () => {
               value={metrics.campaigns.active}
               subtitle={`${metrics.campaigns.completionRate}% avg completion`}
               icon="🎯"
-              color="#667eea"
+              color="#2563eb"
             />
             <MetricCard
               title="Total Pledges"
@@ -268,8 +287,8 @@ const AdvancedAnalyticsScreen = () => {
               <AreaChart data={revenueTrend}>
                 <defs>
                   <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#667eea" stopOpacity={0.8}/>
-                    <stop offset="95%" stopColor="#667eea" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="#2563eb" stopOpacity={0.8}/>
+                    <stop offset="95%" stopColor="#2563eb" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
@@ -279,7 +298,7 @@ const AdvancedAnalyticsScreen = () => {
                 <Area 
                   type="monotone" 
                   dataKey="revenue" 
-                  stroke="#667eea" 
+                  stroke="#2563eb" 
                   fillOpacity={1} 
                   fill="url(#colorRevenue)" 
                 />
@@ -326,7 +345,7 @@ const AdvancedAnalyticsScreen = () => {
                 <XAxis dataKey="title" stroke="#6b7280" angle={-45} textAnchor="end" height={100} />
                 <YAxis stroke="#6b7280" />
                 <Tooltip formatter={(value) => formatCurrency(value)} />
-                <Bar dataKey="currentAmount" fill="#667eea" radius={[8, 8, 0, 0]} />
+                <Bar dataKey="currentAmount" fill="#2563eb" radius={[8, 8, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </ChartCard>
@@ -426,7 +445,7 @@ const AdvancedAnalyticsScreen = () => {
                 <Line 
                   type="monotone" 
                   dataKey="revenue" 
-                  stroke="#667eea" 
+                  stroke="#2563eb" 
                   strokeWidth={2} 
                   dot={{ r: 4 }}
                   name="Historical"
@@ -515,3 +534,5 @@ const ChartCard = ({ title, subtitle, children }) => (
 );
 
 export default AdvancedAnalyticsScreen;
+
+

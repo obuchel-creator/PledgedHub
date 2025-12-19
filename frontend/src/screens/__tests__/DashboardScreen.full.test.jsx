@@ -36,3 +36,5 @@ describe('DashboardScreen', () => {
     expect(nameInput).toHaveValue('Test User');
   });
 });
+
+

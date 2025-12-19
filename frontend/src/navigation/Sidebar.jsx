@@ -1,4 +1,4 @@
-ï»¿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export default function Sidebar({ collapsed: collapsedProp = false }) {
   const [collapsed, setCollapsed] = useState(Boolean(collapsedProp));
@@ -162,7 +162,7 @@ export default function Sidebar({ collapsed: collapsedProp = false }) {
           title={collapsed ? 'Expand' : 'Collapse'}
           style={toggleBtnStyle}
         >
-          {collapsed ? 'Â»' : 'Â«'}
+          {collapsed ? '»' : '«'}
         </button>
       </div>
 
@@ -197,4 +197,6 @@ export default function Sidebar({ collapsed: collapsedProp = false }) {
     </nav>
   );
 }
+
+
 

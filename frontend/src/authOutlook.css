@@ -1,6 +1,6 @@
 /* MTN MoMo Developer-inspired auth screens */
 :root {
-  --mtn-yellow: #FCD116;
+  --mtn-yellow: #f59e0b;
   --mtn-dark: #1a1a1a;
   --mtn-darker: #0f0f0f;
   --mtn-light: #f5f5f5;
@@ -23,7 +23,7 @@ body.auth-bg {
 .auth-center-card {
   background: linear-gradient(135deg, #1a1a1a 0%, #252525 100%);
   border-radius: 12px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 8px 24px rgba(252, 209, 22, 0.1);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 8px 24px rgba(245, 158, 11, 0.1);
   border: 1px solid var(--mtn-border);
   max-width: 420px;
   margin: 60px auto;
@@ -85,7 +85,7 @@ body.auth-bg {
 .auth-center-card select:focus {
   border-color: var(--mtn-yellow);
   outline: none;
-  box-shadow: 0 0 0 3px rgba(252, 209, 22, 0.15);
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
   background: #333333;
 }
 
@@ -107,7 +107,7 @@ body.auth-bg {
 .auth-center-card button,
 .auth-center-card .btn {
   width: 100%;
-  background: linear-gradient(135deg, var(--mtn-yellow) 0%, #f4c430 100%);
+  background: linear-gradient(135deg, var(--mtn-yellow) 0%, #d97706 100%);
   color: var(--mtn-darker);
   border: none;
   border-radius: 6px;
@@ -120,20 +120,20 @@ body.auth-bg {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica Neue", Arial, sans-serif;
   text-transform: uppercase;
   letter-spacing: 0.7px;
-  box-shadow: 0 8px 20px rgba(252, 209, 22, 0.3);
+  box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3);
 }
 
 .auth-center-card button:hover,
 .auth-center-card .btn:hover {
-  background: linear-gradient(135deg, #f4c430 0%, #e5b500 100%);
+  background: linear-gradient(135deg, #d97706 0%, #e5b500 100%);
   transform: translateY(-2px);
-  box-shadow: 0 12px 30px rgba(252, 209, 22, 0.4);
+  box-shadow: 0 12px 30px rgba(245, 158, 11, 0.4);
 }
 
 .auth-center-card button:active,
 .auth-center-card .btn:active {
   transform: translateY(0);
-  box-shadow: 0 4px 12px rgba(252, 209, 22, 0.3);
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
 }
 
 .auth-center-card button:disabled,
@@ -157,8 +157,8 @@ body.auth-bg {
 }
 
 .auth-center-card a:hover {
-  color: #f4c430;
-  text-shadow: 0 0 8px rgba(252, 209, 22, 0.3);
+  color: #d97706;
+  text-shadow: 0 0 8px rgba(245, 158, 11, 0.3);
 }
 
 .auth-divider {
@@ -221,4 +221,6 @@ body.auth-bg {
     font-size: 24px;
   }
 }
+
+
 

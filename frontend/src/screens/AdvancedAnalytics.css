@@ -1,0 +1,415 @@
+/* Advanced Analytics Screen - Professional Enterprise Design */
+
+:root {
+  --analytics-primary: #2563eb;
+  --analytics-primary-dark: #1e40af;
+  --analytics-secondary: #10b981;
+  --analytics-accent: #f59e0b;
+  --analytics-background: #f9fafb;
+  --analytics-card-bg: #ffffff;
+  --analytics-border: #e5e7eb;
+  --analytics-text-primary: #1f2937;
+  --analytics-text-secondary: #6b7280;
+}
+
+/* Loading Animation */
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Main Container */
+.analytics-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, var(--analytics-background) 0%, #f3f4f6 100%);
+  padding: 2rem 1rem;
+}
+
+.analytics-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  animation: fadeIn 0.5s ease-in;
+}
+
+/* Header Section */
+.analytics-header {
+  background: var(--analytics-card-bg);
+  padding: 2rem;
+  border-radius: 16px;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.analytics-header-title {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--analytics-primary) 0%, var(--analytics-primary-dark) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.analytics-header-subtitle {
+  margin: 0.5rem 0 0 0;
+  color: var(--analytics-text-secondary);
+}
+
+.analytics-controls {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* Select Dropdown */
+.analytics-select {
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--analytics-border);
+  font-size: 0.9rem;
+  cursor: pointer;
+  background: white;
+  color: var(--analytics-text-primary);
+  transition: all 0.2s ease;
+}
+
+.analytics-select:hover {
+  border-color: var(--analytics-primary);
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1);
+}
+
+.analytics-select:focus {
+  outline: none;
+  border-color: var(--analytics-primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* Export Button */
+.analytics-export-btn {
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, var(--analytics-primary) 0%, var(--analytics-primary-dark) 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+
+.analytics-export-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3);
+}
+
+.analytics-export-btn:active {
+  transform: translateY(0);
+}
+
+/* Metrics Grid */
+.analytics-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+/* Metric Card */
+.metric-card {
+  background: var(--analytics-card-bg);
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border-left: 4px solid var(--analytics-primary);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  transition: all 0.3s ease;
+  animation: slideInUp 0.5s ease-out;
+}
+
+.metric-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+}
+
+.metric-card.color-green {
+  border-left-color: var(--analytics-secondary);
+}
+
+.metric-card.color-blue {
+  border-left-color: var(--analytics-primary);
+}
+
+.metric-card.color-gold {
+  border-left-color: var(--analytics-accent);
+}
+
+.metric-card.color-purple {
+  border-left-color: #8b5cf6;
+}
+
+.metric-label {
+  font-size: 0.85rem;
+  color: var(--analytics-text-secondary);
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.metric-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--analytics-text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.metric-subtitle {
+  font-size: 0.85rem;
+  color: var(--analytics-text-secondary);
+}
+
+.metric-trend {
+  margin-top: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.metric-trend.up {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--analytics-secondary);
+}
+
+.metric-trend.down {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+.metric-icon {
+  font-size: 2rem;
+}
+
+/* Charts Grid */
+.analytics-charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+/* Chart Card */
+.chart-card {
+  background: var(--analytics-card-bg);
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  animation: slideInUp 0.5s ease-out;
+}
+
+.chart-card-header {
+  margin-bottom: 1.5rem;
+}
+
+.chart-card-title {
+  margin: 0 0 0.25rem 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--analytics-text-primary);
+}
+
+.chart-card-subtitle {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--analytics-text-secondary);
+}
+
+/* Table Styles */
+.analytics-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+.analytics-table thead tr {
+  border-bottom: 2px solid var(--analytics-border);
+  background: #f9fafb;
+}
+
+.analytics-table th {
+  padding: 1rem;
+  text-align: left;
+  color: var(--analytics-text-secondary);
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.analytics-table tbody tr {
+  border-bottom: 1px solid var(--analytics-border);
+  transition: background-color 0.2s ease;
+}
+
+.analytics-table tbody tr:hover {
+  background-color: #f9fafb;
+}
+
+.analytics-table td {
+  padding: 1rem;
+  color: var(--analytics-text-primary);
+}
+
+.analytics-table-value-primary {
+  font-weight: 700;
+  color: var(--analytics-secondary);
+}
+
+.analytics-table-value-secondary {
+  font-size: 0.9rem;
+  color: var(--analytics-text-secondary);
+}
+
+/* Progress Bar */
+.analytics-progress-container {
+  margin-bottom: 1rem;
+}
+
+.analytics-progress-label {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--analytics-text-primary);
+}
+
+.analytics-progress-bar {
+  width: 100%;
+  height: 32px;
+  background: var(--analytics-border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.analytics-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--analytics-primary), var(--analytics-secondary));
+  transition: width 0.5s ease;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .analytics-charts-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .analytics-metrics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .analytics-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .analytics-header-title {
+    font-size: 1.5rem;
+  }
+
+  .analytics-controls {
+    width: 100%;
+  }
+
+  .analytics-select,
+  .analytics-export-btn {
+    flex: 1;
+    min-width: 150px;
+  }
+
+  .analytics-table {
+    font-size: 0.85rem;
+  }
+
+  .analytics-table th,
+  .analytics-table td {
+    padding: 0.75rem 0.5rem;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .analytics-controls {
+    display: none;
+  }
+
+  .chart-card {
+    page-break-inside: avoid;
+    box-shadow: none;
+    border: 1px solid var(--analytics-border);
+  }
+
+  .metric-card {
+    page-break-inside: avoid;
+  }
+}
+
+/* Animations for Data Updates */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.analytics-loading {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Dark mode support (future enhancement) */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --analytics-card-bg: #1f2937;
+    --analytics-background: #111827;
+    --analytics-text-primary: #f3f4f6;
+    --analytics-text-secondary: #d1d5db;
+    --analytics-border: #374151;
+  }
+}

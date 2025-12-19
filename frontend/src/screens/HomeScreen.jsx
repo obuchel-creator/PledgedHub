@@ -1,4 +1,4 @@
-ï»¿import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { getViteEnv } from '../utils/getViteEnv';
 import { Link } from 'react-router-dom';
 import { getCampaigns } from '../services/api';
@@ -439,7 +439,7 @@ export default function Home() {
                   e.target.style.textShadow = '0 2px 8px rgba(0, 0, 0, 0.4)';
                 }}
               >
-                {'â€¹'}
+                {'‹'}
               </button>
               <button
                 type="button"
@@ -478,7 +478,7 @@ export default function Home() {
                   e.target.style.textShadow = '0 2px 8px rgba(0, 0, 0, 0.4)';
                 }}
               >
-                {'â€º'}
+                {'›'}
               </button>
               <div
                 className="hero-slider__bullets"
@@ -899,4 +899,6 @@ export default function Home() {
     </main>
   );
 }
+
+
 

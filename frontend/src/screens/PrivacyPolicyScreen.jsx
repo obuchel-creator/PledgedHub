@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 
 export default function PrivacyPolicyScreen() {
@@ -33,7 +33,7 @@ export default function PrivacyPolicyScreen() {
               gap: '4px',
             }}
           >
-            ← Back to Home
+            ? Back to Home
           </Link>
         </div>
 
@@ -307,4 +307,6 @@ export default function PrivacyPolicyScreen() {
     </div>
   );
 }
+
+
 

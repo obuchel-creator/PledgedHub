@@ -13,7 +13,7 @@ const UnauthorizedScreen = () => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
         padding: '20px',
       }}
     >
@@ -120,8 +120,8 @@ const UnauthorizedScreen = () => {
             style={{
               padding: '12px 24px',
               background: '#fff',
-              color: '#667eea',
-              border: '2px solid #667eea',
+              color: '#2563eb',
+              border: '2px solid #2563eb',
               borderRadius: '8px',
               fontSize: '14px',
               fontWeight: '600',
@@ -142,7 +142,7 @@ const UnauthorizedScreen = () => {
             onClick={() => navigate('/')}
             style={{
               padding: '12px 24px',
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
               color: '#fff',
               border: 'none',
               borderRadius: '8px',
@@ -153,7 +153,7 @@ const UnauthorizedScreen = () => {
             }}
             onMouseOver={(e) => {
               e.target.style.transform = 'translateY(-2px)';
-              e.target.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.4)';
+              e.target.style.boxShadow = '0 4px 12px rgba(37, 99, 235, 0.4)';
             }}
             onMouseOut={(e) => {
               e.target.style.transform = 'translateY(0)';
@@ -194,3 +194,5 @@ const UnauthorizedScreen = () => {
 };
 
 export default UnauthorizedScreen;
+
+

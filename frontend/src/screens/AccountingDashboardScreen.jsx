@@ -1,0 +1,410 @@
+import React, { useState, useEffect } from 'react';
+import './AccountingDashboardScreen.css';
+
+export function AccountingDashboardScreen() {
+  const [reports, setReports] = useState({
+    balanceSheet: null,
+    incomeStatement: null,
+    trialBalance: null,
+    summary: null
+  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [activeTab, setActiveTab] = useState('summary');
+  const [asOfDate, setAsOfDate] = useState(new Date().toISOString().split('T')[0]);
+
+  useEffect(() => {
+    fetchReports();
+  }, [asOfDate]);
+
+  const fetchReports = async () => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      const headers = { 'Authorization': `Bearer ${token}` };
+
+      const [bs, is, tb, summary] = await Promise.all([
+        fetch(`/api/accounting/reports/balance-sheet?asOfDate=${asOfDate}`, { headers }).then(r => r.json()),
+        fetch(`/api/accounting/reports/income-statement?startDate=${asOfDate}&endDate=${asOfDate}`, { headers }).then(r => r.json()),
+        fetch(`/api/accounting/reports/trial-balance?asOfDate=${asOfDate}`, { headers }).then(r => r.json()),
+        fetch(`/api/accounting/reports/financial-summary?asOfDate=${asOfDate}`, { headers }).then(r => r.json())
+      ]);
+
+      setReports({
+        balanceSheet: bs.data,
+        incomeStatement: is.data,
+        trialBalance: tb.data,
+        summary: summary.data
+      });
+    } catch (err) {
+      setError('Failed to load accounting reports');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="accounting-container">
+        <div className="loading-spinner">
+          <div className="spinner"></div>
+          <p>Loading accounting reports...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="accounting-container">
+      <div className="accounting-header">
+        <div>
+          <h1>Accounting Dashboard</h1>
+          <p>Financial reports and account management</p>
+        </div>
+        <div className="header-actions">
+          <input
+            type="date"
+            value={asOfDate}
+            onChange={(e) => setAsOfDate(e.target.value)}
+            className="date-picker"
+          />
+        </div>
+      </div>
+
+      {error && <div className="error-message">{error}</div>}
+
+      <div className="accounting-tabs">
+        <button
+          className={`tab-button ${activeTab === 'summary' ? 'active' : ''}`}
+          onClick={() => setActiveTab('summary')}
+        >
+          📊 Summary
+        </button>
+        <button
+          className={`tab-button ${activeTab === 'balance-sheet' ? 'active' : ''}`}
+          onClick={() => setActiveTab('balance-sheet')}
+        >
+          ⚖️ Balance Sheet
+        </button>
+        <button
+          className={`tab-button ${activeTab === 'income' ? 'active' : ''}`}
+          onClick={() => setActiveTab('income')}
+        >
+          📈 Income Statement
+        </button>
+        <button
+          className={`tab-button ${activeTab === 'trial-balance' ? 'active' : ''}`}
+          onClick={() => setActiveTab('trial-balance')}
+        >
+          ✓ Trial Balance
+        </button>
+      </div>
+
+      <div className="accounting-content">
+        {/* Summary Tab */}
+        {activeTab === 'summary' && reports.summary && (
+          <div className="summary-section">
+            <div className="metric-grid">
+              <div className="metric-card">
+                <div className="metric-label">Total Assets</div>
+                <div className="metric-value">
+                  {reports.summary.balanceSheet.assets.total.toLocaleString('en-UG', {
+                    style: 'currency',
+                    currency: 'UGX',
+                    minimumFractionDigits: 0
+                  })}
+                </div>
+              </div>
+
+              <div className="metric-card">
+                <div className="metric-label">Total Liabilities</div>
+                <div className="metric-value">
+                  {reports.summary.balanceSheet.liabilities.total.toLocaleString('en-UG', {
+                    style: 'currency',
+                    currency: 'UGX',
+                    minimumFractionDigits: 0
+                  })}
+                </div>
+              </div>
+
+              <div className="metric-card">
+                <div className="metric-label">Total Equity</div>
+                <div className="metric-value">
+                  {reports.summary.balanceSheet.equity.total.toLocaleString('en-UG', {
+                    style: 'currency',
+                    currency: 'UGX',
+                    minimumFractionDigits: 0
+                  })}
+                </div>
+              </div>
+
+              <div className="metric-card highlight">
+                <div className="metric-label">Net Income</div>
+                <div className="metric-value positive">
+                  {reports.summary.keyMetrics.netIncome.toLocaleString('en-UG', {
+                    style: 'currency',
+                    currency: 'UGX',
+                    minimumFractionDigits: 0
+                  })}
+                </div>
+              </div>
+            </div>
+
+            <div className="key-metrics">
+              <h3>Key Financial Metrics</h3>
+              <div className="metrics-table">
+                <div className="metric-row">
+                  <span className="metric-name">Current Ratio</span>
+                  <span className="metric-value-small">{reports.summary.keyMetrics.currentRatio}</span>
+                </div>
+                <div className="metric-row">
+                  <span className="metric-name">Debt to Equity</span>
+                  <span className="metric-value-small">{reports.summary.keyMetrics.debtToEquity}</span>
+                </div>
+                <div className="metric-row">
+                  <span className="metric-name">Profit Margin</span>
+                  <span className="metric-value-small">{reports.summary.keyMetrics.profitMargin}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Balance Sheet Tab */}
+        {activeTab === 'balance-sheet' && reports.balanceSheet && (
+          <div className="balance-sheet-section">
+            <div className="sheet-container">
+              <div className="sheet-column">
+                <h3>Assets</h3>
+                {reports.balanceSheet.assets.accounts.map((account) => (
+                  <div key={account.code} className="account-row">
+                    <span>{account.code} - {account.name}</span>
+                    <span className="amount">
+                      {(account.balance || 0).toLocaleString('en-UG', {
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0
+                      })}
+                    </span>
+                  </div>
+                ))}
+                <div className="account-total">
+                  <span>TOTAL ASSETS</span>
+                  <span className="amount">
+                    {reports.balanceSheet.assets.total.toLocaleString('en-UG', {
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 0
+                    })}
+                  </span>
+                </div>
+              </div>
+
+              <div className="sheet-column">
+                <h3>Liabilities & Equity</h3>
+                
+                <div>
+                  <h4>Liabilities</h4>
+                  {reports.balanceSheet.liabilities.accounts.map((account) => (
+                    <div key={account.code} className="account-row">
+                      <span>{account.code} - {account.name}</span>
+                      <span className="amount">
+                        {(account.balance || 0).toLocaleString('en-UG', {
+                          minimumFractionDigits: 0,
+                          maximumFractionDigits: 0
+                        })}
+                      </span>
+                    </div>
+                  ))}
+                  <div className="account-subtotal">
+                    <span>TOTAL LIABILITIES</span>
+                    <span className="amount">
+                      {reports.balanceSheet.liabilities.total.toLocaleString('en-UG', {
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0
+                      })}
+                    </span>
+                  </div>
+                </div>
+
+                <div style={{ marginTop: '20px' }}>
+                  <h4>Equity</h4>
+                  {reports.balanceSheet.equity.accounts.map((account) => (
+                    <div key={account.code} className="account-row">
+                      <span>{account.code} - {account.name}</span>
+                      <span className="amount">
+                        {(account.balance || 0).toLocaleString('en-UG', {
+                          minimumFractionDigits: 0,
+                          maximumFractionDigits: 0
+                        })}
+                      </span>
+                    </div>
+                  ))}
+                  <div className="account-subtotal">
+                    <span>TOTAL EQUITY</span>
+                    <span className="amount">
+                      {reports.balanceSheet.equity.total.toLocaleString('en-UG', {
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0
+                      })}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="account-total" style={{ marginTop: '20px' }}>
+                  <span>TOTAL LIABILITIES + EQUITY</span>
+                  <span className="amount">
+                    {(reports.balanceSheet.liabilities.total + reports.balanceSheet.equity.total).toLocaleString('en-UG', {
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 0
+                    })}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="validation-check">
+              {reports.balanceSheet.validation.difference < 0.01 ? (
+                <div className="check-pass">✓ Balance Sheet is balanced (Assets = Liabilities + Equity)</div>
+              ) : (
+                <div className="check-fail">✗ Balance Sheet is unbalanced by {reports.balanceSheet.validation.difference.toLocaleString('en-UG')}</div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Income Statement Tab */}
+        {activeTab === 'income' && reports.incomeStatement && (
+          <div className="income-statement-section">
+            <h3>Income Statement</h3>
+
+            <div className="income-section">
+              <h4>Revenues</h4>
+              {reports.incomeStatement.revenues.accounts.map((account) => (
+                <div key={account.code} className="account-row">
+                  <span>{account.code} - {account.name}</span>
+                  <span className="amount revenue">
+                    +{(account.balance || 0).toLocaleString('en-UG', {
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 0
+                    })}
+                  </span>
+                </div>
+              ))}
+              <div className="account-subtotal">
+                <span>TOTAL REVENUES</span>
+                <span className="amount revenue">
+                  +{reports.incomeStatement.summary.totalRevenue.toLocaleString('en-UG', {
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                  })}
+                </span>
+              </div>
+            </div>
+
+            <div className="income-section">
+              <h4>Expenses</h4>
+              {reports.incomeStatement.expenses.accounts.length === 0 ? (
+                <div className="no-data">No expenses recorded</div>
+              ) : (
+                reports.incomeStatement.expenses.accounts.map((account) => (
+                  <div key={account.code} className="account-row">
+                    <span>{account.code} - {account.name}</span>
+                    <span className="amount expense">
+                      -{(account.balance || 0).toLocaleString('en-UG', {
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0
+                      })}
+                    </span>
+                  </div>
+                ))
+              )}
+              <div className="account-subtotal">
+                <span>TOTAL EXPENSES</span>
+                <span className="amount expense">
+                  -{reports.incomeStatement.summary.totalExpenses.toLocaleString('en-UG', {
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                  })}
+                </span>
+              </div>
+            </div>
+
+            <div className="account-total" style={{ marginTop: '20px' }}>
+              <span>NET INCOME</span>
+              <span className={`amount ${reports.incomeStatement.summary.netIncome >= 0 ? 'revenue' : 'expense'}`}>
+                {reports.incomeStatement.summary.netIncome.toLocaleString('en-UG', {
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 0
+                })}
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* Trial Balance Tab */}
+        {activeTab === 'trial-balance' && reports.trialBalance && (
+          <div className="trial-balance-section">
+            <h3>Trial Balance</h3>
+            <div className="trial-balance-table">
+              <div className="table-header">
+                <div className="col-code">Code</div>
+                <div className="col-name">Account Name</div>
+                <div className="col-debit">Debits</div>
+                <div className="col-credit">Credits</div>
+              </div>
+              {reports.trialBalance.accounts.map((account) => (
+                <div key={account.code} className="table-row">
+                  <div className="col-code">{account.code}</div>
+                  <div className="col-name">{account.name}</div>
+                  <div className="col-debit">
+                    {(account.total_debit || 0).toLocaleString('en-UG', {
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 0
+                    })}
+                  </div>
+                  <div className="col-credit">
+                    {(account.total_credit || 0).toLocaleString('en-UG', {
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 0
+                    })}
+                  </div>
+                </div>
+              ))}
+              <div className="table-total">
+                <div className="col-code"></div>
+                <div className="col-name"><strong>TOTALS</strong></div>
+                <div className="col-debit">
+                  <strong>
+                    {reports.trialBalance.totals.totalDebits.toLocaleString('en-UG', {
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 0
+                    })}
+                  </strong>
+                </div>
+                <div className="col-credit">
+                  <strong>
+                    {reports.trialBalance.totals.totalCredits.toLocaleString('en-UG', {
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 0
+                    })}
+                  </strong>
+                </div>
+              </div>
+            </div>
+
+            <div className="validation-check">
+              {reports.trialBalance.validation.balancesDifference < 0.01 ? (
+                <div className="check-pass">✓ Trial Balance is balanced (Total Debits = Total Credits)</div>
+              ) : (
+                <div className="check-fail">✗ Trial Balance is unbalanced by {reports.trialBalance.validation.balancesDifference.toLocaleString('en-UG')}</div>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default AccountingDashboardScreen;
+
+

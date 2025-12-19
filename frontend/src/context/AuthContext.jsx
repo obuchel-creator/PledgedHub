@@ -63,17 +63,29 @@ export function AuthProvider({ children }) {
     setLoading(true);
     try {
       const data = await loginUser(credentials);
+      console.log('🔐 AuthContext: loginUser returned:', data);
+      
+      // Check if response indicates an error
+      if (data && data.success === false) {
+        console.log('🔐 AuthContext: Login failed with error:', data.error);
+        return data; // Return error response so LoginScreen can display it
+      }
+      
       const newToken = data && (data.token || data.accessToken);
       if (newToken) {
         console.log('🔐 AuthContext: Login successful, token received');
         localStorage.setItem(TOKEN_KEY, newToken);
         setToken(newToken);
         await refreshUser();
+        return data;
       } else if (data && data.user) {
         console.log('🔐 AuthContext: Login response received without token');
         setUser(data.user);
+        return data;
+      } else {
+        console.log('🔐 AuthContext: Unexpected response:', data);
+        return { success: false, error: 'Unexpected response from server' };
       }
-      return data;
     } catch (err) {
       console.error('🔐 AuthContext: Login error:', err.message);
       throw err;
@@ -143,3 +155,5 @@ export function useAuth() {
   }
   return context;
 }
+
+

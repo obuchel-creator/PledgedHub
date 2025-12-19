@@ -75,9 +75,9 @@
 .form-group textarea:focus,
 .form-group select:focus {
   outline: none;
-  border-color: #FCD116;
+  border-color: #f59e0b;
   background-color: #333333;
-  box-shadow: 0 0 0 3px rgba(252, 209, 22, 0.15);
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
 }
 
 .form-group textarea {
@@ -153,20 +153,20 @@
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #FCD116, #f4c430);
+  background: linear-gradient(135deg, #f59e0b, #d97706);
   color: #0f0f0f;
-  box-shadow: 0 8px 20px rgba(252, 209, 22, 0.25);
+  box-shadow: 0 8px 20px rgba(245, 158, 11, 0.25);
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 12px 30px rgba(252, 209, 22, 0.35);
-  background: linear-gradient(135deg, #f4c430, #FCD116);
+  box-shadow: 0 12px 30px rgba(245, 158, 11, 0.35);
+  background: linear-gradient(135deg, #d97706, #f59e0b);
 }
 
 .btn-primary:active {
   transform: translateY(0);
-  box-shadow: 0 4px 15px rgba(252, 209, 22, 0.2);
+  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.2);
 }
 
 .btn-secondary {
@@ -179,7 +179,7 @@
 .btn-secondary:hover {
   background: linear-gradient(135deg, #333333, #3a3a3a);
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
-  border-color: #FCD116;
+  border-color: #f59e0b;
 }
 
 .btn-secondary:active {
@@ -217,10 +217,10 @@
 }
 
 .step.active .step-number {
-  background: linear-gradient(135deg, #FCD116, #f4c430);
-  border-color: #FCD116;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  border-color: #f59e0b;
   color: #0f0f0f;
-  box-shadow: 0 0 0 4px rgba(252, 209, 22, 0.15);
+  box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.15);
 }
 
 .step.completed .step-number {
@@ -328,3 +328,5 @@
     min-width: 80px;
   }
 }
+
+

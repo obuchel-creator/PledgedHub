@@ -36,8 +36,8 @@
 
 .error-box button {
   padding: 0.75rem 1.5rem;
-  background: #FFCC00;
-  color: #000000;
+  background: #2563eb;
+  color: #ffffff;
   border: none;
   border-radius: 8px;
   cursor: pointer;
@@ -46,7 +46,7 @@
 }
 
 .error-box button:hover {
-  background: #FFB800;
+  background: #1e40af;
 }
 
 /* Campaign Card */
@@ -61,7 +61,7 @@
 .campaign-image {
   width: 100%;
   height: 300px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
   overflow: hidden;
 }
 
@@ -105,7 +105,7 @@
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(90deg, #2563eb 0%, #1e40af 100%);
   border-radius: 6px;
   transition: width 0.3s ease;
 }
@@ -216,8 +216,8 @@
 
 .form-group input:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 .form-group small {
@@ -232,7 +232,7 @@
 .pay-button {
   width: 100%;
   padding: 0.875rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
   color: white;
   border: none;
   border-radius: 8px;
@@ -246,7 +246,7 @@
 .submit-button:hover:not(:disabled),
 .pay-button:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
 }
 
 .submit-button:disabled,
@@ -384,7 +384,7 @@
 }
 
 .payment-option:hover {
-  border-color: #667eea;
+  border-color: #2563eb;
   background: #f0f4ff;
 }
 
@@ -393,7 +393,7 @@
   height: 18px;
   margin-right: 1rem;
   cursor: pointer;
-  accent-color: #667eea;
+  accent-color: #2563eb;
 }
 
 .payment-option span {
@@ -425,7 +425,7 @@
 .event-code strong {
   display: block;
   margin-top: 0.5rem;
-  color: #667eea;
+  color: #2563eb;
   font-size: 1.5rem;
   letter-spacing: 2px;
   font-family: 'Courier New', monospace;
@@ -583,3 +583,5 @@
     border-color: #dc2626;
   }
 }
+
+

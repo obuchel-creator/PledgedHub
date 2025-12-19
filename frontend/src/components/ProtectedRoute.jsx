@@ -14,13 +14,23 @@ const ProtectedRoute = ({ children, requiredRole = null }) => {
     return <Navigate to="/login" replace />;
   }
 
-  if (requiredRole && user?.role !== requiredRole) {
-    console.log('🔐 ProtectedRoute: User lacks required role:', requiredRole, 'has:', user?.role);
-    return <Navigate to="/dashboard" replace />;
+  if (requiredRole) {
+    // Check if user has the required role (admin or superadmin both qualify for admin-required routes)
+    const userRole = user?.role;
+    const isAuthorized = requiredRole === 'admin' 
+      ? (userRole === 'admin' || userRole === 'superadmin' || userRole === 'staff')
+      : userRole === requiredRole;
+    
+    if (!isAuthorized) {
+      console.log('🔐 ProtectedRoute: User lacks required role:', requiredRole, 'has:', userRole);
+      return <Navigate to="/dashboard" replace />;
+    }
   }
 
   return children;
 };
 
 export default ProtectedRoute;
+
+
 

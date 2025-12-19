@@ -7,6 +7,7 @@ const navLinks = [
   { to: '/dashboard', label: 'Dashboard', icon: '🏠' },
   { to: '/campaigns', label: 'Campaigns', icon: '📊' },
   { to: '/analytics', label: 'Analytics', icon: '📈', adminOnly: true },
+  { to: '/accounting/dashboard', label: 'Accounting', icon: '📋', adminOnly: true },
   { to: '/users', label: 'Users', icon: '👥', adminOnly: true },
   { to: '/settings', label: 'Settings', icon: '⚙️' }
 ];

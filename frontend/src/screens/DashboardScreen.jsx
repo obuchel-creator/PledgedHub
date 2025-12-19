@@ -80,7 +80,7 @@ function Dashboard() {
                         <div className="list-item__meta">
                           <span
                             className="list-item__title"
-                            style={{ color: '#9333ea', fontWeight: '600' }}
+                            style={{ color: '#2563eb', fontWeight: '600' }}
                           >
                             {amountDisplay}
                           </span>
@@ -349,7 +349,7 @@ function Dashboard() {
                       minWidth: 'fit-content',
                       background: creatingPledge
                         ? '#9ca3af'
-                        : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        : 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
                       color: 'white',
                       fontWeight: '700',
                       padding: '0.7rem 1.1rem',
@@ -527,3 +527,5 @@ function Dashboard() {
 // Add Dashboard.propTypes here if/when props are introduced in the future.
 
 export default Dashboard;
+
+

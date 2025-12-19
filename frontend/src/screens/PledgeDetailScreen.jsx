@@ -892,7 +892,7 @@ export default function PledgeDetailScreen(props) {
           <div
             style={{
               padding: '1.25rem',
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
               borderRadius: '12px',
               boxShadow: '0 4px 12px rgba(102, 126, 234, 0.3)',
             }}
@@ -1278,3 +1278,5 @@ export default function PledgeDetailScreen(props) {
     </main>
   );
 }
+
+

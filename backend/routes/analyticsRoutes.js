@@ -80,7 +80,29 @@ router.get('/purpose-breakdown', requireStaff, async (req, res) => {
 router.get('/at-risk', requireStaff, async (req, res) => {
     try {
         const { start, end } = req.query;
-        const data = await analyticsService.getAtRiskPledges(start, end);
+        const data = await analyticsService.getAtRiskPledgesDetailed(start, end);
+        res.json({ success: true, data });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// GET /api/analytics/payment-methods
+router.get('/payment-methods', requireStaff, async (req, res) => {
+    try {
+        const { start, end } = req.query;
+        const data = await analyticsService.getPaymentMethods(start, end);
+        res.json({ success: true, data });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// GET /api/analytics/credit-metrics
+router.get('/credit-metrics', requireStaff, async (req, res) => {
+    try {
+        const { start, end } = req.query;
+        const data = await analyticsService.getCreditMetrics(start, end);
         res.json({ success: true, data });
     } catch (err) {
         res.status(500).json({ success: false, error: err.message });

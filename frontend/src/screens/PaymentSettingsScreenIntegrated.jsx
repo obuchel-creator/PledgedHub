@@ -589,3 +589,5 @@ const PaymentSettingsScreen = () => {
 };
 
 export default PaymentSettingsScreen;
+
+

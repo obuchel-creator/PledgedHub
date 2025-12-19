@@ -12,11 +12,15 @@ export default function Navbar() {
   // Dynamic nav links based on user role
   const navLinks = [
     { to: '/dashboard', label: 'Dashboard' },
-    { to: '/campaigns', label: '🎯 Campaigns' },
-    { to: '/analytics', label: '📊 Analytics' },
+    { to: '/campaigns', label: 'Campaigns' },
+    { to: '/analytics', label: 'Analytics' },
     { to: '/create', label: 'Create' },
     ...(user?.role === 'admin' || user?.role === 'superadmin'
-      ? [{ to: '/admin/users', label: '👥 Users' }]
+      ? [
+          { to: '/admin/users', label: '👥 Users' },
+          { to: '/accounting/dashboard', label: '📊 Accounting' },
+          { to: '/accounting/chart-of-accounts', label: '📋 Accounts' }
+        ]
       : []),
     { to: '/about', label: 'About' },
   ];
@@ -142,7 +146,7 @@ export default function Navbar() {
                       fontWeight: '600',
                       fontSize: '0.95rem',
                       padding: '0.5rem 1rem',
-                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                      background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
                       color: '#ffffff',
                       borderRadius: '8px',
                       boxShadow: '0 2px 8px rgba(102, 126, 234, 0.3)',
@@ -263,3 +267,5 @@ export default function Navbar() {
     </header>
   );
 }
+
+

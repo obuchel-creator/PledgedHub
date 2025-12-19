@@ -1,9 +1,9 @@
-﻿import React from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 
 export default function PrivacyScreen() {
   return (
-    <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', padding: '40px 20px' }}>
+    <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)', padding: '40px 20px' }}>
       <div style={{ maxWidth: '900px', margin: '0 auto' }}>
         <div style={{ background: 'white', borderRadius: '16px', padding: '48px 32px', marginBottom: '32px', boxShadow: '0 10px 40px rgba(0, 0, 0, 0.1)' }}>
           <p style={{ color: '#f97316', fontSize: '14px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '12px', textAlign: 'center' }}>LEGAL</p>
@@ -52,4 +52,6 @@ export default function PrivacyScreen() {
     </div>
   );
 }
+
+
 

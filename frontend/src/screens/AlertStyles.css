@@ -1,7 +1,7 @@
 /* AlertStyles.css - MTN Theme Alerts and Toast Notifications */
 
 :root {
-  --mtn-primary: #FCD116;
+  --mtn-primary: #f59e0b;
   --mtn-dark-bg: #0f0f0f;
   --mtn-bg-primary: #1a1a1a;
   --mtn-bg-secondary: #252525;
@@ -433,3 +433,5 @@
     width: 100%;
   }
 }
+
+

@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 const { createPledge, getPledge, listPledges, updatePledge, deletePledge, batchCreatePledges } = require('../controllers/pledgeController');
 const { authenticateToken, requireStaff } = require('../middleware/authMiddleware');
+const pledgeVerificationService = require('../services/pledgeVerificationService');
 
 // Batch create pledges
 // POST /batch
@@ -12,9 +13,29 @@ router.post('/batch', authenticateToken, requireStaff, batchCreatePledges);
 /**
  * Create a new pledge
  * POST /
- * Protected: Staff/Admin only
+ * Protected: Public - allow anyone to create a pledge
  */
-router.post('/', authenticateToken, requireStaff, createPledge);
+router.post('/', createPledge);
+
+/**
+ * Verify pledge email
+ * POST /verify
+ * Protected: Public
+ */
+router.post('/verify/:token', async (req, res) => {
+  try {
+    const { token } = req.params;
+    const result = await pledgeVerificationService.verifyPledge(token);
+    
+    if (result.success) {
+      return res.status(200).json(result);
+    } else {
+      return res.status(400).json(result);
+    }
+  } catch (error) {
+    return res.status(500).json({ success: false, error: error.message });
+  }
+});
 
 /**
  * Get all pledges

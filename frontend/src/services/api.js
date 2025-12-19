@@ -52,7 +52,7 @@ async function createHttpClient() {
     // Add request interceptor to attach token to every request
     client.interceptors.request.use(
       (config) => {
-        const token = localStorage.getItem('authToken');
+        const token = localStorage.getItem('pledgehub_token');
         if (token) {
           config.headers['Authorization'] = `Bearer ${token}`;
           console.debug('🔑 [AXIOS] Token attached to request:', token.substring(0, 20) + '...');
@@ -287,9 +287,24 @@ export async function getPledge(id) {
   return handleRequest(client.get(`pledges/${encodeURIComponent(String(id))}`));
 }
 
+/**
+ * Verify a pledge with a token
+ * @param {string} token - Verification token
+ * @returns {Promise<Object>}
+ */
+export async function verifyPledge(token) {
+  if (!token) return Promise.reject(new Error('verifyPledge: token is required'));
+  const client = await getClient();
+  return handleRequest(client.post(`pledges/verify/${encodeURIComponent(String(token))}`));
+}
+
 export async function createPledge(data) {
   if (!data) return Promise.reject(new Error('createPledge: data is required'));
-  const client = await getClient();
+  const { default: axios } = await import('axios');
+  const client = axios.create({
+    baseURL: BASE_URL || undefined,
+    headers: { 'Content-Type': 'application/json' },
+  });
   return handleRequest(client.post('pledges', data));
 }
 

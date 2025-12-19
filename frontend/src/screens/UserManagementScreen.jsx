@@ -212,7 +212,7 @@ export default function UserManagementScreen() {
 
     try {
       // Call API to update user role
-      const response = await fetch(`http://localhost:5001/api/users/${editingUser.id}/role`, {
+      const response = await fetch(`/api/users/${editingUser.id}/role`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -265,7 +265,7 @@ export default function UserManagementScreen() {
   return (
     <div
       style={{
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
         minHeight: '100vh',
         paddingTop: '2rem',
         paddingBottom: '3rem',
@@ -295,7 +295,7 @@ export default function UserManagementScreen() {
               <p
                 className="page-header__eyebrow"
                 style={{
-                  color: '#667eea',
+                  color: '#2563eb',
                   fontWeight: '700',
                   fontSize: '0.95rem',
                   marginBottom: '0.5rem',
@@ -347,9 +347,9 @@ export default function UserManagementScreen() {
                   display: 'flex',
                   gap: '1rem',
                   padding: '1.5rem',
-                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
                   borderRadius: '16px',
-                  boxShadow: '0 4px 20px rgba(102, 126, 234, 0.3)',
+                  boxShadow: '0 4px 20px rgba(37, 99, 235, 0.3)',
                 }}
               >
                 <div
@@ -407,7 +407,7 @@ export default function UserManagementScreen() {
                 padding: '1.5rem',
                 borderRadius: '16px',
                 boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
-                border: '2px solid #9333ea',
+                border: '2px solid #2563eb',
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
@@ -416,7 +416,7 @@ export default function UserManagementScreen() {
                     width: '50px',
                     height: '50px',
                     borderRadius: '12px',
-                    background: 'linear-gradient(135deg, #9333ea 0%, #7e22ce 100%)',
+                    background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -752,7 +752,7 @@ export default function UserManagementScreen() {
                               <button
                                 onClick={() => handleEditRole(u)}
                                 className="btn btn-ghost btn--small"
-                                style={{ color: '#9333ea' }}
+                                style={{ color: '#2563eb' }}
                                 title="Change user role"
                               >
                                 ⚡ Edit Role
@@ -1326,8 +1326,8 @@ export default function UserManagementScreen() {
                           cursor: 'pointer',
                           padding: '1rem',
                           background:
-                            newUser.role === 'superadmin' ? 'rgba(147, 51, 234, 0.08)' : 'white',
-                          border: `2px solid ${newUser.role === 'superadmin' ? '#9333ea' : '#e5e7eb'}`,
+                            newUser.role === 'superadmin' ? 'rgba(37, 99, 235, 0.08)' : 'white',
+                          border: `2px solid ${newUser.role === 'superadmin' ? '#2563eb' : '#e5e7eb'}`,
                           borderRadius: '12px',
                           transition: 'all 0.2s',
                         }}
@@ -1472,12 +1472,12 @@ export default function UserManagementScreen() {
                     width: '80px',
                     height: '80px',
                     borderRadius: '50%',
-                    background: 'linear-gradient(135deg, #9333ea 0%, #7e22ce 100%)',
+                    background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     margin: '0 auto 1.5rem',
-                    boxShadow: '0 8px 24px rgba(147, 51, 234, 0.3)',
+                    boxShadow: '0 8px 24px rgba(37, 99, 235, 0.3)',
                   }}
                 >
                   <span style={{ fontSize: '2.5rem' }}>⚡</span>
@@ -1516,7 +1516,7 @@ export default function UserManagementScreen() {
                       fontSize: '0.95rem',
                     }}
                   >
-                    Current Role: <span style={{ color: '#9333ea' }}>{editingUser.role}</span>
+                    Current Role: <span style={{ color: '#2563eb' }}>{editingUser.role}</span>
                   </label>
                   <label
                     style={{
@@ -1639,8 +1639,8 @@ export default function UserManagementScreen() {
                           cursor: 'pointer',
                           padding: '1rem',
                           background:
-                            newRole === 'superadmin' ? 'rgba(147, 51, 234, 0.08)' : 'white',
-                          border: `2px solid ${newRole === 'superadmin' ? '#9333ea' : '#e5e7eb'}`,
+                            newRole === 'superadmin' ? 'rgba(37, 99, 235, 0.08)' : 'white',
+                          border: `2px solid ${newRole === 'superadmin' ? '#2563eb' : '#e5e7eb'}`,
                           borderRadius: '12px',
                           transition: 'all 0.2s',
                         }}
@@ -1718,14 +1718,14 @@ export default function UserManagementScreen() {
                       padding: '0.875rem 1.75rem',
                       background: updatingRole
                         ? '#9ca3af'
-                        : 'linear-gradient(135deg, #9333ea 0%, #7e22ce 100%)',
+                        : 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
                       border: 'none',
                       borderRadius: '12px',
                       fontWeight: '700',
                       fontSize: '1rem',
                       cursor: updatingRole ? 'not-allowed' : 'pointer',
                       color: 'white',
-                      boxShadow: updatingRole ? 'none' : '0 4px 12px rgba(147, 51, 234, 0.4)',
+                      boxShadow: updatingRole ? 'none' : '0 4px 12px rgba(37, 99, 235, 0.4)',
                       transition: 'all 0.2s',
                     }}
                     onMouseEnter={(e) =>
@@ -1744,3 +1744,5 @@ export default function UserManagementScreen() {
     </div>
   );
 }
+
+

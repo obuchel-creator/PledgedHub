@@ -1,11 +1,11 @@
 .qb-navbar {
   display: flex;
   align-items: center;
-  background: #003D82;
-  color: #ffffff;
+  background: #FCD116;
+  color: #000000;
   padding: 0 2rem;
   height: 64px;
-  box-shadow: 0 2px 8px rgba(0, 61, 130, 0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -15,7 +15,7 @@
   font-weight: 700;
   letter-spacing: 0.02em;
   margin-right: 2rem;
-  color: #FFCC00;
+  color: #000000;
   font-family: 'Roboto', 'Segoe UI', Arial, sans-serif;
 }
 .qb-navbar__links {
@@ -33,12 +33,12 @@
   transition: all 0.2s;
 }
 .qb-navbar__links li.active {
-  border-bottom: 2px solid #FFCC00;
+  border-bottom: 2px solid #000000;
 }
 .qb-navbar__links a {
   display: flex;
   align-items: center;
-  color: #ffffff;
+  color: #000000;
   text-decoration: none;
   font-size: 1rem;
   font-weight: 500;
@@ -48,7 +48,8 @@
   font-family: 'Roboto', 'Segoe UI', Arial, sans-serif;
 }
 .qb-navbar__links a:hover {
-  color: #FFCC00;
+  color: #333333;
+  background-color: rgba(0, 0, 0, 0.05);
 }
 .qb-navbar__icon {
   font-size: 1.3rem;
@@ -60,8 +61,8 @@
   gap: 0.7rem;
 }
 .qb-navbar__avatar {
-  background: #FFCC00;
-  color: #003D82;
+  background: #000000;
+  color: #FCD116;
   font-weight: 700;
   border-radius: 50%;
   width: 36px;
@@ -74,17 +75,17 @@
 .qb-navbar__username {
   font-size: 1rem;
   font-weight: 500;
-  color: #ffffff;
+  color: #000000;
 }
 .qb-navbar__login {
-  color: #FFCC00;
+  color: #000000;
   font-weight: 600;
   text-decoration: underline;
   cursor: pointer;
   transition: all 0.2s;
 }
 .qb-navbar__login:hover {
-  color: #FFD700;
+  color: #333333;
 }
 @media (max-width: 700px) {
   .qb-navbar {

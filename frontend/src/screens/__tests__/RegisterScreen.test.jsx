@@ -1,4 +1,4 @@
-﻿import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import RegisterScreen from '../RegisterScreen';
 
@@ -89,4 +89,6 @@ describe('RegisterScreen', () => {
     jest.restoreAllMocks();
   });
 });
+
+
 

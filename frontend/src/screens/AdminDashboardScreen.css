@@ -1,7 +1,7 @@
 /* AdminDashboardScreen.css - MTN Theme for Admin Panels */
 
 :root {
-  --mtn-primary: #FCD116;
+  --mtn-primary: #f59e0b;
   --mtn-dark-bg: #0f0f0f;
   --mtn-bg-primary: #1a1a1a;
   --mtn-bg-secondary: #252525;
@@ -103,7 +103,7 @@
 .admin-stat-card:hover {
   border-color: var(--mtn-primary);
   transform: translateY(-4px);
-  box-shadow: 0 12px 40px rgba(252, 209, 22, 0.15);
+  box-shadow: 0 12px 40px rgba(245, 158, 11, 0.15);
 }
 
 .stat-card-header {
@@ -209,7 +209,7 @@
 }
 
 .admin-table tbody tr:hover {
-  background-color: rgba(252, 209, 22, 0.05);
+  background-color: rgba(245, 158, 11, 0.05);
 }
 
 .admin-table td {
@@ -360,20 +360,20 @@
 
 .admin-action-btn {
   padding: 12px 24px;
-  background: linear-gradient(135deg, var(--mtn-primary), #f4c430);
+  background: linear-gradient(135deg, var(--mtn-primary), #d97706);
   color: var(--mtn-dark-bg);
   border: none;
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
   font-size: 14px;
-  box-shadow: 0 8px 20px rgba(252, 209, 22, 0.25);
+  box-shadow: 0 8px 20px rgba(245, 158, 11, 0.25);
   transition: all 0.3s ease;
 }
 
 .admin-action-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 12px 30px rgba(252, 209, 22, 0.35);
+  box-shadow: 0 12px 30px rgba(245, 158, 11, 0.35);
 }
 
 .admin-action-btn.secondary {
@@ -384,7 +384,7 @@
 }
 
 .admin-action-btn.secondary:hover {
-  background-color: rgba(252, 209, 22, 0.1);
+  background-color: rgba(245, 158, 11, 0.1);
 }
 
 .admin-action-btn.danger {
@@ -554,3 +554,5 @@
     font-size: 16px;
   }
 }
+
+

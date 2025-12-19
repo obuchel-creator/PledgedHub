@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 export default function HelpScreen() {
@@ -6,14 +6,14 @@ export default function HelpScreen() {
   const [searchQuery, setSearchQuery] = useState('');
 
   const categories = [
-    { id: 'getting-started', name: 'Getting Started', icon: '🚀' },
-    { id: 'pledges', name: 'Managing Pledges', icon: '💰' },
-    { id: 'account', name: 'Account & Settings', icon: '👤' },
-    { id: 'payments', name: 'Payments & Tracking', icon: '💳' },
-    { id: 'notifications', name: 'Notifications', icon: '🔔' },
-    { id: 'security', name: 'Security & Privacy', icon: '🔒' },
-    { id: 'troubleshooting', name: 'Troubleshooting', icon: '🔧' },
-    { id: 'contact', name: 'Contact Support', icon: '📧' },
+    { id: 'getting-started', name: 'Getting Started', icon: '??' },
+    { id: 'pledges', name: 'Managing Pledges', icon: '??' },
+    { id: 'account', name: 'Account & Settings', icon: '??' },
+    { id: 'payments', name: 'Payments & Tracking', icon: '??' },
+    { id: 'notifications', name: 'Notifications', icon: '??' },
+    { id: 'security', name: 'Security & Privacy', icon: '??' },
+    { id: 'troubleshooting', name: 'Troubleshooting', icon: '??' },
+    { id: 'contact', name: 'Contact Support', icon: '??' },
   ];
 
   const faqData = {
@@ -185,7 +185,7 @@ export default function HelpScreen() {
     <div 
       style={{ 
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
         padding: '40px 20px',
       }}
     >
@@ -253,7 +253,7 @@ export default function HelpScreen() {
                   fontSize: '20px',
                 }}
               >
-                🔍
+                ??
               </span>
             </div>
           </div>
@@ -397,7 +397,7 @@ export default function HelpScreen() {
                   gap: '12px',
                 }}
               >
-                <span style={{ fontSize: '24px' }}>ðŸ“§</span>
+                <span style={{ fontSize: '24px' }}>📧</span>
                 Contact Support
               </h2>
 
@@ -411,7 +411,7 @@ export default function HelpScreen() {
                   }}
                 >
                   <h3 style={{ margin: '0 0 8px 0', color: '#0369a1', fontWeight: '600' }}>
-                    ðŸ“§ Email Support
+                    📧 Email Support
                   </h3>
                   <p style={{ margin: '0 0 12px 0', color: '#374151', fontSize: '14px' }}>
                     Get help with your account, technical issues, or general questions.
@@ -437,7 +437,7 @@ export default function HelpScreen() {
                   }}
                 >
                   <h3 style={{ margin: '0 0 8px 0', color: '#059669', fontWeight: '600' }}>
-                    ðŸ“š Help Center
+                    📚 Help Center
                   </h3>
                   <p style={{ margin: '0 0 12px 0', color: '#374151', fontSize: '14px' }}>
                     Browse all help topics and find answers to common questions.
@@ -458,7 +458,7 @@ export default function HelpScreen() {
                       fontSize: '14px',
                     }}
                   >
-                    Browse Help Topics â†’
+                    Browse Help Topics →
                   </button>
                 </div>
 
@@ -471,7 +471,7 @@ export default function HelpScreen() {
                   }}
                 >
                   <h3 style={{ margin: '0 0 8px 0', color: '#a21caf', fontWeight: '600' }}>
-                    ðŸ› Report a Bug
+                    🐛 Report a Bug
                   </h3>
                   <p style={{ margin: '0 0 12px 0', color: '#374151', fontSize: '14px' }}>
                     Found an issue? Help us improve by reporting bugs.
@@ -484,7 +484,7 @@ export default function HelpScreen() {
                       fontWeight: '600',
                     }}
                   >
-                    Report Bug â†’
+                    Report Bug →
                   </a>
                 </div>
               </div>
@@ -534,7 +534,7 @@ export default function HelpScreen() {
                   gap: '8px',
                 }}
               >
-                🔒 Privacy Policy
+                ?? Privacy Policy
               </Link>
               <Link
                 to="/terms"
@@ -551,7 +551,7 @@ export default function HelpScreen() {
                   gap: '8px',
                 }}
               >
-                📋 Terms of Service
+                ?? Terms of Service
               </Link>
               <Link
                 to="/about"
@@ -568,7 +568,7 @@ export default function HelpScreen() {
                   gap: '8px',
                 }}
               >
-                ℹ️ About Us
+                ?? About Us
               </Link>
             </div>
           </section>
@@ -938,6 +938,8 @@ export default function HelpScreen() {
     </div>
   );
 }
+
+
 
 
 

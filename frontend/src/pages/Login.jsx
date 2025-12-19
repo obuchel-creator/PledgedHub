@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { loginUser } from '../services/api';
@@ -40,7 +40,7 @@ export default function Login() {
       const response = await loginUser(payload);
       if (response && response.success && response.token) {
         login(response.token, response.user);
-        localStorage.setItem('authToken', response.token);
+        localStorage.setItem('pledgehub_token', response.token);
         navigate('/dashboard');
       } else {
         setError(response?.message || 'Invalid login response');
@@ -179,4 +179,6 @@ export default function Login() {
     </div>
   );
 }
+
+
 

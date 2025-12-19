@@ -1,6 +1,6 @@
 .security-settings-screen {
     min-height: 100vh;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
     padding: 40px 20px;
 }
 
@@ -70,7 +70,7 @@
 }
 
 .tab.active {
-    color: #667eea;
+    color: #2563eb;
 }
 
 .tab.active::after {
@@ -80,7 +80,7 @@
     left: 0;
     right: 0;
     height: 3px;
-    background: linear-gradient(90deg, #667eea, #764ba2);
+    background: linear-gradient(90deg, #2563eb, #1e40af);
 }
 
 /* Alerts */
@@ -121,7 +121,7 @@
     margin: 0 0 32px 0;
     font-size: 24px;
     color: #333;
-    border-bottom: 2px solid #667eea;
+    border-bottom: 2px solid #2563eb;
     padding-bottom: 16px;
 }
 
@@ -131,7 +131,7 @@
     padding: 24px;
     background: #f9f9f9;
     border-radius: 12px;
-    border-left: 4px solid #667eea;
+    border-left: 4px solid #2563eb;
 }
 
 .settings-section h3 {
@@ -172,8 +172,8 @@
 
 .form-group input:focus {
     outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 .form-group input:disabled {
@@ -211,13 +211,13 @@
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
     color: white;
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
 }
 
 .btn-primary:hover:not(:disabled) {
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
     transform: translateY(-2px);
 }
 
@@ -269,7 +269,7 @@
 
 .ip-item:hover {
     background: #f9f9f9;
-    border-color: #667eea;
+    border-color: #2563eb;
 }
 
 .ip-address {
@@ -291,7 +291,7 @@
     padding: 12px;
     background: white;
     border-radius: 8px;
-    border-left: 3px solid #667eea;
+    border-left: 3px solid #2563eb;
 }
 
 .info-item .label {
@@ -314,13 +314,13 @@
     padding: 20px;
     background: #f0f4ff;
     border-radius: 10px;
-    border-left: 4px solid #667eea;
+    border-left: 4px solid #2563eb;
     margin-top: 20px;
 }
 
 .info-box h4 {
     margin: 0 0 12px 0;
-    color: #667eea;
+    color: #2563eb;
     font-size: 14px;
 }
 
@@ -396,7 +396,7 @@
 .status-value {
     font-size: 24px;
     font-weight: 700;
-    color: #667eea;
+    color: #2563eb;
     margin: 0 0 8px 0;
     font-family: 'Courier New', monospace;
 }
@@ -521,3 +521,5 @@
         align-items: flex-start;
     }
 }
+
+

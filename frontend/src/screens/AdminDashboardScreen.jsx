@@ -71,7 +71,7 @@ export default function AdminDashboardScreen() {
     return (
       <div
         style={{
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
           minHeight: '100vh',
           display: 'flex',
           alignItems: 'center',
@@ -86,7 +86,7 @@ export default function AdminDashboardScreen() {
             boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
           }}
         >
-          <p style={{ margin: 0, fontSize: '1.1rem', color: '#667eea' }}>Loading dashboard...</p>
+          <p style={{ margin: 0, fontSize: '1.1rem', color: '#2563eb' }}>Loading dashboard...</p>
         </div>
       </div>
     );
@@ -95,7 +95,7 @@ export default function AdminDashboardScreen() {
   return (
     <div
       style={{
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
         minHeight: '100vh',
         paddingTop: '2rem',
         paddingBottom: '3rem',
@@ -125,7 +125,7 @@ export default function AdminDashboardScreen() {
             <div>
               <p
                 className="page-header__eyebrow"
-                style={{ color: '#667eea', fontWeight: '600', marginBottom: '0.5rem' }}
+                style={{ color: '#2563eb', fontWeight: '600', marginBottom: '0.5rem' }}
               >
                 Admin Dashboard
               </p>
@@ -230,7 +230,7 @@ export default function AdminDashboardScreen() {
                 <p
                   style={{
                     margin: '0.25rem 0 0',
-                    color: '#667eea',
+                    color: '#2563eb',
                     fontSize: '1.75rem',
                     fontWeight: '700',
                   }}
@@ -356,7 +356,7 @@ export default function AdminDashboardScreen() {
                       transition: 'all 0.2s',
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.borderColor = '#667eea';
+                      e.currentTarget.style.borderColor = '#2563eb';
                       e.currentTarget.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.15)';
                     }}
                     onMouseLeave={(e) => {
@@ -411,7 +411,7 @@ export default function AdminDashboardScreen() {
                           style={{
                             width: `${Math.min(progress, 100)}%`,
                             height: '100%',
-                            backgroundColor: progress >= 100 ? '#10b981' : '#667eea',
+                            backgroundColor: progress >= 100 ? '#10b981' : '#2563eb',
                             transition: 'width 0.3s ease',
                           }}
                         />
@@ -633,3 +633,5 @@ export default function AdminDashboardScreen() {
     </div>
   );
 }
+
+

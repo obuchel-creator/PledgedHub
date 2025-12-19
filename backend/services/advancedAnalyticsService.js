@@ -3,7 +3,8 @@
  * QuickBooks-style analytics with insights, trends, forecasting, and comprehensive reporting
  */
 
-const db = require('../config/db');
+const { pool } = require('../config/db');
+const db = { query: pool.query.bind(pool), execute: pool.execute.bind(pool) };
 
 /**
  * Get comprehensive dashboard metrics with trends

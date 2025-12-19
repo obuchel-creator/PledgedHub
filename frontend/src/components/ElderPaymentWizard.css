@@ -51,10 +51,10 @@
 }
 
 .elder-wizard-step.active .elder-wizard-step-circle {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
   color: white;
-  border-color: #667eea;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  border-color: #2563eb;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
   transform: scale(1.1);
 }
 
@@ -75,7 +75,7 @@
 }
 
 .elder-wizard-step.active .elder-wizard-step-label {
-  color: #667eea;
+  color: #2563eb;
   font-weight: 700;
 }
 
@@ -161,8 +161,8 @@
 
 .elder-wizard-input:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2);
+  border-color: #2563eb;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.2);
   background: white;
 }
 
@@ -387,7 +387,7 @@
   width: 80px;
   height: 80px;
   border: 8px solid #e0e0e0;
-  border-top-color: #667eea;
+  border-top-color: #2563eb;
   border-radius: 50%;
   animation: elder-wizard-spin 1s linear infinite;
   margin-bottom: 24px;
@@ -650,3 +650,5 @@
     transform: scaleY(1.3);
   }
 }
+
+

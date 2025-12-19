@@ -77,7 +77,7 @@ export default function CampaignDetailScreen() {
     return (
       <div
         style={{
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
           minHeight: '100vh',
           display: 'flex',
           alignItems: 'center',
@@ -92,7 +92,7 @@ export default function CampaignDetailScreen() {
             boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
           }}
         >
-          <p style={{ margin: 0, fontSize: '1.1rem', color: '#667eea' }}>
+          <p style={{ margin: 0, fontSize: '1.1rem', color: '#2563eb' }}>
             Loading campaign details...
           </p>
         </div>
@@ -104,7 +104,7 @@ export default function CampaignDetailScreen() {
     return (
       <div
         style={{
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
           minHeight: '100vh',
           padding: '2rem',
         }}
@@ -125,7 +125,7 @@ export default function CampaignDetailScreen() {
             onClick={() => navigate('/admin')}
             style={{
               padding: '0.75rem 1.5rem',
-              background: '#667eea',
+              background: '#2563eb',
               color: 'white',
               border: 'none',
               borderRadius: '8px',
@@ -147,7 +147,7 @@ export default function CampaignDetailScreen() {
   return (
     <div
       style={{
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
         minHeight: '100vh',
         padding: '2rem',
       }}
@@ -256,7 +256,7 @@ export default function CampaignDetailScreen() {
             >
               TOTAL PLEDGED
             </div>
-            <div style={{ fontSize: '2rem', fontWeight: '700', color: '#667eea' }}>
+            <div style={{ fontSize: '2rem', fontWeight: '700', color: '#2563eb' }}>
               UGX {campaign.stats?.totalPledged?.toLocaleString() || 0}
             </div>
           </div>
@@ -378,7 +378,7 @@ export default function CampaignDetailScreen() {
             {campaign.suggested_amount && (
               <div>
                 <span style={{ color: '#6b7280' }}>Donors Needed: </span>
-                <span style={{ fontWeight: '600', color: '#667eea' }}>
+                <span style={{ fontWeight: '600', color: '#2563eb' }}>
                   {campaign.stats?.donorsNeeded || 0}
                 </span>
               </div>
@@ -410,7 +410,7 @@ export default function CampaignDetailScreen() {
               onClick={() => navigate('/create')}
               style={{
                 padding: '0.75rem 1.5rem',
-                background: '#667eea',
+                background: '#2563eb',
                 color: 'white',
                 border: 'none',
                 borderRadius: '8px',
@@ -513,7 +513,7 @@ export default function CampaignDetailScreen() {
                 onClick={() => navigate('/create')}
                 style={{
                   padding: '0.75rem 1.5rem',
-                  background: '#667eea',
+                  background: '#2563eb',
                   color: 'white',
                   border: 'none',
                   borderRadius: '8px',
@@ -531,3 +531,5 @@ export default function CampaignDetailScreen() {
     </div>
   );
 }
+
+

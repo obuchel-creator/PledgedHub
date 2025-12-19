@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createPledge, getCampaigns } from '../services/api';
 import './FormScreens.css';
 
@@ -7,6 +7,7 @@ export default function CreatePledgeScreen() {
   const [campaignId, setCampaignId] = useState('');
   const [donorName, setDonorName] = useState('');
   const [donorEmail, setDonorEmail] = useState('');
+  const [donorPhone, setDonorPhone] = useState('');
   const [amount, setAmount] = useState('');
   const [purpose, setPurpose] = useState('');
   const [collectionDate, setCollectionDate] = useState('');
@@ -14,6 +15,7 @@ export default function CreatePledgeScreen() {
   const [loadingCampaigns, setLoadingCampaigns] = useState(false);
   const [message, setMessage] = useState(null);
   const [error, setError] = useState(null);
+  const [formattedAmount, setFormattedAmount] = useState('');
 
   useEffect(() => {
     loadCampaigns();
@@ -40,7 +42,9 @@ export default function CreatePledgeScreen() {
     setCampaignId('');
     setDonorName('');
     setDonorEmail('');
+    setDonorPhone('');
     setAmount('');
+    setFormattedAmount('');
     setPurpose('');
     setCollectionDate('');
   };
@@ -61,6 +65,15 @@ export default function CreatePledgeScreen() {
     if (!emailRegex.test(donorEmail.trim())) {
       setError('Please enter a valid email address.');
       return false;
+    }
+
+    // Phone validation (optional but recommended for Uganda)
+    if (donorPhone.trim()) {
+      const phoneRegex = /^[\d\s\-\+\(\)]{7,}$/;
+      if (!phoneRegex.test(donorPhone.trim())) {
+        setError('Please enter a valid phone number.');
+        return false;
+      }
     }
 
     const amountNum = Number(amount);
@@ -93,14 +106,14 @@ export default function CreatePledgeScreen() {
         donorName: donorName.trim(),
         donor_name: donorName.trim(),
         donor_email: donorEmail.trim().toLowerCase(),
-        donor_phone: null,
+        donor_phone: donorPhone.trim() || null,
         purpose: purpose.trim() || 'General donation',
         collection_date: collectionDate,
         status: 'pending',
         message: purpose.trim() || 'General donation',
         date: new Date().toISOString(),
       });
-      setMessage('Pledge recorded successfully.');
+      setMessage(`✅ Pledge submitted! Check your email (${donorEmail}) to verify your pledge.`);
       resetForm();
     } catch (err) {
       setError((err && err.message) || 'An error occurred while creating the pledge.');
@@ -256,41 +269,70 @@ export default function CreatePledgeScreen() {
 
             <div className="form-grid form-grid--two">
               <div className="form-field">
-                <label htmlFor="amount" className="form-label">
-                  Pledge amount (UGX) *
+                <label htmlFor="donorPhone" className="form-label">
+                  Phone number
                 </label>
                 <input
-                  id="amount"
-                  name="amount"
-                  type="number"
-                  value={amount}
-                  onChange={(event) => setAmount(event.target.value)}
+                  id="donorPhone"
+                  name="donorPhone"
+                  type="tel"
+                  value={donorPhone}
+                  onChange={(event) => setDonorPhone(event.target.value)}
                   className="input"
-                  required
-                  aria-required="true"
-                  step="any"
-                  min="0"
                   disabled={loading}
-                  placeholder="e.g., 100000"
+                  placeholder="e.g., +256 701 123456 (for SMS reminders)"
                 />
+                <p
+                  className="form-hint"
+                  style={{ marginTop: '0.5rem', fontSize: '0.875rem', color: '#64748b' }}
+                >
+                  Optional but recommended for SMS reminders
+                </p>
               </div>
 
               <div className="form-field">
-                <label htmlFor="collectionDate" className="form-label">
-                  Collection date *
+                <label htmlFor="amount" className="form-label">
+                  Pledge amount (UGX) *
                 </label>
-                <input
-                  id="collectionDate"
-                  name="collectionDate"
-                  type="date"
-                  value={collectionDate}
-                  onChange={(event) => setCollectionDate(event.target.value)}
-                  className="input"
-                  required
-                  aria-required="true"
-                  disabled={loading}
-                  min={new Date().toISOString().split('T')[0]}
-                />
+                <div style={{ position: 'relative' }}>
+                  <input
+                    id="amount"
+                    name="amount"
+                    type="number"
+                    value={amount}
+                    onChange={(event) => {
+                      setAmount(event.target.value);
+                      if (event.target.value) {
+                        setFormattedAmount(Number(event.target.value).toLocaleString());
+                      } else {
+                        setFormattedAmount('');
+                      }
+                    }}
+                    className="input"
+                    required
+                    aria-required="true"
+                    step="any"
+                    min="0"
+                    disabled={loading}
+                    placeholder="e.g., 100000"
+                  />
+                  {formattedAmount && (
+                    <span
+                      style={{
+                        position: 'absolute',
+                        right: '16px',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        color: '#10b981',
+                        fontSize: '0.875rem',
+                        fontWeight: '600',
+                        pointerEvents: 'none',
+                      }}
+                    >
+                      UGX {formattedAmount}
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -312,15 +354,7 @@ export default function CreatePledgeScreen() {
 
             <div className="form-actions">
               <button type="submit" className="btn btn-primary" disabled={loading}>
-                {loading ? 'Creating…' : 'Create pledge'}
-              </button>
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={resetForm}
-                disabled={loading}
-              >
-                Clear form
+                {loading ? '⏳ Creating...' : '✓ Create Pledge'}
               </button>
             </div>
 
@@ -333,3 +367,5 @@ export default function CreatePledgeScreen() {
     </div>
   );
 }
+
+

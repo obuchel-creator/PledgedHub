@@ -292,7 +292,7 @@ export default function SettingsScreen() {
   );
 
   return (
-    <div style={{ padding: '40px 20px', maxWidth: '900px', margin: '0 auto', minHeight: '100vh', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
+    <div style={{ padding: '40px 20px', maxWidth: '900px', margin: '0 auto', minHeight: '100vh', background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)' }}>
       <div style={{
         background: 'white',
         border: '1px solid #e5e7eb',
@@ -898,3 +898,5 @@ export default function SettingsScreen() {
     </div>
   );
 }
+
+

@@ -33,7 +33,7 @@ export default function GuestPledgeScreen() {
       setLoading(true);
       setError(null);
 
-      const res = await fetch(`http://localhost:5001/api/public/campaigns/${slug}`);
+      const res = await fetch(`/api/public/campaigns/${slug}`);
       const data = await res.json();
 
       if (!data.success) {
@@ -91,7 +91,7 @@ export default function GuestPledgeScreen() {
     try {
       setIsSubmitting(true);
 
-      const res = await fetch('http://localhost:5001/api/public/pledges', {
+      const res = await fetch('/api/public/pledges', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -125,7 +125,7 @@ export default function GuestPledgeScreen() {
 
     try {
       const res = await fetch(
-        `http://localhost:5001/api/public/pledges/${pledgeCreated.pledgeId}/pay`,
+        `/api/public/pledges/${pledgeCreated.pledgeId}/pay`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -393,3 +393,5 @@ export default function GuestPledgeScreen() {
     </div>
   );
 }
+
+

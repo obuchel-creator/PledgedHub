@@ -20,12 +20,18 @@ import PledgeDetailScreen from './screens/PledgeDetailScreen';
 import AdvancedAnalyticsScreen from './screens/AdvancedAnalyticsScreen';
 import FundraisingScreen from './screens/FundraisingScreen';
 import AccountingScreen from './screens/AccountingScreen';
+import { AccountingDashboardScreen } from './screens/AccountingDashboardScreen';
+import { ChartOfAccountsScreen } from './screens/ChartOfAccountsScreen';
 import CommissionDashboardScreen from './screens/CommissionDashboardScreen';
 import SecuritySettingsScreen from './screens/SecuritySettingsScreen';
 import PaymentInitiationScreen from './screens/PaymentInitiationScreen';
 import GuestPledgeScreen from './screens/GuestPledgeScreen';
 import CashAccountabilityDashboard from './screens/CashAccountabilityDashboard';
 import NotFoundScreen from './screens/NotFoundScreen';
+import HelpScreen from './screens/HelpScreen';
+import PrivacyScreen from './screens/PrivacyScreen';
+import TermsScreen from './screens/TermsScreen';
+import VerifyPledgeScreen from './screens/VerifyPledgeScreen';
 
 function App() {
   return (
@@ -68,6 +74,22 @@ function App() {
           }
         />
         <Route
+          path="/accounting/dashboard"
+          element={
+            <ProtectedRoute requiredRole="admin">
+              <AccountingDashboardScreen />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/accounting/chart-of-accounts"
+          element={
+            <ProtectedRoute requiredRole="admin">
+              <ChartOfAccountsScreen />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/commissions"
           element={
             <ProtectedRoute requiredRole="admin">
@@ -99,6 +121,10 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="/help" element={<HelpScreen />} />
+        <Route path="/privacy" element={<PrivacyScreen />} />
+        <Route path="/terms" element={<TermsScreen />} />
+        <Route path="/verify-pledge" element={<VerifyPledgeScreen />} />
         <Route path="*" element={<NotFoundScreen />} />
       </Routes>
     </Router>
@@ -106,3 +132,5 @@ function App() {
 }
 
 export default App;
+
+

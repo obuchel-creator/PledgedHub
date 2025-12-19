@@ -43,21 +43,33 @@ export default function LoginScreen() {
     setError('');
 
     try {
-      console.log('[LoginScreen] Attempting login with:', { email: form.email });
+      console.log('[LoginScreen] 🔐 Attempting login with:', { email: form.email });
       const result = await login({ email: form.email, password: form.password });
       
-      console.log('[LoginScreen] Login result:', result);
+      console.log('[LoginScreen] 🔐 Login result received:', result);
       
-      if (result && result.token) {
-        console.log('[LoginScreen] Login successful, navigating to dashboard');
+      // Check if login was successful
+      if (result && result.success === false && result.error) {
+        // Error response from handleRequest
+        console.error('[LoginScreen] 🔐 Login API error:', result.error);
+        setError(result.error);
+      } else if (result && result.token) {
+        console.log('[LoginScreen] ✅ Login successful, token received, navigating to dashboard');
         navigate('/dashboard');
+      } else if (result && result.user && !result.token) {
+        console.error('[LoginScreen] 🔐 User received but no token');
+        setError('Login failed: No authentication token received');
+      } else if (!result) {
+        console.error('[LoginScreen] 🔐 No response from login');
+        setError('No response from server. Please check your connection.');
       } else {
-        console.log('[LoginScreen] Login failed:', result?.error);
+        console.error('[LoginScreen] 🔐 Unexpected login response:', result);
         setError(result?.error || 'Login failed. Please check your credentials.');
       }
     } catch (err) {
-      console.error('[LoginScreen] Login error:', err);
-      setError(err?.response?.data?.error || err?.message || 'Login failed. Please try again.');
+      console.error('[LoginScreen] 🔐 Login exception:', err);
+      const errorMsg = err?.response?.data?.error || err?.message || 'Login failed. Please try again.';
+      setError(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -163,3 +175,5 @@ Email, Username, or Phone <span style={{ color: 'var(--error)' }}>*</span>
     </div>
   );
 }
+
+

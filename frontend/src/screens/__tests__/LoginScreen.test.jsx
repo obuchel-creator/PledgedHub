@@ -1,4 +1,4 @@
-﻿import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import LoginScreen from '../LoginScreen';
 
@@ -35,4 +35,6 @@ describe('LoginScreen', () => {
     expect(screen.getByRole('button', { name: /next/i })).toBeInTheDocument();
   });
 });
+
+
 

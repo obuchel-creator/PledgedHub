@@ -1,7 +1,7 @@
 /* PledgesScreen.css - MTN Theme Styling for Pledges List */
 
 :root {
-  --mtn-primary: #FCD116;
+  --mtn-primary: #f59e0b;
   --mtn-dark-bg: #0f0f0f;
   --mtn-bg-primary: #1a1a1a;
   --mtn-bg-secondary: #252525;
@@ -71,7 +71,7 @@
   outline: none;
   border-color: var(--mtn-primary);
   background-color: var(--mtn-bg-tertiary);
-  box-shadow: 0 0 0 3px rgba(252, 209, 22, 0.15);
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
 }
 
 .pledges-search input::placeholder {
@@ -149,7 +149,7 @@
 }
 
 .pledges-table tbody tr:hover {
-  background-color: rgba(252, 209, 22, 0.05);
+  background-color: rgba(245, 158, 11, 0.05);
 }
 
 .pledges-table td {
@@ -242,7 +242,7 @@
 .pledge-card:hover {
   border-color: var(--mtn-primary);
   transform: translateY(-4px);
-  box-shadow: 0 12px 40px rgba(252, 209, 22, 0.15);
+  box-shadow: 0 12px 40px rgba(245, 158, 11, 0.15);
 }
 
 .pledge-card-header {
@@ -353,20 +353,20 @@
 
 .pledges-empty-btn {
   padding: 12px 28px;
-  background: linear-gradient(135deg, var(--mtn-primary), #f4c430);
+  background: linear-gradient(135deg, var(--mtn-primary), #d97706);
   color: var(--mtn-dark-bg);
   border: none;
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
   font-size: 14px;
-  box-shadow: 0 8px 20px rgba(252, 209, 22, 0.25);
+  box-shadow: 0 8px 20px rgba(245, 158, 11, 0.25);
   transition: all 0.3s ease;
 }
 
 .pledges-empty-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 12px 30px rgba(252, 209, 22, 0.35);
+  box-shadow: 0 12px 30px rgba(245, 158, 11, 0.35);
 }
 
 /* Loading State */
@@ -463,3 +463,5 @@
     font-size: 20px;
   }
 }
+
+

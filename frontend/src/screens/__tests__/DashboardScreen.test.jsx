@@ -5,3 +5,5 @@ test('renders dashboard loading state', () => {
   render(<Dashboard />);
   expect(screen.getByText(/Loading pledges and recent payments/i)).toBeInTheDocument();
 });
+
+

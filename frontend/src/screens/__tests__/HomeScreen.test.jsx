@@ -17,3 +17,5 @@ describe('HomeScreen', () => {
     expect(screen.getByText(/avg. suggested gift/i)).toBeInTheDocument();
   });
 });
+
+

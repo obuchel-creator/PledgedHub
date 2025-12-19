@@ -541,6 +541,166 @@ async function getDashboardData() {
     }
 }
 
+/**
+ * Get payment methods breakdown (MTN, Airtel, Bank, Cash)
+ * @returns {Promise<Array>} Payment methods with amounts
+ */
+async function getPaymentMethods(start, end) {
+    try {
+        let where = 'WHERE deleted = 0';
+        let params = [];
+        
+        if (start) {
+            where += ' AND created_at >= ?';
+            params.push(start);
+        }
+        if (end) {
+            where += ' AND created_at <= ?';
+            params.push(end);
+        }
+        
+        const [rows] = await pool.execute(`
+            SELECT 
+                COALESCE(payment_method, 'unknown') as provider,
+                SUM(amount) as amount,
+                COUNT(*) as count
+            FROM payments
+            ${where}
+            GROUP BY payment_method
+            ORDER BY amount DESC
+        `, params);
+        
+        return rows.map(r => ({
+            provider: r.provider || 'Unknown',
+            method: r.provider || 'Unknown',
+            amount: parseFloat(r.amount) || 0,
+            count: parseInt(r.count) || 0
+        }));
+    } catch (error) {
+        console.error('Error getting payment methods:', error);
+        return [];
+    }
+}
+
+/**
+ * Get credit system metrics (Free, PayAsYouGo, Campaign, Premium users)
+ * @returns {Promise<Object>} Credit metrics
+ */
+async function getCreditMetrics(start, end) {
+    try {
+        let where = 'WHERE 1=1';
+        let params = [];
+        
+        if (start) {
+            where += ' AND created_at >= ?';
+            params.push(start);
+        }
+        if (end) {
+            where += ' AND created_at <= ?';
+            params.push(end);
+        }
+        
+        // Get user tier counts
+        const [tiers] = await pool.execute(`
+            SELECT 
+                COALESCE(subscription_tier, 'free') as tier,
+                COUNT(*) as count,
+                COALESCE(SUM(credits_balance), 0) as total_credits
+            FROM users
+            ${where}
+            GROUP BY subscription_tier
+        `, params);
+        
+        const tierMap = {};
+        tiers.forEach(t => {
+            tierMap[t.tier] = {
+                count: parseInt(t.count) || 0,
+                credits: parseFloat(t.total_credits) || 0
+            };
+        });
+        
+        // Calculate metrics
+        return {
+            freeUsers: tierMap['free']?.count || 0,
+            payAsYouGoUsers: tierMap['pay_as_you_go']?.count || 0,
+            campaignTierSubscribers: tierMap['campaign']?.count || 0,
+            premiumTierSubscribers: tierMap['premium']?.count || 0,
+            totalCreditsLoaded: Object.values(tierMap).reduce((sum, t) => sum + (t.credits || 0), 0),
+            totalUsers: Object.values(tierMap).reduce((sum, t) => sum + (t.count || 0), 0)
+        };
+    } catch (error) {
+        console.error('Error getting credit metrics:', error);
+        return {
+            freeUsers: 0,
+            payAsYouGoUsers: 0,
+            campaignTierSubscribers: 0,
+            premiumTierSubscribers: 0,
+            totalCreditsLoaded: 0,
+            totalUsers: 0
+        };
+    }
+}
+
+/**
+ * Get at-risk pledges with detailed information
+ * @returns {Promise<Array>} At-risk pledges
+ */
+async function getAtRiskPledgesDetailed(start, end) {
+    try {
+        let where = "WHERE status IN ('pending', 'active', 'overdue') AND deleted = 0";
+        let params = [];
+        
+        if (start) {
+            where += ' AND collection_date >= ?';
+            params.push(start);
+        }
+        if (end) {
+            where += ' AND collection_date <= ?';
+            params.push(end);
+        }
+        
+        const [pledges] = await pool.execute(`
+            SELECT 
+                id,
+                donor_name,
+                donor_email,
+                donor_phone,
+                amount,
+                description as purpose,
+                collection_date,
+                status,
+                last_reminder_sent,
+                DATEDIFF(CURDATE(), collection_date) as days_overdue
+            FROM pledges
+            ${where}
+            AND (
+                collection_date < CURDATE()
+                OR (collection_date <= DATE_ADD(CURDATE(), INTERVAL 7 DAY) 
+                    AND (last_reminder_sent IS NULL OR last_reminder_sent < DATE_SUB(CURDATE(), INTERVAL 3 DAY)))
+            )
+            ORDER BY days_overdue DESC, collection_date ASC
+            LIMIT 50
+        `, params);
+        
+        return pledges.map(p => ({
+            id: p.id,
+            donorName: p.donor_name,
+            donorEmail: p.donor_email,
+            donorPhone: p.donor_phone,
+            amount: parseFloat(p.amount) || 0,
+            purpose: p.purpose || 'Unspecified',
+            dueDate: p.collection_date,
+            status: p.status,
+            lastReminderSent: p.last_reminder_sent,
+            daysOverdue: Math.max(0, parseInt(p.days_overdue) || 0),
+            riskLevel: (p.days_overdue || 0) > 30 ? 'CRITICAL' : (p.days_overdue || 0) > 10 ? 'HIGH' : 'MEDIUM'
+        }));
+    } catch (error) {
+        console.error('Error getting at-risk pledges detailed:', error);
+        return [];
+    }
+}
+
 module.exports = {
     getOverallStats,
     getPledgeTrends,
@@ -553,9 +713,12 @@ module.exports = {
     getDashboardData,
     getSummary,
     getTrends,
-    getCampaigns
-    ,getDrilldownByPurpose
-    ,getDrilldownByCampaign
-    ,getDrilldownByDonor
-    ,getDrilldownByStatus
+    getCampaigns,
+    getDrilldownByPurpose,
+    getDrilldownByCampaign,
+    getDrilldownByDonor,
+    getDrilldownByStatus,
+    getPaymentMethods,
+    getCreditMetrics,
+    getAtRiskPledgesDetailed
 };

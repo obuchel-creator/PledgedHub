@@ -41,6 +41,7 @@ async function batchCreatePledges(req, res) {
 const { validationResult } = require('express-validator');
 const Pledge = require('../models/Pledge');  // Using database-connected model
 const campaignService = require('../services/campaignService');
+const pledgeVerificationService = require('../services/pledgeVerificationService');
 
 async function createPledge(req, res) {
     try {
@@ -153,13 +154,33 @@ async function createPledge(req, res) {
             const [rows] = await pool.execute('SELECT * FROM pledges WHERE id = ?', [result.insertId]);
             const createdPledge = rows[0];
 
+            // Send verification email if donor has email
+            if (donor_email && typeof donor_email === 'string' && donor_email.trim()) {
+              console.log('📧 [PLEDGE CREATE] Sending verification email to:', donor_email);
+              const verificationResult = await pledgeVerificationService.sendVerificationEmail(
+                result.insertId,
+                donor_email.trim(),
+                donor_name || donorName || 'Donor'
+              );
+              
+              if (!verificationResult.success) {
+                console.warn('⚠️  [PLEDGE CREATE] Failed to send verification email:', verificationResult.error);
+              } else {
+                console.log('✅ [PLEDGE CREATE] Verification email sent successfully');
+              }
+            }
+
             // If pledge is linked to a campaign, update campaign amount
             if (campaign_id) {
                 console.log('🔵 [PLEDGE CREATE] Updating campaign amount for campaign:', campaign_id);
                 await campaignService.updateCampaignAmount(campaign_id);
             }
 
-            return res.status(201).json({ success: true, pledge: createdPledge });
+            return res.status(201).json({ 
+              success: true, 
+              pledge: createdPledge,
+              message: 'Pledge created! Please verify your email to confirm.'
+            });
         } catch (dbError) {
             console.error('❌ [PLEDGE CREATE] Database error:', dbError);
             

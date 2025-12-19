@@ -1,43 +1,59 @@
 /* Global theme - lightweight, accessible, low-specificity */
 
-/* Variables - MTN Brand Colors */
+/* Variables - Professional Color Scheme */
 :root {
+  /* Primary: Deep Blue - Trust & Stability */
+  --primary: #2563eb;
+  --primary-dark: #1e40af;
+  --primary-light: #3b82f6;
+  
+  /* Secondary: Emerald Green - Growth & Impact */
+  --secondary: #10b981;
+  --secondary-dark: #059669;
+  --secondary-light: #34d399;
+  
+  /* Accent: Gold - Premium & Achievement */
+  --accent: #f59e0b;
+  --accent-dark: #d97706;
+  --accent-light: #fbbf24;
+  
+  /* Legacy compatibility */
   --bg: #ffffff;
-  --text: #000000;
-  --muted: #666666;
-  --accent: #FFCC00;
-  --accent-hover: #FFB800;
-  --border: #FFCC00;
-  --input-bg: #ffffff;
-  --focus-rgb: 255, 204, 0; /* for rgba(...) - MTN Golden Yellow */
+  --text: #1f2937;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --input-bg: #f9fafb;
+  --focus-rgb: 37, 99, 235; /* Primary Blue */
   --container-max-width: 1100px;
   --radius: 8px;
   --base-line: 1.6;
 }
 
-/* Light Theme - MTN Brand */
+/* Light Theme - Professional */
 body.light-theme {
   --bg: #ffffff;
-  --text: #000000;
-  --muted: #666666;
-  --accent: #FFCC00;
-  --accent-hover: #FFB800;
-  --border: #FFCC00;
-  --input-bg: #ffffff;
+  --text: #1f2937;
+  --muted: #6b7280;
+  --primary: #2563eb;
+  --secondary: #10b981;
+  --accent: #f59e0b;
+  --border: #e5e7eb;
+  --input-bg: #f9fafb;
   background: var(--bg);
   color: var(--text);
 }
 
-/* Dark Theme - MTN Brand */
+/* Dark Theme - Professional */
 body.dark-theme {
-  --bg: #1a1a1a;
-  --text: #FFCC00;
-  --muted: #999999;
-  --accent: #FFCC00;
-  --accent-hover: #FFB800;
-  --border: #FFCC00;
-  --input-bg: #2a2a2a;
-  --focus-rgb: 255, 204, 0;
+  --bg: #111827;
+  --text: #f3f4f6;
+  --muted: #d1d5db;
+  --primary: #3b82f6;
+  --secondary: #34d399;
+  --accent: #fbbf24;
+  --border: #374151;
+  --input-bg: #1f2937;
+  --focus-rgb: 59, 130, 246;
   background: var(--bg);
   color: var(--text);
 }
@@ -346,3 +362,5 @@ kbd {
     margin-bottom: 0.85rem;
   }
 }
+
+

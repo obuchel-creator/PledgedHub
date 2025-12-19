@@ -32,6 +32,7 @@ import HelpScreen from './screens/HelpScreen';
 import PrivacyScreen from './screens/PrivacyScreen';
 import TermsScreen from './screens/TermsScreen';
 import VerifyPledgeScreen from './screens/VerifyPledgeScreen';
+import ProfileScreen from './screens/ProfileScreen';
 
 function App() {
   return (
@@ -131,6 +132,11 @@ function App() {
         <Route path="/payment" element={
           <ProtectedRoute>
             <PaymentInitiationScreen />
+          </ProtectedRoute>
+        } />
+        <Route path="/profile" element={
+          <ProtectedRoute>
+            <ProfileScreen />
           </ProtectedRoute>
         } />
         <Route path="/help" element={<HelpScreen />} />

@@ -1,36 +1,75 @@
-/* Professional Theme - Dashboard Screen */
+/* Professional Theme - Dashboard Screen (Refactored with Component-Based CSS) */
 
-.dashboard-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 40px 20px;
-  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
-  min-height: 100vh;
-}
+/* Dashboard Header */
 
 .dashboard-header {
-  margin-bottom: 40px;
+  margin-bottom: 2rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid var(--color-border-light);
 }
 
-.dashboard-header h1 {
-  font-size: 2.5rem;
-  color: #ffffff;
+.dashboard-header__content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.dashboard-header__title {
+  font-size: 2rem;
   font-weight: 700;
-  margin: 0 0 8px 0;
+  color: var(--color-text-primary);
+  margin: 0;
   letter-spacing: -0.5px;
 }
 
-.dashboard-header p {
-  font-size: 16px;
-  color: #e0e7ff;
-  margin: 0;
+.dashboard-header__subtitle {
+  font-size: 1rem;
+  color: var(--color-text-secondary);
+  margin: 0.5rem 0 0 0;
 }
 
+/* Dashboard Main Grid */
 .dashboard-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 24px;
-  margin-bottom: 40px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.dashboard-grid__section {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.dashboard-grid__section--primary {
+  grid-column: span 1;
+}
+
+.dashboard-grid__section--secondary {
+  grid-column: span 1;
+}
+
+.dashboard-grid__section--full {
+  grid-column: 1 / -1;
+}
+
+@media (min-width: 768px) {
+  .dashboard-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .dashboard-grid__section--primary {
+    grid-column: span 1;
+  }
+}
+
+@media (min-width: 1024px) {
+  .dashboard-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 .dashboard-card {
@@ -208,44 +247,414 @@
   margin: 0;
 }
 
-.stat-box .sub-text {
-  font-size: 13px;
-  color: #666666;
-  margin-top: 8px;
+/* Dashboard Metrics Component Styles */
+.dashboard-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+  grid-column: 1 / -1;
 }
 
-.empty-state {
-  background: linear-gradient(135deg, #ffffff, #fafafa);
-  border: 2px dashed #d0d0d0;
-  border-radius: 12px;
-  padding: 60px 40px;
-  text-align: center;
-  color: #666666;
+.metric-card {
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-sm);
 }
 
-.empty-state h3 {
-  color: #000000;
-  font-size: 1.25rem;
-  margin-bottom: 12px;
+.metric-card:hover {
+  border-color: var(--color-accent);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.metric-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.metric-card__label {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.metric-card__icon {
+  font-size: 1.5rem;
+  opacity: 0.8;
+}
+
+.metric-card__value {
+  font-size: 2rem;
   font-weight: 700;
+  color: var(--color-primary);
+  margin-bottom: 0.5rem;
 }
 
-.empty-state p {
-  margin: 0 0 24px 0;
+.metric-card__description {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  margin-bottom: 0.75rem;
+}
+
+.metric-card__badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.metric-card__badge--success {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: var(--color-success);
+}
+
+.metric-card__badge--warning {
+  background-color: rgba(245, 158, 11, 0.1);
+  color: var(--color-warning);
+}
+
+.metric-card__badge--danger {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: var(--color-error);
+}
+
+/* Pledges List Component Styles */
+.pledges-list {
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.pledges-list__item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid var(--color-border-light);
+  transition: background-color 0.2s ease;
+}
+
+.pledges-list__item:last-child {
+  border-bottom: none;
+}
+
+.pledges-list__item:hover {
+  background-color: var(--color-hover);
+}
+
+.pledges-list__content {
+  flex: 1;
+  min-width: 0;
+}
+
+.pledges-list__amount {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin-bottom: 0.25rem;
+}
+
+.pledges-list__meta {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+.pledges-list__meta-item {
+  display: inline;
+}
+
+.pledges-list__status {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-right: 0.5rem;
+}
+
+.pledges-list__status--pending {
+  background-color: rgba(245, 158, 11, 0.1);
+  color: var(--color-warning);
+}
+
+.pledges-list__status--collected {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: var(--color-success);
+}
+
+.pledges-list__status--overdue {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: var(--color-error);
+}
+
+.pledges-list__actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-left: 1rem;
+  flex-shrink: 0;
+}
+
+.pledges-list__empty {
+  padding: 2rem;
+  text-align: center;
+  color: var(--color-text-secondary);
+}
+
+.pledges-list__loading {
+  padding: 2rem;
+  text-align: center;
+  color: var(--color-text-secondary);
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  border-top: 1px solid var(--color-border-light);
+  background-color: var(--color-bg-secondary);
+}
+
+.pagination__btn {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-card-bg);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.pagination__btn:hover:not(:disabled) {
+  background-color: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
+.pagination__btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination__info {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  padding: 0 0.75rem;
+}
+
+/* Pledge Form Section Styles */
+.pledge-form-section {
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.pledge-form-section__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--color-border-light);
+  gap: 1rem;
+}
+
+.pledge-form-section__title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.pledge-form-section__subtitle {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  margin: 0.5rem 0 0 0;
+}
+
+.pledge-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.pledge-form__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.25rem;
+}
+
+.pledge-form__actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+/* Recent Payments Component Styles */
+.payment-item {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  border-bottom: 1px solid var(--color-border-light);
+  transition: background-color 0.2s ease;
+  align-items: flex-start;
+}
+
+.payment-item:last-child {
+  border-bottom: none;
+}
+
+.payment-item:hover {
+  background-color: var(--color-hover);
+}
+
+.payment-item__icon {
+  flex-shrink: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.payment-item__badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: white;
+}
+
+.payment-item__badge--success {
+  background-color: var(--color-success);
+}
+
+.payment-item__badge--pending {
+  background-color: var(--color-warning);
+}
+
+.payment-item__badge--error {
+  background-color: var(--color-error);
+}
+
+.payment-item__content {
+  flex: 1;
+  min-width: 0;
+}
+
+.payment-item__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.25rem;
+  gap: 1rem;
+}
+
+.payment-item__amount {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-success);
+}
+
+.payment-item__method {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.payment-item__label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0 0 0.25rem 0;
+}
+
+.payment-item__date {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+/* Achievement Section Styles */
+.card--achievement {
+  background: linear-gradient(135deg, var(--color-success) 0%, rgba(16, 185, 129, 0.8) 100%);
+  color: white;
+  border: none;
+}
+
+.achievement-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2rem;
+}
+
+.achievement-info {
+  flex: 1;
+  min-width: 250px;
+}
+
+.achievement-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+}
+
+.achievement-description {
+  font-size: 1rem;
+  opacity: 0.95;
+  margin: 0 0 1rem 0;
   line-height: 1.6;
 }
 
-.empty-state .btn-primary {
-  padding: 12px 24px;
-  background: linear-gradient(135deg, #2563eb, #3b82f6);
-  color: #ffffff;
-  border: none;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  text-decoration: none;
-  display: inline-block;
+.achievement-stats {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.achievement-stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.achievement-stat__divider {
+  opacity: 0.6;
+}
+
+.achievement-action {
+  flex-shrink: 0;
 }
 
 /* Responsive Design */

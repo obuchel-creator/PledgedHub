@@ -44,7 +44,14 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPasswordScreen />} />
         <Route path="/reset-password" element={<ResetPasswordScreen />} />
         <Route path="/create" element={<CreatePledgeScreen />} />
-        <Route path="/campaigns" element={<CampaignsScreen />} />
+        <Route
+          path="/campaigns"
+          element={
+            <ProtectedRoute>
+              <CampaignsScreen />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/about" element={<AboutScreen />} />
         <Route path="/fundraising" element={<FundraisingScreen />} />
         <Route path="/campaign/:slug" element={<GuestPledgeScreen />} />

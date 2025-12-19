@@ -5,7 +5,7 @@ const { pool } = require('../config/db');
 const router = express.Router();
 
 // POST /api/register (public)
-router.post('/register', async (req, res) => {
+router.post('/', async (req, res) => {
   try {
     const { name, email, phone, password } = req.body;
     if (!name || !email || !phone || !password) {

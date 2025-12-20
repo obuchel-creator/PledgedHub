@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { Link, useNavigate } from 'react-router-dom';
 import '../authOutlook.css';
 import Logo from '../components/Logo';
+import { useAuth } from '../context/AuthContext';
 
 // More flexible phone pattern - accepts various formats
 // +256, 0256, 256, or just numbers starting with common prefixes
@@ -17,6 +18,7 @@ console.log('🟠 RegisterScreen.jsx: registerUser imported');
 
 function RegisterScreen({ disableRequired = false }) {
   const navigate = useNavigate();
+  const { refreshUser } = useAuth();
   console.log('🟢 RegisterScreen: Component rendered');
   
   const [form, setForm] = useState({
@@ -76,9 +78,17 @@ function RegisterScreen({ disableRequired = false }) {
       const result = await registerUser(payload);
       console.log('✅ RegisterScreen: Registration result:', result);
       if (result && result.token) {
-        console.log('✅ RegisterScreen: Token received, redirecting to dashboard');
+        console.log('✅ RegisterScreen: Token received, saving and refreshing user');
         localStorage.setItem('pledgehub_token', result.token);
-        navigate('/dashboard');
+        
+        // Refresh user context to load user data
+        await refreshUser();
+        
+        // Give context a moment to update, then redirect
+        setTimeout(() => {
+          console.log('✅ RegisterScreen: Redirecting to dashboard');
+          navigate('/dashboard', { replace: true });
+        }, 500);
       } else {
         console.log('❌ RegisterScreen: No token in result:', result);
         setError(result?.error || 'Registration failed. Please try again.');

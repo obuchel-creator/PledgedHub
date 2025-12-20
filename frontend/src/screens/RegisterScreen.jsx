@@ -9,10 +9,16 @@ import Logo from '../components/Logo';
 const phonePattern = /^(\+?256|0)?\d{9,10}$/;
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+console.log('🟠 RegisterScreen.jsx: File loaded');
+
 import { registerUser } from '../services/api';
+
+console.log('🟠 RegisterScreen.jsx: registerUser imported');
 
 function RegisterScreen({ disableRequired = false }) {
   const navigate = useNavigate();
+  console.log('🟢 RegisterScreen: Component rendered');
+  
   const [form, setForm] = useState({
     firstName: '',
     lastName: '',
@@ -25,6 +31,8 @@ function RegisterScreen({ disableRequired = false }) {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  
+  console.log('📊 RegisterScreen: Current form state:', form);
 
   const handleChange = (e) => {
     console.log('📝 Input changed:', e.target.name, '=', e.target.value);
@@ -269,6 +277,14 @@ function RegisterScreen({ disableRequired = false }) {
               type="submit"
               disabled={loading}
               aria-label="Register"
+              onClick={(e) => {
+                console.log('🔴 Button onClick fired!');
+                handleSubmit(e);
+              }}
+              style={{
+                cursor: loading ? 'not-allowed' : 'pointer',
+                opacity: loading ? 0.6 : 1,
+              }}
             >
               {loading ? 'Creating account...' : 'Register'}
             </button>

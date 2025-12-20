@@ -19,21 +19,37 @@ async function runMigration() {
 
     // 1. Add role column to users if not exists
     console.log('📝 Step 1: Adding role column to users table...');
-    await connection.execute(`
-      ALTER TABLE users 
-      ADD COLUMN IF NOT EXISTS role VARCHAR(50) DEFAULT 'donor' 
-      COMMENT 'User role: donor, creator, support_staff, finance_admin, super_admin'
-    `);
-    console.log('✅ Role column added (or already exists)\n');
+    try {
+      await connection.execute(`
+        ALTER TABLE users 
+        ADD COLUMN role VARCHAR(50) DEFAULT 'donor' 
+        COMMENT 'User role: donor, creator, support_staff, finance_admin, super_admin'
+      `);
+      console.log('✅ Role column added\n');
+    } catch (err) {
+      if (err.message.includes('Duplicate column')) {
+        console.log('✅ Role column already exists\n');
+      } else {
+        throw err;
+      }
+    }
 
     // 2. Add permissions JSON column for fine-grained control
     console.log('📝 Step 2: Adding permissions column to users table...');
-    await connection.execute(`
-      ALTER TABLE users 
-      ADD COLUMN IF NOT EXISTS permissions JSON DEFAULT NULL 
-      COMMENT 'Granular permission overrides as JSON object'
-    `);
-    console.log('✅ Permissions column added (or already exists)\n');
+    try {
+      await connection.execute(`
+        ALTER TABLE users 
+        ADD COLUMN permissions JSON DEFAULT NULL 
+        COMMENT 'Granular permission overrides as JSON object'
+      `);
+      console.log('✅ Permissions column added\n');
+    } catch (err) {
+      if (err.message.includes('Duplicate column')) {
+        console.log('✅ Permissions column already exists\n');
+      } else {
+        throw err;
+      }
+    }
 
     // 3. Create role_audit_log table
     console.log('📝 Step 3: Creating role_audit_log table for compliance...');
@@ -76,6 +92,36 @@ async function runMigration() {
 
     // 5. Seed default role permissions
     console.log('📝 Step 5: Seeding default role permissions...');
+    
+    // Get all permission names to assign to super_admin
+    const allPermissions = [
+      'view_own_pledges',
+      'create_pledge',
+      'view_own_payments',
+      'view_own_profile',
+      'create_campaign',
+      'view_own_campaigns',
+      'view_own_earnings',
+      'request_payout',
+      'view_disputes',
+      'verify_pledges',
+      'issue_small_refunds',
+      'view_user_profiles',
+      'create_support_ticket',
+      'approve_payouts',
+      'view_all_transactions',
+      'audit_commissions',
+      'generate_financial_reports',
+      'view_ledger',
+      'export_financial_data',
+      'manage_users',
+      'manage_roles',
+      'system_configuration',
+      'view_system_logs',
+      'view_analytics',
+      'all_permissions'
+    ];
+    
     const permissions = {
       donor: [
         'view_own_pledges',
@@ -107,13 +153,7 @@ async function runMigration() {
         'view_ledger',
         'export_financial_data'
       ],
-      super_admin: [
-        'manage_users',
-        'manage_roles',
-        'system_configuration',
-        'view_system_logs',
-        'all_permissions'
-      ]
+      super_admin: allPermissions // Super admin gets ALL permissions
     };
 
     let seededCount = 0;
@@ -134,11 +174,19 @@ async function runMigration() {
 
     // 6. Add indexes for performance
     console.log('📝 Step 6: Adding indexes for performance...');
-    await connection.execute(`
-      ALTER TABLE users 
-      ADD INDEX IF NOT EXISTS idx_role (role)
-    `);
-    console.log('✅ Indexes created (or already exist)\n');
+    try {
+      await connection.execute(`
+        ALTER TABLE users 
+        ADD INDEX idx_role (role)
+      `);
+      console.log('✅ Indexes created\n');
+    } catch (err) {
+      if (err.message.includes('Duplicate key name') || err.message.includes('key already exists')) {
+        console.log('✅ Indexes already exist\n');
+      } else {
+        throw err;
+      }
+    }
 
     // 7. Display summary
     console.log('═══════════════════════════════════════════════════════════');

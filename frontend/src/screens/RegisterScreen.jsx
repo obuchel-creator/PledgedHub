@@ -36,9 +36,26 @@ function RegisterScreen({ disableRequired = false }) {
   console.log('📊 RegisterScreen: Current form state:', form);
 
   const handleChange = (e) => {
-    console.log('📝 Input changed:', e.target.name, '=', e.target.value);
-    setForm({ ...form, [e.target.name]: e.target.value });
-    setError('');
+    const { name, value } = e.target;
+    console.log('📝 Input changed:', name, '=', value);
+    setForm({ ...form, [name]: value });
+    
+    // Only clear error if it's related to the field being edited
+    if (error) {
+      const errorLower = error.toLowerCase();
+      const fieldName = name.toLowerCase();
+      
+      // Clear error if user is fixing the field that caused it
+      if (
+        (errorLower.includes('password') && (fieldName === 'password' || fieldName === 'confirmpassword')) ||
+        (errorLower.includes('first name') && fieldName === 'firstname') ||
+        (errorLower.includes('last name') && fieldName === 'lastname') ||
+        (errorLower.includes('phone') && fieldName === 'phone') ||
+        (errorLower.includes('email') && fieldName === 'email')
+      ) {
+        setError('');
+      }
+    }
   };
 
   const validate = () => {
@@ -63,8 +80,8 @@ function RegisterScreen({ disableRequired = false }) {
     if (err) {
       console.log('❌ Validation failed:', err);
       setError(err);
-      setStatus('❌ Validation failed');
-      setTimeout(() => setStatus(''), 3000);
+      setStatus('❌ ' + err);
+      // Don't auto-clear validation errors - user needs to see and fix them
       return;
     }
     setLoading(true);

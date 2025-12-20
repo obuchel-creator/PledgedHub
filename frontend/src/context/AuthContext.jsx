@@ -103,6 +103,14 @@ export function AuthProvider({ children }) {
     setLoading(true);
     try {
       const data = await registerUser(payload);
+      console.log('🔐 AuthContext: registerUser returned:', data);
+      
+      // Check if response indicates an error
+      if (data && (data.success === false || data.error)) {
+        console.log('🔐 AuthContext: Registration failed with error:', data.error);
+        return data; // Return error response so RegisterScreen can display it
+      }
+      
       // optionally auto-login when register returns token
       const newToken = data && (data.token || data.accessToken);
       if (newToken) {

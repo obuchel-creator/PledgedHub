@@ -33,6 +33,7 @@ function RegisterScreen({ disableRequired = false }) {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState(''); // For showing real-time status
   
   console.log('📊 RegisterScreen: Current form state:', form);
 
@@ -58,15 +59,19 @@ function RegisterScreen({ disableRequired = false }) {
     e.preventDefault();
     console.log('🔵 RegisterScreen: handleSubmit called!');
     console.log('📋 Form data:', form);
+    setStatus('⏳ Validating form...');
     const err = validate();
     console.log('✓ Validation result:', err || 'PASSED');
     if (err) {
       console.log('❌ Validation failed:', err);
       setError(err);
+      setStatus('❌ Validation failed');
+      setTimeout(() => setStatus(''), 3000);
       return;
     }
     setLoading(true);
     setError('');
+    setStatus('⏳ Creating account...');
     try {
       const payload = {
         name: (form.firstName + ' ' + form.lastName).trim(),
@@ -75,36 +80,48 @@ function RegisterScreen({ disableRequired = false }) {
         password: form.password,
       };
       console.log('📝 RegisterScreen: Submitting registration with payload:', payload);
+      setStatus('⏳ Sending to server...');
       const result = await registerUser(payload);
       console.log('✅ RegisterScreen: Registration result:', result);
+      
       if (result && result.token) {
         console.log('✅ RegisterScreen: Token received, saving and refreshing user');
+        setStatus('✅ Account created! Loading user data...');
         localStorage.setItem('pledgehub_token', result.token);
         
         // Refresh user context to load user data
+        console.log('⏳ Calling refreshUser...');
         await refreshUser();
+        console.log('✅ User context refreshed');
         
         // Give context a moment to update, then redirect
+        setStatus('✅ Redirecting to dashboard...');
         setTimeout(() => {
           console.log('✅ RegisterScreen: Redirecting to dashboard');
           navigate('/dashboard', { replace: true });
         }, 500);
       } else {
         console.log('❌ RegisterScreen: No token in result:', result);
-        setError(result?.error || 'Registration failed. Please try again.');
+        const errorMsg = result?.error || 'Registration failed. Please try again.';
+        setError(errorMsg);
+        setStatus('❌ ' + errorMsg);
       }
     } catch (err) {
       // If the error has a specific message, use it; otherwise, use 'Server error'
       console.error('❌ RegisterScreen: Catch error:', err);
-      const msg = err?.response?.data?.message || err?.message;
+      const msg = err?.response?.data?.message || err?.message || err?.toString();
+      console.error('Error details:', msg);
       if (msg && (
         msg.toLowerCase().includes('invalid email address') ||
         msg.toLowerCase().includes('passwords do not match') ||
         msg.toLowerCase().includes('phone number must be in format')
       )) {
         setError(msg);
+        setStatus('❌ ' + msg);
       } else {
-        setError('Server error: ' + (err?.message || 'Unknown error'));
+        const fullError = 'Server error: ' + msg;
+        setError(fullError);
+        setStatus('❌ ' + fullError);
       }
     } finally {
       setLoading(false);
@@ -136,7 +153,8 @@ function RegisterScreen({ disableRequired = false }) {
           <h2>Create your account</h2>
           <p className="subtitle">Sign up to PledgeHub</p>
 
-          {error && <div className="error-message">{error}</div>}
+          {error && <div className="error-message" style={{ marginBottom: '16px', padding: '12px', background: '#fee2e2', color: '#991b1b', borderRadius: '4px', fontSize: '14px' }}>{error}</div>}
+          {status && <div style={{ marginBottom: '16px', padding: '12px', background: '#e0f2fe', color: '#0c4a6e', borderRadius: '4px', fontSize: '14px', fontWeight: '500' }}>{status}</div>}
 
           <form onSubmit={handleSubmit} style={{ width: '100%' }}>
             <div style={{ display: 'flex', gap: '12px' }}>

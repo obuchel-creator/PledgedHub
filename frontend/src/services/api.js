@@ -88,20 +88,31 @@ async function createHttpClient() {
         headers['Authorization'] = `Bearer ${token}`;
       }
 
-      console.debug('🌐 [API] POST Request:', url, { body, headers });
+      console.log('🌐 [API] POST Request starting:', url);
+      console.log('🌐 [API] POST body:', body);
+      console.log('🌐 [API] POST headers:', headers);
+      
       try {
+        console.log('🌐 [API] Calling fetch...');
         const res = await fetch(url, {
           method: 'POST',
           headers,
           body: body ? JSON.stringify(body) : undefined
         });
+        console.log('🌐 [API] Fetch returned, status:', res.status);
+        
         const text = await res.text();
+        console.log('🌐 [API] Response text:', text);
+        
         let data;
         try {
           data = text ? JSON.parse(text) : null;
         } catch {
           data = text;
         }
+        
+        console.log('🌐 [API] Parsed data:', data);
+        
         if (!res.ok) {
           const msg = data?.error || data?.message || res.statusText;
           console.error('❌ [API] POST Error Response:', { status: res.status, msg, data });
@@ -305,31 +316,45 @@ export async function registerUser(userData) {
     };
     
     console.debug('🔵 [API] Registering user with payload:', payload);
+    console.log('🔵 [API] Calling POST to /api/register...');
     
-    // Use 'register' (not '/api/register') because BASE_URL already includes '/api'
-    const res = await client.post('register', payload, {
-      headers: { 'Content-Type': 'application/json' },
-    });
+    // Create a timeout promise
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Request timeout after 10 seconds')), 10000)
+    );
     
-    console.debug('🔵 [API] Registration response:', res);
+    // Race: API call vs timeout
+    const res = await Promise.race([
+      client.post('register', payload, {
+        headers: { 'Content-Type': 'application/json' },
+      }),
+      timeoutPromise
+    ]);
+    
+    console.log('🔵 [API] Registration response received:', res);
     
     // Expect { token, user } or { data: { token, user } }
     if (res && res.data) {
       if (res.data.token) {
+        console.log('✅ [API] Registration successful, token:', res.data.token.substring(0, 20) + '...');
         return { token: res.data.token, user: res.data.user };
       }
       // Handle nested response
       if (res.data.data && res.data.data.token) {
+        console.log('✅ [API] Registration successful (nested), token:', res.data.data.token.substring(0, 20) + '...');
         return { token: res.data.data.token, user: res.data.data.user };
       }
     }
     
+    console.error('❌ [API] No token in response:', res);
     return { success: false, error: 'Registration failed. Please try again.' };
   } catch (err) {
     console.error('❌ [API] Registration error:', err);
+    console.error('❌ [API] Error type:', err.constructor.name);
+    console.error('❌ [API] Error message:', err?.message);
     return { 
       success: false, 
-      error: err?.response?.data?.error || err?.message || 'Registration failed.' 
+      error: err?.response?.data?.error || err?.message || 'Registration failed - please check your connection.' 
     };
   }
 }

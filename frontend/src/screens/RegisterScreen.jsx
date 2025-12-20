@@ -4,7 +4,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import '../authOutlook.css';
 import Logo from '../components/Logo';
 
-const phonePattern = /^\+256\d{9}$/;
+// More flexible phone pattern - accepts various formats
+// +256, 0256, 256, or just numbers starting with common prefixes
+const phonePattern = /^(\+?256|0)?\d{9,10}$/;
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 import { registerUser } from '../services/api';
@@ -25,6 +27,7 @@ function RegisterScreen({ disableRequired = false }) {
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
+    console.log('📝 Input changed:', e.target.name, '=', e.target.value);
     setForm({ ...form, [e.target.name]: e.target.value });
     setError('');
   };
@@ -43,8 +46,12 @@ function RegisterScreen({ disableRequired = false }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log('🔵 RegisterScreen: handleSubmit called!');
+    console.log('📋 Form data:', form);
     const err = validate();
+    console.log('✓ Validation result:', err || 'PASSED');
     if (err) {
+      console.log('❌ Validation failed:', err);
       setError(err);
       return;
     }

@@ -12,13 +12,11 @@ const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 console.log('🟠 RegisterScreen.jsx: File loaded');
 
-import { registerUser } from '../services/api';
-
-console.log('🟠 RegisterScreen.jsx: registerUser imported');
+console.log('🟠 RegisterScreen.jsx: File loaded');
 
 function RegisterScreen({ disableRequired = false }) {
   const navigate = useNavigate();
-  const { refreshUser } = useAuth();
+  const { register } = useAuth();
   console.log('🟢 RegisterScreen: Component rendered');
   
   const [form, setForm] = useState({
@@ -81,25 +79,19 @@ function RegisterScreen({ disableRequired = false }) {
       };
       console.log('📝 RegisterScreen: Submitting registration with payload:', payload);
       setStatus('⏳ Sending to server...');
-      const result = await registerUser(payload);
+      
+      // Use context's register function which handles token + user data loading
+      const result = await register(payload);
       console.log('✅ RegisterScreen: Registration result:', result);
       
       if (result && result.token) {
-        console.log('✅ RegisterScreen: Token received, saving and refreshing user');
-        setStatus('✅ Account created! Loading user data...');
-        localStorage.setItem('pledgehub_token', result.token);
+        console.log('✅ RegisterScreen: Token received and user context loaded');
+        setStatus('✅ Account created! Redirecting to dashboard...');
         
-        // Refresh user context to load user data
-        console.log('⏳ Calling refreshUser...');
-        await refreshUser();
-        console.log('✅ User context refreshed');
-        
-        // Give context a moment to update, then redirect
-        setStatus('✅ Redirecting to dashboard...');
-        setTimeout(() => {
-          console.log('✅ RegisterScreen: Redirecting to dashboard');
-          navigate('/dashboard', { replace: true });
-        }, 500);
+        // The context's register() already called refreshUser() and set loading=false
+        // Now we can safely navigate
+        console.log('✅ RegisterScreen: Navigating to dashboard');
+        navigate('/dashboard', { replace: true });
       } else {
         console.log('❌ RegisterScreen: No token in result:', result);
         const errorMsg = result?.error || 'Registration failed. Please try again.';

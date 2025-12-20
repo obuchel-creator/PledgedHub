@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { authenticateToken, requireAdmin } = require('../middleware/authMiddleware');
+const { authenticateToken, requireAdmin, requireRole } = require('../middleware/authMiddleware');
 const bankFeeCalculator = require('../services/bankFeeCalculatorService');
 
 /**

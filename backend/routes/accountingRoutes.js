@@ -5,7 +5,7 @@
 
 const express = require('express');
 const router = express.Router();
-const { authenticateToken, requireAdmin, requireStaff } = require('../middleware/authMiddleware');
+const { authenticateToken, requireAdmin, requireStaff, requireRole } = require('../middleware/authMiddleware');
 const Account = require('../models/Account');
 const accountingService = require('../services/accountingService');
 const financialReportsService = require('../services/financialReportsService');

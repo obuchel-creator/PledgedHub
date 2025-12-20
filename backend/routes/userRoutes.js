@@ -2,7 +2,7 @@
 const router = require('express').Router();
 const userController = require('../controllers/userController');
 const authController = require('../controllers/authController');
-const { authenticateToken: protect } = require('../middleware/authMiddleware');
+const { authenticateToken: protect, requireRole } = require('../middleware/authMiddleware');
 
 const asyncHandler = (fn) => (req, res, next) => {
     try {

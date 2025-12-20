@@ -15,6 +15,7 @@ const express = require('express');
 const router = express.Router();
 const commissionDistributionService = require('../services/commissionDistributionService');
 const { pool } = require('../config/db');
+const { authenticateToken, requireRole } = require('../middleware/authMiddleware');
 
 /**
  * GET /api/commissions/summary

@@ -1,13 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const campaignService = require('../services/campaignService');
-const { authenticateToken, requireAdmin } = require('../middleware/authMiddleware');
+const { authenticateToken, requireAdmin, requireRole } = require('../middleware/authMiddleware');
 
 /**
  * POST /api/campaigns
- * Create a new campaign (ADMIN ONLY)
+ * Create a new campaign (creator and super_admin)
  */
-router.post('/', authenticateToken, requireAdmin, async (req, res) => {
+router.post('/', authenticateToken, requireRole(['creator', 'super_admin']), async (req, res) => {
     try {
         console.log('🔵 [CAMPAIGN CREATE] Received request');
         console.log('🔵 [CAMPAIGN CREATE] Body:', JSON.stringify(req.body, null, 2));

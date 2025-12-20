@@ -7,9 +7,7 @@ const express = require('express');
 const router = express.Router();
 const monetizationService = require('../services/monetizationService');
 const { isMonetizationActive, getMonetizationStartDate } = require('../config/monetization');
-
-// Middleware to check authentication (reuse from your auth system)
-const authenticateToken = require('../middleware/authenticateToken');
+const { authenticateToken, requireRole } = require('../middleware/authMiddleware');
 
 /**
  * GET /api/monetization/status

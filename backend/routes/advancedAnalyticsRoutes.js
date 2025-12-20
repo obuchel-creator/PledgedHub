@@ -6,7 +6,7 @@
 const express = require('express');
 const router = express.Router();
 const advancedAnalytics = require('../services/advancedAnalyticsService');
-const { authenticateToken } = require('../middleware/authMiddleware');
+const { authenticateToken, requireRole } = require('../middleware/authMiddleware');
 
 /**
  * GET /api/advanced-analytics/dashboard

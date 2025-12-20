@@ -11,10 +11,15 @@ router.post('/', async (req, res) => {
     if (!name || !email || !phone || !password) {
       return res.status(400).json({ error: 'All fields are required.' });
     }
-    // Check if user already exists
+    // Check if user already exists by email
     const [existing] = await pool.query('SELECT id FROM users WHERE email = ?', [email]);
     if (existing.length > 0) {
       return res.status(400).json({ error: 'Email already registered.' });
+    }
+    // Check if phone number already exists
+    const [existingPhone] = await pool.query('SELECT id FROM users WHERE phone = ?', [phone]);
+    if (existingPhone.length > 0) {
+      return res.status(400).json({ error: 'Phone number already registered.' });
     }
     const hashedPassword = await bcrypt.hash(password, 10);
     const [result] = await pool.query(

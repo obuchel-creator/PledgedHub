@@ -1,10 +1,10 @@
 export function formatCurrency(amount) {
   if (typeof amount !== 'number') return amount;
-  return amount.toLocaleString('en-UG', {
-    style: 'currency',
-    currency: 'UGX',
+  const formatted = amount.toLocaleString('en-US', {
+    minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   });
+  return `UGX ${formatted}`;
 }
 
 export function formatDateShort(date) {

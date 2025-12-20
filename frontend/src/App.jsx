@@ -3,6 +3,15 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import ProtectedRoute from './components/ProtectedRoute';
 
+// Global error logging
+console.log('🟢 App.jsx: Loading');
+window.addEventListener('error', (event) => {
+  console.error('❌ Global JavaScript Error:', event.error, event);
+});
+window.addEventListener('unhandledrejection', (event) => {
+  console.error('❌ Unhandled Promise Rejection:', event.reason);
+});
+
 // Design System Imports
 import './styles/modern-design-system.css';
 import './styles/globals.css';
@@ -35,6 +44,7 @@ import VerifyPledgeScreen from './screens/VerifyPledgeScreen';
 import ProfileScreen from './screens/ProfileScreen';
 
 function App() {
+  console.log('🟢 App component: Rendering');
   return (
     <Router>
       <Navbar />

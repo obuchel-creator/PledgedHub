@@ -103,6 +103,20 @@ function RegisterScreen({ disableRequired = false }) {
 
   return (
     <div className="auth-bg">
+      <div style={{
+        position: 'fixed',
+        top: '10px',
+        right: '10px',
+        background: '#10b981',
+        color: 'white',
+        padding: '10px 15px',
+        borderRadius: '4px',
+        zIndex: 10000,
+        fontSize: '12px',
+        fontFamily: 'monospace'
+      }}>
+        ✓ RegisterScreen LOADED
+      </div>
       <main>
         <section className="auth-center-card">
           <div style={{ width: '100%', textAlign: 'center', marginBottom: '32px' }}>

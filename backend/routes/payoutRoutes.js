@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { authenticateToken, requireAdmin } = require('../middleware/authMiddleware');
+const { authenticateToken, requireAdmin, requireRole } = require('../middleware/authMiddleware');
 const payoutService = require('../services/payoutService');
 
 /**
@@ -77,9 +77,9 @@ router.get('/earnings/:year/:month', authenticateToken, async (req, res) => {
 
 /**
  * POST /api/payouts/admin/calculate-monthly
- * Admin: Calculate earnings for a creator for specific month
+ * Finance Admin: Calculate earnings for a creator for specific month
  */
-router.post('/admin/calculate-monthly', authenticateToken, requireAdmin, async (req, res) => {
+router.post('/admin/calculate-monthly', authenticateToken, requireRole('finance_admin'), async (req, res) => {
   try {
     const { creatorId, year, month } = req.body;
 
@@ -96,9 +96,9 @@ router.post('/admin/calculate-monthly', authenticateToken, requireAdmin, async (
 
 /**
  * POST /api/payouts/admin/create
- * Admin: Create new payout for creator
+ * Finance Admin: Create new payout for creator
  */
-router.post('/admin/create', authenticateToken, requireAdmin, async (req, res) => {
+router.post('/admin/create', authenticateToken, requireRole('finance_admin'), async (req, res) => {
   try {
     const { creatorId, amount, bankCode, payoutMethod } = req.body;
 
@@ -115,9 +115,9 @@ router.post('/admin/create', authenticateToken, requireAdmin, async (req, res) =
 
 /**
  * GET /api/payouts/admin/pending
- * Admin: Get all pending payouts
+ * Finance Admin: Get all pending payouts
  */
-router.get('/admin/pending', authenticateToken, requireAdmin, async (req, res) => {
+router.get('/admin/pending', authenticateToken, requireRole('finance_admin'), async (req, res) => {
   try {
     const status = req.query.status || 'processing';
     const result = await payoutService.getPendingAdminPayouts(status);
@@ -129,9 +129,9 @@ router.get('/admin/pending', authenticateToken, requireAdmin, async (req, res) =
 
 /**
  * GET /api/payouts/admin/all-creators
- * Admin: Get all creators with earnings
+ * Finance Admin: Get all creators with earnings
  */
-router.get('/admin/all-creators', authenticateToken, requireAdmin, async (req, res) => {
+router.get('/admin/all-creators', authenticateToken, requireRole('finance_admin'), async (req, res) => {
   try {
     const result = await payoutService.getAllCreatorEarnings();
     res.json(result);
@@ -142,9 +142,9 @@ router.get('/admin/all-creators', authenticateToken, requireAdmin, async (req, r
 
 /**
  * PUT /api/payouts/admin/:id/complete
- * Admin: Mark payout as completed
+ * Finance Admin: Mark payout as completed
  */
-router.put('/admin/:id/complete', authenticateToken, requireAdmin, async (req, res) => {
+router.put('/admin/:id/complete', authenticateToken, requireRole('finance_admin'), async (req, res) => {
   try {
     const { referenceNumber } = req.body;
 

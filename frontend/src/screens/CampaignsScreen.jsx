@@ -226,7 +226,7 @@ const CampaignsScreen = () => {
                 <div style={{ marginTop: '1rem', textAlign: 'right' }}>
                   <div style={{ display: 'flex', flexDirection: 'row', gap: '0.75rem', alignItems: 'center', justifyContent: 'flex-end' }}>
                     <Link
-                      to={`/campaign/${slug}`}
+                      to={`/campaigns/${campaign.id}`}
                       className="btn-primary"
                       style={{
                         padding: '0.5rem 1.2rem',
@@ -251,7 +251,7 @@ const CampaignsScreen = () => {
                         raisedAmount: campaign.currentAmount || campaign.raised || 0,
                       }}
                       contentId={campaign.id}
-                      shareUrl={`${window.location.origin}/campaign/${slug}`}
+                      shareUrl={`${window.location.origin}/campaigns/${campaign.id}`}
                       style="button"
                       size="medium"
                       className="btn-primary"

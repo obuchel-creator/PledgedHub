@@ -271,174 +271,290 @@ export default function GuestPledgeScreen() {
   }
 
   // Main pledge form
+  const progress = calculateProgress();
+  const remaining = campaign.goal_amount - campaign.raised_amount;
+  
   return (
     <div className="guest-pledge-container">
-      <div className="campaign-card">
-        {campaign.image_url && (
-          <div className="campaign-image">
-            <img src={campaign.image_url} alt={campaign.title} />
-          </div>
+      {/* Hero Banner */}
+      <div className="campaign-hero">
+        <div className="hero-badge">🎯 Active Campaign</div>
+        <h1 className="hero-title">{campaign.title}</h1>
+        {campaign.description && (
+          <p className="hero-description">{campaign.description}</p>
         )}
+      </div>
 
-        <div className="campaign-info">
-          <h1>{campaign.title}</h1>
-          <p className="campaign-description">{campaign.description}</p>
-
-          {/* Progress Bar */}
-          <div className="progress-section">
-            <div className="progress-bar">
-              <div
-                className="progress-fill"
-                style={{ width: `${calculateProgress()}%` }}
-              />
-            </div>
-            <div className="progress-text">
-              <span className="raised">
-                {formatCurrency(campaign.raised_amount)} raised
-              </span>
-              <span className="goal">Goal: {formatCurrency(campaign.goal_amount)}</span>
-            </div>
-            <p className="pledge-count">
-              {campaign.pledgeCount} {campaign.pledgeCount === 1 ? 'pledge' : 'pledges'}
-            </p>
+      {/* Stats Grid */}
+      <div className="stats-grid">
+        <div className="stat-card raised">
+          <div className="stat-icon">💰</div>
+          <div className="stat-content">
+            <div className="stat-value">{formatCurrency(campaign.raised_amount)}</div>
+            <div className="stat-label">Raised</div>
           </div>
+        </div>
+        
+        <div className="stat-card goal">
+          <div className="stat-icon">🎯</div>
+          <div className="stat-content">
+            <div className="stat-value">{formatCurrency(campaign.goal_amount)}</div>
+            <div className="stat-label">Goal</div>
+          </div>
+        </div>
+        
+        <div className="stat-card backers">
+          <div className="stat-icon">👥</div>
+          <div className="stat-content">
+            <div className="stat-value">{campaign.pledgeCount || 0}</div>
+            <div className="stat-label">{campaign.pledgeCount === 1 ? 'Backer' : 'Backers'}</div>
+          </div>
+        </div>
+        
+        <div className="stat-card remaining">
+          <div className="stat-icon">📊</div>
+          <div className="stat-content">
+            <div className="stat-value">{Math.round(progress)}%</div>
+            <div className="stat-label">Funded</div>
+          </div>
+        </div>
+      </div>
 
-          {/* Recent Pledges */}
+      {/* Progress Bar - Enhanced */}
+      <div className="progress-card">
+        <div className="progress-header">
+          <span className="progress-percent">{Math.round(progress)}% Complete</span>
+          <span className="progress-remaining">{formatCurrency(remaining)} to go</span>
+        </div>
+        <div className="progress-bar-modern">
+          <div 
+            className="progress-fill-modern" 
+            style={{ width: `${progress}%` }}
+          >
+            <div className="progress-shine"></div>
+          </div>
+        </div>
+      </div>
+
+      {/* Two Column Layout */}
+      <div className="pledge-layout">
+        {/* Left Column - Recent Activity */}
+        <div className="activity-column">
           {campaign.recentPledges && campaign.recentPledges.length > 0 && (
-            <div className="recent-pledges">
-              <h3>Recent Support</h3>
-              <div className="pledge-list">
+            <div className="recent-pledges-modern">
+              <h3 className="section-title">
+                <span className="title-icon">🔥</span>
+                Recent Contributions
+              </h3>
+              <div className="pledge-timeline">
                 {campaign.recentPledges.map((pledge, idx) => (
-                  <div key={idx} className="pledge-item">
-                    <span className="donor">{pledge.donor}</span>
-                    <span className="amount">{formatCurrency(pledge.amount)}</span>
+                  <div key={idx} className="pledge-timeline-item">
+                    <div className="pledge-avatar">
+                      {pledge.donor.charAt(0)}
+                    </div>
+                    <div className="pledge-details">
+                      <div className="pledge-donor-name">{pledge.donor}</div>
+                      <div className="pledge-time">
+                        {new Date(pledge.date).toLocaleDateString('en-US', { 
+                          month: 'short', 
+                          day: 'numeric' 
+                        })}
+                      </div>
+                    </div>
+                    <div className="pledge-amount-badge">
+                      {formatCurrency(pledge.amount)}
+                    </div>
                   </div>
                 ))}
               </div>
             </div>
           )}
+
+          {/* Trust Indicators */}
+          <div className="trust-section">
+            <h4 className="trust-title">Why contribute?</h4>
+            <div className="trust-items">
+              <div className="trust-item">
+                <span className="trust-check">✓</span>
+                <span>Secure mobile money payments</span>
+              </div>
+              <div className="trust-item">
+                <span className="trust-check">✓</span>
+                <span>Instant receipt & confirmation</span>
+              </div>
+              <div className="trust-item">
+                <span className="trust-check">✓</span>
+                <span>Track your contribution</span>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
 
-      {/* Pledge Form */}
-      <div className="pledge-form-card">
-        <h2>💝 Make Your Pledge</h2>
+        {/* Right Column - Pledge Form */}
+        <div className="form-column">
+          <div className="pledge-form-modern">
+            <div className="form-header">
+              <h2 className="form-title">💝 Make Your Contribution</h2>
+              <p className="form-subtitle">Join {campaign.pledgeCount || 0} others supporting this cause</p>
+            </div>
 
-        {submitError && <div className="error-message">{submitError}</div>}
+            {submitError && (
+              <div className="error-alert">
+                <span className="error-icon">⚠️</span>
+                {submitError}
+              </div>
+            )}
 
-        <form onSubmit={handlePledgeSubmit}>
-          {/* Amount */}
-          <div className="form-group">
-            <label htmlFor="amount">Amount (UGX) *</label>
-            <input
-              id="amount"
-              type="number"
-              min="1000"
-              step="1000"
-              placeholder="500000"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              required
-            />
+            <form onSubmit={handlePledgeSubmit} className="modern-form">
+              {/* Quick Amount Buttons */}
+              <div className="amount-section">
+                <label className="modern-label">
+                  <span className="label-icon">💰</span>
+                  Contribution Amount
+                </label>
+                <div className="quick-amounts">
+                  {[50000, 100000, 250000, 500000].map(amt => (
+                    <button
+                      key={amt}
+                      type="button"
+                      className={`quick-amount-btn ${amount === amt.toString() ? 'active' : ''}`}
+                      onClick={() => setAmount(amt.toString())}
+                    >
+                      {(amt / 1000).toLocaleString()}K
+                    </button>
+                  ))}
+                </div>
+                <div className="input-with-icon">
+                  <span className="input-icon">UGX</span>
+                  <input
+                    id="amount"
+                    type="number"
+                    min="1000"
+                    step="1000"
+                    placeholder="Enter custom amount"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    className="modern-input"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Name */}
+              <div className="form-group-modern">
+                <label htmlFor="name" className="modern-label">
+                  <span className="label-icon">👤</span>
+                  Your Name <span className="optional">(optional)</span>
+                </label>
+                <input
+                  id="name"
+                  type="text"
+                  placeholder="Enter your name or stay anonymous"
+                  value={donorName}
+                  onChange={(e) => setDonorName(e.target.value)}
+                  className="modern-input"
+                />
+              </div>
+
+              {/* Phone */}
+              <div className="form-group-modern">
+                <label htmlFor="phone" className="modern-label">
+                  <span className="label-icon">📱</span>
+                  Mobile Money Number <span className="required">*</span>
+                </label>
+                <input
+                  id="phone"
+                  type="tel"
+                  placeholder="+256 700 000 000"
+                  value={donorPhone}
+                  onChange={(e) => setDonorPhone(e.target.value)}
+                  className="modern-input"
+                  required
+                />
+                <div className="input-hint">
+                  MTN or Airtel number for payment
+                </div>
+              </div>
+
+              {/* Email */}
+              <div className="form-group-modern">
+                <label htmlFor="email" className="modern-label">
+                  <span className="label-icon">✉️</span>
+                  Email <span className="optional">(optional)</span>
+                </label>
+                <input
+                  id="email"
+                  type="email"
+                  placeholder="your@email.com"
+                  value={donorEmail}
+                  onChange={(e) => setDonorEmail(e.target.value)}
+                  className="modern-input"
+                />
+                <div className="input-hint">
+                  Receive receipt and updates
+                </div>
+              </div>
+
+              {/* Submit Button */}
+              <button
+                type="submit"
+                className="cta-button"
+                disabled={isSubmitting || !amount}
+              >
+                {isSubmitting ? (
+                  <>
+                    <span className="spinner"></span>
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    <span>Continue to Payment</span>
+                    <span className="button-arrow">→</span>
+                  </>
+                )}
+              </button>
+
+              <div className="security-note">
+                <span className="lock-icon">🔒</span>
+                Secure payment • Your data is protected
+              </div>
+            </form>
           </div>
 
-          {/* Name */}
-          <div className="form-group">
-            <label htmlFor="name">Your Name (optional)</label>
-            <input
-              id="name"
-              type="text"
-              placeholder="Your name (leave blank for Anonymous)"
-              value={donorName}
-              onChange={(e) => setDonorName(e.target.value)}
-            />
+          {/* Share Card */}
+          <div className="share-card-modern">
+            <div className="share-icon-large">📢</div>
+            <h3 className="share-title">Help us reach the goal!</h3>
+            <p className="share-text">Share this campaign with your network</p>
+            <button
+              className="share-button-modern"
+              onClick={async () => {
+                const shareUrl = window.location.href;
+                const shareText = `Support the campaign: ${campaign.title}`;
+                if (navigator.share) {
+                  try {
+                    await navigator.share({ title: campaign.title, text: shareText, url: shareUrl });
+                  } catch (e) { /* user cancelled */ }
+                } else {
+                  try {
+                    await navigator.clipboard.writeText(shareUrl);
+                    alert('✓ Link copied to clipboard!');
+                  } catch (e) {
+                    window.prompt('Copy this link:', shareUrl);
+                  }
+                }
+              }}
+            >
+              <span>Share Campaign</span>
+              <span className="share-icon">🔗</span>
+            </button>
+            {campaign.event_code && (
+              <div className="event-code-badge">
+                Code: <strong>{campaign.event_code}</strong>
+              </div>
+            )}
           </div>
-
-          {/* Phone */}
-          <div className="form-group">
-            <label htmlFor="phone">Phone Number (for payment) *</label>
-            <input
-              id="phone"
-              type="tel"
-              placeholder="+256700000000"
-              value={donorPhone}
-              onChange={(e) => setDonorPhone(e.target.value)}
-              required
-            />
-            <small>Format: +256700000000 or 07XXXXXXXX</small>
-          </div>
-
-          {/* Email */}
-          <div className="form-group">
-            <label htmlFor="email">Email (optional)</label>
-            <input
-              id="email"
-              type="email"
-              placeholder="your@email.com"
-              value={donorEmail}
-              onChange={(e) => setDonorEmail(e.target.value)}
-            />
-          </div>
-
-          {/* Submit */}
-          <button
-            type="submit"
-            className="submit-button"
-            disabled={isSubmitting || !amount}
-          >
-            {isSubmitting ? '⏳ Creating pledge...' : '✓ Continue to Payment'}
-          </button>
-        </form>
-
-        <p className="form-note">
-          ℹ️ Your phone number is used only for payment notifications and receipts
-        </p>
-      </div>
-
-      {/* Share Section */}
-      <div className="share-section">
-        <p>📱 Scan QR code to join the fundraiser</p>
-        {campaign.event_code && (
-          <p className="event-code">
-            Or enter code: <strong>{campaign.event_code}</strong>
-          </p>
-        )}
-        <button
-          className="share-btn"
-          style={{
-            marginTop: '1rem',
-            background: 'linear-gradient(90deg, #3b82f6 0%, #1d4ed8 100%)',
-            color: '#fff',
-            border: 'none',
-            borderRadius: '8px',
-            padding: '0.7rem 1.5rem',
-            fontWeight: 600,
-            fontSize: '1rem',
-            cursor: 'pointer',
-            boxShadow: '0 2px 12px #3b82f633',
-            transition: 'background 0.2s, transform 0.2s',
-          }}
-          onClick={async () => {
-            // Always use a valid slug or fallback
-            const slug = campaign.slug || campaign.event_code || campaign.id || '';
-            const shareUrl = window.location.origin + `/campaign/${slug}`;
-            const shareText = `Support the campaign: ${campaign.title}\n${shareUrl}`;
-            if (navigator.share) {
-              try {
-                await navigator.share({ title: campaign.title, text: shareText, url: shareUrl });
-              } catch (e) { /* user cancelled */ }
-            } else {
-              try {
-                await navigator.clipboard.writeText(shareUrl);
-                alert('Link copied to clipboard!');
-              } catch (e) {
-                window.prompt('Copy this link:', shareUrl);
-              }
-            }
-          }}
-        >
-          🔗 Share Campaign
-        </button>
+        </div>
       </div>
     </div>
   );

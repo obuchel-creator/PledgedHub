@@ -23,10 +23,10 @@ router.get('/campaigns/id/:id', async (req, res) => {
     // Get campaign by ID
     const [campaigns] = await pool.execute(`
       SELECT 
-        id, title, description, goal_amount, raised_amount,
-        image_url, event_code, share_url, is_public, created_at
+        id, name as title, description, target_amount as goal_amount,
+        event_code, share_url, is_public, created_at
       FROM campaigns
-      WHERE id = ? AND is_public = TRUE AND deleted_at IS NULL
+      WHERE id = ? AND is_public = TRUE AND deleted = 0
       LIMIT 1
     `, [id]);
 
@@ -38,6 +38,15 @@ router.get('/campaigns/id/:id', async (req, res) => {
     }
 
     const campaign = campaigns[0];
+    
+    // Calculate raised amount from pledges
+    const [raisedResult] = await pool.execute(`
+      SELECT COALESCE(SUM(amount), 0) as raised_amount
+      FROM pledges
+      WHERE campaign_id = ? AND deleted = 0
+    `, [campaign.id]);
+    
+    campaign.raised_amount = parseFloat(raisedResult[0]?.raised_amount || 0);
 
     // Get recent pledges (for social proof, showing first names only)
     const [pledges] = await pool.execute(`
@@ -93,10 +102,10 @@ router.get('/campaigns/:slug', async (req, res) => {
     // Get campaign by slug
     const [campaigns] = await pool.execute(`
       SELECT 
-        id, title, description, goal_amount, raised_amount,
-        image_url, event_code, share_url, is_public, created_at
+        id, name as title, description, target_amount as goal_amount,
+        event_code, share_url, is_public, created_at
       FROM campaigns
-      WHERE share_url = ? AND is_public = TRUE AND deleted_at IS NULL
+      WHERE share_url = ? AND is_public = TRUE AND deleted = 0
       LIMIT 1
     `, [slug]);
 
@@ -108,6 +117,15 @@ router.get('/campaigns/:slug', async (req, res) => {
     }
 
     const campaign = campaigns[0];
+    
+    // Calculate raised amount from pledges
+    const [raisedResult] = await pool.execute(`
+      SELECT COALESCE(SUM(amount), 0) as raised_amount
+      FROM pledges
+      WHERE campaign_id = ? AND deleted = 0
+    `, [campaign.id]);
+    
+    campaign.raised_amount = parseFloat(raisedResult[0]?.raised_amount || 0);
 
     // Get recent pledges (for social proof, showing first names only)
     const [pledges] = await pool.execute(`

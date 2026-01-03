@@ -1,21 +1,620 @@
-/* Guest Pledge Screen - Responsive Fundraising Page */
+/* Guest Pledge Screen - Modern UI/UX 2026 */
 
 .guest-pledge-container {
-  max-width: 900px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 1.5rem;
-  background: var(--bg-base, #f9fafb);
+  padding: 2rem 1.5rem;
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #f9fafb 100%);
   min-height: 100vh;
+}
+
+/* Hero Banner */
+.campaign-hero {
+  text-align: center;
+  padding: 3rem 2rem;
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+  border-radius: 20px;
+  margin-bottom: 2rem;
+  color: white;
+  box-shadow: 0 10px 40px rgba(37, 99, 235, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.campaign-hero::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 400px;
+  height: 400px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  filter: blur(80px);
+}
+
+.hero-badge {
+  display: inline-block;
+  padding: 0.5rem 1.5rem;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.hero-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin: 0 0 1rem 0;
+  line-height: 1.2;
+  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
+}
+
+.hero-description {
+  font-size: 1.15rem;
+  line-height: 1.6;
+  opacity: 0.95;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+/* Stats Grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+.stat-icon {
+  font-size: 2.5rem;
+  line-height: 1;
+}
+
+.stat-content {
+  flex: 1;
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #1f2937;
+  margin-bottom: 0.25rem;
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.stat-card.raised .stat-icon { color: #059669; }
+.stat-card.goal .stat-icon { color: #2563eb; }
+.stat-card.backers .stat-icon { color: #7c3aed; }
+.stat-card.remaining .stat-icon { color: #f59e0b; }
+
+/* Progress Card */
+.progress-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 16px;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.progress-percent {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #2563eb;
+}
+
+.progress-remaining {
+  font-size: 0.95rem;
+  color: #6b7280;
+}
+
+.progress-bar-modern {
+  width: 100%;
+  height: 16px;
+  background: #e5e7eb;
+  border-radius: 50px;
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-fill-modern {
+  height: 100%;
+  background: linear-gradient(90deg, #2563eb 0%, #1e40af 100%);
+  border-radius: 50px;
+  transition: width 1s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-shine {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  animation: shine 2s infinite;
+}
+
+@keyframes shine {
+  to { left: 100%; }
+}
+
+/* Two Column Layout */
+.pledge-layout {
+  display: grid;
+  grid-template-columns: 1fr 500px;
+  gap: 2rem;
+  align-items: start;
+}
+
+/* Activity Column */
+.activity-column {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.recent-pledges-modern {
+  background: white;
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 1.5rem 0;
+}
+
+.title-icon {
+  font-size: 1.5rem;
+}
+
+.pledge-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.pledge-timeline-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: #f9fafb;
+  border-radius: 12px;
+  transition: background 0.2s;
+}
+
+.pledge-timeline-item:hover {
+  background: #f3f4f6;
+}
+
+.pledge-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2563eb, #1e40af);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.pledge-details {
+  flex: 1;
+}
+
+.pledge-donor-name {
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 0.25rem;
+}
+
+.pledge-time {
+  font-size: 0.85rem;
+  color: #9ca3af;
+}
+
+.pledge-amount-badge {
+  background: #dcfce7;
+  color: #059669;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+/* Trust Section */
+.trust-section {
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  padding: 2rem;
+  border-radius: 16px;
+  border: 2px solid #bfdbfe;
+}
+
+.trust-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1e40af;
+  margin: 0 0 1rem 0;
+}
+
+.trust-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.trust-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.95rem;
+  color: #1e40af;
+}
+
+.trust-check {
+  width: 24px;
+  height: 24px;
+  background: #2563eb;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* Form Column */
+.form-column {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  position: sticky;
+  top: 2rem;
+}
+
+.pledge-form-modern {
+  background: white;
+  padding: 2.5rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.form-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.form-title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #1f2937;
+  margin: 0 0 0.5rem 0;
+}
+
+.form-subtitle {
+  color: #6b7280;
+  font-size: 1rem;
+}
+
+.modern-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Amount Section */
+.amount-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.quick-amounts {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+}
+
+.quick-amount-btn {
+  padding: 0.75rem;
+  background: #f3f4f6;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-weight: 600;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.quick-amount-btn:hover {
+  background: #e5e7eb;
+  border-color: #d1d5db;
+}
+
+.quick-amount-btn.active {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: white;
+}
+
+.modern-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.label-icon {
+  font-size: 1.1rem;
+}
+
+.optional {
+  font-weight: 400;
+  color: #9ca3af;
+  font-size: 0.9rem;
+}
+
+.required {
+  color: #ef4444;
+  font-weight: 700;
+}
+
+.input-with-icon {
+  position: relative;
+}
+
+.input-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6b7280;
+  font-weight: 600;
+  pointer-events: none;
+}
+
+.modern-input {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-family: inherit;
+  transition: all 0.2s;
+  box-sizing: border-box;
+}
+
+.input-with-icon .modern-input {
+  padding-left: 4rem;
+}
+
+.modern-input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+}
+
+.input-hint {
+  font-size: 0.85rem;
+  color: #9ca3af;
+  margin-top: 0.5rem;
+}
+
+.form-group-modern {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Error Alert */
+.error-alert {
+  padding: 1rem 1.25rem;
+  background: #fee2e2;
+  color: #dc2626;
+  border-left: 4px solid #dc2626;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+}
+
+.error-icon {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+/* CTA Button */
+.cta-button {
+  width: 100%;
+  padding: 1rem 1.5rem;
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  box-shadow: 0 4px 20px rgba(37, 99, 235, 0.4);
+}
+
+.cta-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 30px rgba(37, 99, 235, 0.5);
+}
+
+.cta-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.button-arrow {
+  font-size: 1.5rem;
+  transition: transform 0.2s;
+}
+
+.cta-button:hover:not(:disabled) .button-arrow {
+  transform: translateX(4px);
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.security-note {
+  text-align: center;
+  color: #6b7280;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.lock-icon {
+  font-size: 1rem;
+}
+
+/* Share Card */
+.share-card-modern {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  padding: 2rem;
+  border-radius: 16px;
+  text-align: center;
+  border: 2px solid #fbbf24;
+}
+
+.share-icon-large {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.share-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #92400e;
+  margin: 0 0 0.5rem 0;
+}
+
+.share-text {
+  color: #92400e;
+  margin: 0 0 1.5rem 0;
+  opacity: 0.8;
+}
+
+.share-button-modern {
+  width: 100%;
+  padding: 0.875rem 1.5rem;
+  background: #92400e;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.share-button-modern:hover {
+  background: #78350f;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(146, 64, 14, 0.3);
+}
+
+.share-icon {
+  font-size: 1.25rem;
+}
+
+.event-code-badge {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 8px;
+  color: #92400e;
+  font-size: 0.9rem;
+}
+
+.event-code-badge strong {
+  font-weight: 800;
+  font-size: 1.1rem;
+  letter-spacing: 1px;
 }
 
 /* Loading & Error States */
 .loading,
 .error-box {
   text-align: center;
-  padding: 3rem 1.5rem;
+  padding: 4rem 2rem;
   background: white;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   margin: 2rem 0;
 }
 
@@ -35,269 +634,78 @@
 }
 
 .error-box button {
-  padding: 0.75rem 1.5rem;
+  padding: 0.875rem 2rem;
   background: #2563eb;
-  color: #ffffff;
+  color: white;
   border: none;
   border-radius: 8px;
   cursor: pointer;
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: 1rem;
+  transition: all 0.2s;
 }
 
 .error-box button:hover {
   background: #1e40af;
-}
-
-/* Campaign Card */
-.campaign-card {
-  background: white;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  margin-bottom: 2rem;
-}
-
-.campaign-image {
-  width: 100%;
-  height: 300px;
-  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
-  overflow: hidden;
-}
-
-.campaign-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.campaign-info {
-  padding: 2rem;
-}
-
-.campaign-info h1 {
-  margin: 0 0 0.5rem 0;
-  font-size: 2rem;
-  color: #1f2937;
-  line-height: 1.2;
-}
-
-.campaign-description {
-  color: #6b7280;
-  font-size: 1.05rem;
-  line-height: 1.6;
-  margin: 0 0 2rem 0;
-}
-
-/* Progress Section */
-.progress-section {
-  margin: 2rem 0;
-}
-
-.progress-bar {
-  width: 100%;
-  height: 12px;
-  background: #e5e7eb;
-  border-radius: 6px;
-  overflow: hidden;
-  margin-bottom: 1rem;
-}
-
-.progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #2563eb 0%, #1e40af 100%);
-  border-radius: 6px;
-  transition: width 0.3s ease;
-}
-
-.progress-text {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.5rem;
-  font-size: 0.95rem;
-  font-weight: 600;
-}
-
-.progress-text .raised {
-  color: #059669;
-}
-
-.progress-text .goal {
-  color: #6b7280;
-  font-weight: 400;
-}
-
-.pledge-count {
-  margin: 0;
-  color: #9ca3af;
-  font-size: 0.9rem;
-}
-
-/* Recent Pledges */
-.recent-pledges {
-  margin-top: 2rem;
-  padding-top: 2rem;
-  border-top: 1px solid #e5e7eb;
-}
-
-.recent-pledges h3 {
-  margin: 0 0 1rem 0;
-  color: #374151;
-  font-size: 1rem;
-}
-
-.pledge-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 1rem;
-}
-
-.pledge-item {
-  padding: 1rem;
-  background: #f3f4f6;
-  border-radius: 8px;
-  text-align: center;
-  border: 1px solid #e5e7eb;
-}
-
-.pledge-item .donor {
-  display: block;
-  color: #6b7280;
-  font-size: 0.85rem;
-  margin-bottom: 0.5rem;
-}
-
-.pledge-item .amount {
-  display: block;
-  color: #059669;
-  font-weight: 700;
-  font-size: 1rem;
-}
-
-/* Pledge Form Card */
-.pledge-form-card {
-  background: white;
-  border-radius: 12px;
-  padding: 2rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  margin-bottom: 2rem;
-}
-
-.pledge-form-card h2 {
-  margin: 0 0 1.5rem 0;
-  color: #1f2937;
-  font-size: 1.5rem;
-}
-
-/* Form Groups */
-.form-group {
-  margin-bottom: 1.5rem;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 0.5rem;
-  color: #374151;
-  font-weight: 600;
-  font-size: 0.95rem;
-}
-
-.form-group input {
-  width: 100%;
-  padding: 0.75rem;
-  border: 2px solid #e5e7eb;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-family: inherit;
-  transition: border-color 0.2s;
-  box-sizing: border-box;
-}
-
-.form-group input:focus {
-  outline: none;
-  border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-}
-
-.form-group small {
-  display: block;
-  margin-top: 0.25rem;
-  color: #9ca3af;
-  font-size: 0.85rem;
-}
-
-/* Buttons */
-.submit-button,
-.pay-button {
-  width: 100%;
-  padding: 0.875rem;
-  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
-  margin-top: 1rem;
-}
-
-.submit-button:hover:not(:disabled),
-.pay-button:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
 }
 
-.submit-button:disabled,
-.pay-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+/* Responsive Design */
+@media (max-width: 968px) {
+  .pledge-layout {
+    grid-template-columns: 1fr;
+  }
+  
+  .form-column {
+    position: static;
+  }
+  
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .hero-title {
+    font-size: 2rem;
+  }
 }
 
-.back-button {
-  width: 100%;
-  padding: 0.75rem;
-  background: #f3f4f6;
-  color: #374151;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  font-weight: 600;
-  cursor: pointer;
-  margin-top: 0.75rem;
-  transition: background 0.2s;
+@media (max-width: 640px) {
+  .guest-pledge-container {
+    padding: 1rem;
+  }
+  
+  .campaign-hero {
+    padding: 2rem 1.5rem;
+  }
+  
+  .hero-title {
+    font-size: 1.75rem;
+  }
+  
+  .stats-grid {
+    gap: 1rem;
+  }
+  
+  .stat-card {
+    padding: 1rem;
+  }
+  
+  .stat-icon {
+    font-size: 2rem;
+  }
+  
+  .stat-value {
+    font-size: 1.25rem;
+  }
+  
+  .quick-amounts {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .pledge-form-modern {
+    padding: 1.5rem;
+  }
 }
-
-.back-button:hover {
-  background: #e5e7eb;
-}
-
-.form-note {
-  margin-top: 1rem;
-  color: #6b7280;
-  font-size: 0.9rem;
-  text-align: center;
-}
-
-/* Error Messages */
-.error-message {
-  padding: 1rem;
-  background: #fee2e2;
-  color: #dc2626;
-  border-left: 4px solid #dc2626;
-  border-radius: 4px;
-  margin-bottom: 1.5rem;
-  font-size: 0.95rem;
-}
-
-/* Receipt Card */
-.receipt-card {
-  background: white;
-  border-radius: 12px;
-  padding: 2.5rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  max-width: 500px;
   margin: 2rem auto;
   text-align: center;
 }

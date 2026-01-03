@@ -36,8 +36,14 @@ const ShareButton = ({
   const shareContent = generateShareMessage(contentType, contentData);
   const url = shareUrl || generateShareUrl(window.location.pathname, 'share_button', contentId);
 
+  // Debug logging
+  console.log('🔵 ShareButton props:', { contentType, contentData, contentId, shareUrl, url });
+  console.log('🔵 ShareButton state - showDropdown:', showDropdown);
+
   // Handle share action
   const handleShare = async (channel) => {
+    console.log('🟢 Share clicked for platform:', channel, 'URL:', url);
+    
     // Track the share
     await trackShare(contentType, contentId, channel);
 
@@ -105,13 +111,18 @@ const ShareButton = ({
   // Button style
   if (style === 'button') {
     return (
-      <div className="relative" style={{ display: 'inline-block' }}>
+      <div style={{ position: 'relative', display: 'inline-block' }}>
         <button
-          onClick={() => setShowDropdown(!showDropdown)}
+          onClick={() => {
+            console.log('🔵 ShareButton clicked, showDropdown was:', showDropdown);
+            setShowDropdown(!showDropdown);
+          }}
           className={`${currentSize.button} bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all duration-300 flex items-center gap-2 ${className}`}
           style={{
             border: 'none',
             cursor: 'pointer',
+            position: 'relative',
+            zIndex: 1,
           }}
         >
           <svg className={currentSize.icon} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -124,14 +135,18 @@ const ShareButton = ({
           <>
             {/* Backdrop */}
             <div
-              onClick={() => setShowDropdown(false)}
+              onClick={() => {
+                console.log('🟡 Backdrop clicked, closing dropdown');
+                setShowDropdown(false);
+              }}
               style={{
                 position: 'fixed',
                 top: 0,
                 left: 0,
                 right: 0,
                 bottom: 0,
-                zIndex: 999,
+                zIndex: 998,
+                backgroundColor: 'rgba(0,0,0,0.2)',
               }}
             />
             
@@ -140,15 +155,18 @@ const ShareButton = ({
               className={currentSize.dropdown}
               style={{
                 position: 'absolute',
-                top: '100%',
-                right: 0,
-                marginTop: '8px',
+                top: 'calc(100% + 8px)',
+                left: '50%',
+                transform: 'translateX(-50%)',
                 backgroundColor: 'white',
                 borderRadius: '12px',
-                boxShadow: '0 10px 40px rgba(0,0,0,0.15)',
-                padding: '8px',
-                minWidth: '220px',
-                zIndex: 1000,
+                boxShadow: '0 10px 40px rgba(0,0,0,0.25)',
+                border: '1px solid #e5e7eb',
+                padding: '12px',
+                minWidth: '240px',
+                maxWidth: '280px',
+                zIndex: 999,
+                display: 'block',
               }}
             >
               {/* Native Share (mobile only) */}

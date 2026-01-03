@@ -33,7 +33,7 @@ export default function Footer() {
         >
           <div>
             <Link to="/" style={{ textDecoration: 'none' }}>
-              <Logo size="medium" showText={false} />
+              <Logo size="large" showText={false} />
             </Link>
             <p
               style={{
@@ -260,7 +260,7 @@ export default function Footer() {
                 padding: '0 0.2rem',
               }}
             >
-              © {year} PledgeHub Team. All rights reserved.
+              © {year} PledgeHub. All rights reserved.
             </span>
           </div>
           <div style={{ display: 'flex', gap: '1.5rem', fontSize: '1rem' }}>

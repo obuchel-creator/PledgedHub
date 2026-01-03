@@ -6,7 +6,7 @@ import { formatCurrency, formatDateTime } from '../utils/formatters';
  * RecentPayments Component
  * Displays a list of recent payment transactions with status
  */
-function RecentPayments({ payments = [] }) {
+function RecentPayments({ payments = [], error = '' }) {
   const formatPaymentMethod = (method) => {
     if (!method) return 'Unknown';
     return method
@@ -14,6 +14,21 @@ function RecentPayments({ payments = [] }) {
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ');
   };
+
+  if (error) {
+    return (
+      <section className="card" aria-labelledby="payments-title">
+        <h2 id="payments-title" className="card__title">Recent Payments</h2>
+        <p className="card__subtitle">
+          Latest donations logged across campaigns.
+        </p>
+        <div className="alert alert--error" role="alert">
+          <p className="alert__message">{error}</p>
+          <p className="alert__helper">You might need staff access or a fresh login to view recent payments.</p>
+        </div>
+      </section>
+    );
+  }
 
   if (payments.length === 0) {
     return (
@@ -108,6 +123,7 @@ RecentPayments.propTypes = {
       date: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     })
   ),
+  error: PropTypes.string,
 };
 
 export default RecentPayments;

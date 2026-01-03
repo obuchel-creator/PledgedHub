@@ -11,7 +11,7 @@ export default function Navbar() {
 
   // Dynamic nav links based on user role
   const navLinks = [
-    { to: '/dashboard', label: 'Dashboard' },
+    ...(user ? [{ to: '/dashboard', label: 'Dashboard' }] : [{ to: '/explore', label: 'Explore' }]),
     { to: '/campaigns', label: 'Campaigns' },
     { to: '/analytics', label: 'Analytics' },
     { to: '/create', label: 'Create' },
@@ -52,20 +52,7 @@ export default function Navbar() {
             style={{ textDecoration: 'none' }}
           >
             <span style={{ display: 'flex', alignItems: 'center', gap: '0.7rem' }}>
-              <Logo size="medium" showText={false} />
-              <span
-                style={{
-                  fontFamily: 'Roboto, Segoe UI, Arial, sans-serif',
-                  fontWeight: 700,
-                  fontSize: '1.25rem',
-                  color: '#FFCC00',
-                  letterSpacing: '0.02em',
-                  marginLeft: '0.1rem',
-                  opacity: 0.92,
-                }}
-              >
-                PledgeHub
-              </span>
+              <Logo size="large" showText={false} />
             </span>
           </Link>
 

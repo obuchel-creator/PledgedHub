@@ -1,4 +1,3 @@
-
 const express = require('express');
 const router = express.Router();
 const { pool } = require('../config/db');
@@ -48,90 +47,40 @@ router.post('/register', async (req, res) => {
     console.log('[REGISTER] Sending response:', response);
     res.status(201).json(response);
   } catch (err) {
+    // Enhanced error logging for debugging
     console.error('[REGISTER ERROR]', err);
+    if (err && err.stack) {
+      console.error('[REGISTER ERROR STACK]', err.stack);
+    }
+    if (err && err.sqlMessage) {
+      console.error('[REGISTER SQL ERROR]', err.sqlMessage);
+    }
     if (err.message && err.message.includes('Duplicate')) {
       return res.status(400).json({ error: 'User already exists.' });
     }
-    res.status(500).json({ error: err.message || 'Server error.' });
+    res.status(500).json({
+      error: err.message || 'Server error.',
+      details: err.sqlMessage || err.stack || null
+    });
   }
 });
 
-// Login - supports email, phone, or username
+// Login - supports email, username, or phone
+const authService = require('../services/authService');
 router.post('/login', async (req, res) => {
-  console.log('[LOGIN] POST /api/auth/login', { identifier: req.body.email || req.body.phone || req.body.username });
-  const { email, phone, username, password } = req.body;
-  const identifier = email || phone || username;
-  
-  if (!identifier || !password) {
-    return res.status(400).json({ error: 'Email/phone/username and password are required' });
+  const { email, password } = req.body;
+  console.log('[LOGIN] Incoming login request:', { email, password: password ? '***' : undefined });
+  if (!email || !password) {
+    console.warn('[LOGIN] Missing email or password');
+    return res.status(400).json({ success: false, error: 'Email/username/phone and password are required' });
   }
-  
-  try {
-    // Query by email, phone, or username
-    let query = 'SELECT * FROM users WHERE ';
-    let params = [];
-    
-    if (email) {
-      query += 'email = ?';
-      params.push(email);
-    } else if (phone) {
-      query += 'phone = ?';
-      params.push(phone);
-    } else {
-      query += 'username = ?';
-      params.push(username);
-    }
-    
-    const [users] = await pool.execute(query, params);
-    const user = users[0];
-    
-    if (!user) {
-      console.log('[LOGIN] User not found for identifier:', identifier);
-      return res.status(401).json({ error: 'Invalid credentials' });
-    }
-    
-    console.log('[LOGIN] User found:', { id: user.id, email: user.email, username: user.username });
-    console.log('[LOGIN] Password provided length:', password?.length);
-    console.log('[LOGIN] Stored hash length:', user.password?.length);
-    console.log('[LOGIN] Password provided (first 5 chars):', password?.substring(0, 5));
-    
-    // Compare password with hashed password
-    const match = await bcrypt.compare(password, user.password);
-    
-    console.log('[LOGIN] bcrypt.compare result:', match);
-    
-    if (!match) {
-      console.log('[LOGIN] Password mismatch for user:', user.id);
-      return res.status(401).json({ error: 'Invalid credentials' });
-    }
-    
-    // Generate JWT token
-    const token = jwt.sign(
-      { 
-        id: user.id, 
-        name: user.name, 
-        username: user.username,
-        email: user.email,
-        phone: user.phone,
-        role: user.role 
-      }, 
-      process.env.JWT_SECRET, 
-      { expiresIn: '7d' }
-    );
-    
-    // Return user without password
-    const { password: _, ...userWithoutPassword } = user;
-    
-    console.log('[LOGIN] Success for user:', user.id);
-    res.json({ 
-      success: true,
-      token, 
-      user: userWithoutPassword 
-    });
-    
-  } catch (err) {
-    console.error('[LOGIN ERROR]', err);
-    res.status(500).json({ error: 'Login failed. Please try again.' });
+  const result = await authService.login({ email, password });
+  if (result.success) {
+    console.log('[LOGIN] Login successful for:', email);
+    res.json(result.data); // Only send { token, user }
+  } else {
+    console.warn('[LOGIN] Login failed for:', email, '| Reason:', result.error);
+    res.status(401).json({ success: false, error: result.error });
   }
 });
 

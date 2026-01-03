@@ -430,7 +430,39 @@ async function generateDashboard() {
       generateIncomeStatement(monthStart, today),
       generateARAgingReport(today)
     ]);
-    
+
+    // Get pledge summary for AI insights
+    const pledgeAccountingService = require('./pledgeAccountingService');
+    const aiService = require('./aiService');
+    let aiInsights = null;
+    let aiSuggestions = [];
+    let aiForecast = null;
+    try {
+      const pledgeSummary = await pledgeAccountingService.getPledgeFinancialSummary();
+      if (aiService.isAIAvailable() && pledgeSummary.success) {
+        // Use only the pledges object for AI analysis
+        aiInsights = await aiService.analyzePledgeData([
+          {
+            ...pledgeSummary.data.pledges,
+            status: 'summary' // Tag for context
+          }
+        ]);
+        // Smart suggestions for collection improvement
+        aiSuggestions = await aiService.getSuggestions({
+          collectionRate: aiInsights?.summary?.collectionRate || 0,
+          overdue: aiInsights?.summary?.overdue || 0,
+          pending: aiInsights?.summary?.pending || 0,
+          pendingAmount: aiInsights?.summary?.totalAmount || 0
+        });
+      }
+      // Revenue forecast (using advancedAnalyticsService)
+      const advancedAnalyticsService = require('./advancedAnalyticsService');
+      // Use userId = null for org-wide forecast, or pass actual userId if available
+      aiForecast = await advancedAnalyticsService.generateRevenueForecast(null, 6);
+    } catch (e) {
+      console.error('AI insights/suggestions/forecast error:', e.message);
+    }
+
     return {
       success: true,
       data: {
@@ -438,6 +470,10 @@ async function generateDashboard() {
         incomeYTD: incomeYTD.success ? incomeYTD.data : null,
         incomeMonth: incomeMonth.success ? incomeMonth.data : null,
         arAging: arAging.success ? arAging.data : null,
+        aiInsights: aiInsights?.insights || [],
+        aiSummary: aiInsights?.summary || {},
+        aiSuggestions: aiSuggestions || [],
+        aiForecast: aiForecast?.data || null,
         generatedAt: new Date()
       }
     };

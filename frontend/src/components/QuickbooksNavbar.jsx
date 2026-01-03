@@ -1,5 +1,7 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
+import pledgeHubLogo from '../assets/pledge hub logo.png';
 
 export default function QuickbooksNavbar() {
   return (
@@ -20,10 +22,7 @@ export default function QuickbooksNavbar() {
     >
       {/* PledgeHub Logo and Brand */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-        <img src="/pledgehub-logo.png" alt="PledgeHub" style={{ height: '32px' }} />
-        <span style={{ fontWeight: 700, fontSize: '1.25rem', color: '#2563eb' }}>
-          PledgeHub
-        </span>
+        <img src={pledgeHubLogo} alt="PledgeHub" style={{ height: '56px' }} />
       </div>
       {/* Main Nav Links - PledgeHub */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>

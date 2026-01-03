@@ -1,0 +1,28 @@
+version: '3.8'
+services:
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: ""
+      MYSQL_DATABASE: pledgehub_db
+    volumes:
+      - db_data:/var/lib/mysql
+    # ...existing config for your app's database
+
+  db-backup:
+    image: databack/mysql-backup
+    environment:
+      - MYSQL_HOST=db
+      - MYSQL_PORT=3306
+      - MYSQL_USER=root
+      - MYSQL_PASS=
+      - MYSQL_DB=pledgehub_db
+      - SCHEDULE=@daily  # Cron format, e.g. daily
+      - BACKUP_METHOD=mysqldump
+    volumes:
+      - ./db_backups:/backup
+    depends_on:
+      - db
+
+volumes:
+  db_data:

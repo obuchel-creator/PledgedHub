@@ -51,39 +51,44 @@ export default function CreatePledgeScreen() {
 
   const validate = () => {
     if (!donorName.trim()) {
-      setError('Donor name is required.');
+      setError('⚠️ Donor name is required.');
       return false;
     }
 
     if (!donorEmail.trim()) {
-      setError('Donor email is required.');
+      setError('⚠️ Email address is required.');
       return false;
     }
 
-    // Basic email validation
+    // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(donorEmail.trim())) {
-      setError('Please enter a valid email address.');
+      setError('⚠️ Please enter a valid email address.');
       return false;
     }
 
-    // Phone validation (optional but recommended for Uganda)
-    if (donorPhone.trim()) {
-      const phoneRegex = /^[\d\s\-\+\(\)]{7,}$/;
-      if (!phoneRegex.test(donorPhone.trim())) {
-        setError('Please enter a valid phone number.');
-        return false;
-      }
+    // Phone validation - NOW MANDATORY
+    if (!donorPhone.trim()) {
+      setError('⚠️ Phone number is required for donor tracking.');
+      return false;
+    }
+    
+    // Uganda phone format validation
+    const phoneClean = donorPhone.replace(/[\s\-\(\)]/g, '');
+    const ugandaPhoneRegex = /^(\+?256|0)?[7][0-9]{8}$/;
+    if (!ugandaPhoneRegex.test(phoneClean)) {
+      setError('⚠️ Please enter a valid Uganda phone number (e.g., +256 700 123456 or 0700 123456).');
+      return false;
     }
 
     const amountNum = Number(amount);
     if (amount === '' || Number.isNaN(amountNum) || amountNum <= 0) {
-      setError('Amount must be a positive number.');
+      setError('⚠️ Pledge amount must be greater than zero.');
       return false;
     }
 
     if (!collectionDate) {
-      setError('Collection date is required.');
+      setError('⚠️ Collection date is required.');
       return false;
     }
 
@@ -137,28 +142,32 @@ export default function CreatePledgeScreen() {
         <header
           className="page-header"
           style={{
-            background: 'var(--surface)',
-            borderRadius: '12px',
-            padding: '2rem',
+            background: 'linear-gradient(135deg, #FCD116 0%, #ffdb4d 100%)',
+            borderRadius: '16px',
+            padding: '2.5rem',
             marginBottom: '2rem',
-            boxShadow: '0 4px 12px -4px rgba(15, 23, 42, 0.1), 0 2px 6px rgba(15, 23, 42, 0.05)',
+            boxShadow: '0 8px 24px rgba(252, 209, 22, 0.25), 0 2px 8px rgba(0, 0, 0, 0.1)',
+            color: '#181818',
           }}
         >
-          <p className="page-header__eyebrow" style={{ color: 'rgba(147, 51, 234, 0.9)', fontWeight: '600' }}>
-            New Pledge
-          </p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '1rem' }}>
+            <span style={{ fontSize: '2.5rem' }}>💰</span>
+            <p className="page-header__eyebrow" style={{ color: '#181818', fontWeight: '700', fontSize: '0.95rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              Fundraising Campaign
+            </p>
+          </div>
           <h1
             id="create-pledge-title"
             className="page-header__title"
-            style={{ color: 'var(--text)', marginBottom: '0.75rem' }}
+            style={{ color: '#181818', marginBottom: '0.75rem', fontSize: '2.25rem', fontWeight: '800' }}
           >
-            Record a pledge
+            Make a Donation Pledge
           </h1>
           <p
             className="page-header__subtitle"
-            style={{ color: 'var(--text-muted)', fontSize: '1.05rem', lineHeight: '1.6', fontWeight: '500' }}
+            style={{ color: 'rgba(24, 24, 24, 0.8)', fontSize: '1.1rem', lineHeight: '1.6', fontWeight: '500' }}
           >
-            Capture a donor's commitment to contribute to a campaign or as a standalone pledge.
+            Support this fundraising campaign by pledging your contribution. Your commitment helps us reach our goal and make a difference.
           </p>
         </header>
 
@@ -177,13 +186,16 @@ export default function CreatePledgeScreen() {
             className="section__title"
             style={{
               color: 'var(--text)',
-              fontSize: '1.5rem',
+              fontSize: '1.75rem',
               fontWeight: '700',
-              marginBottom: '1.5rem',
+              marginBottom: '0.5rem',
             }}
           >
-            Pledge details
+            Your Pledge Information
           </h2>
+          <p style={{ color: '#64748b', fontSize: '0.95rem', marginBottom: '2rem', lineHeight: '1.5' }}>
+            Fill in your details below to pledge your support. All fields marked with * are required to track and acknowledge your generous contribution.
+          </p>
 
           {message && (
             <div className="alert alert--success" role="status">
@@ -231,8 +243,8 @@ export default function CreatePledgeScreen() {
 
             <div className="form-grid form-grid--two">
               <div className="form-field">
-                <label htmlFor="donorName" className="form-label">
-                  Donor name *
+                <label htmlFor="donorName" className="form-label" style={{ fontWeight: '600', fontSize: '0.95rem' }}>
+                  <span style={{ marginRight: '6px' }}>👤</span> Your Full Name *
                 </label>
                 <input
                   id="donorName"
@@ -244,13 +256,14 @@ export default function CreatePledgeScreen() {
                   required
                   aria-required="true"
                   disabled={loading}
-                  placeholder="e.g., John Doe"
+                  placeholder="Enter your full name"
+                  style={{ fontSize: '1rem', padding: '12px 16px' }}
                 />
               </div>
 
               <div className="form-field">
-                <label htmlFor="donorEmail" className="form-label">
-                  Donor email *
+                <label htmlFor="donorEmail" className="form-label" style={{ fontWeight: '600', fontSize: '0.95rem' }}>
+                  <span style={{ marginRight: '6px' }}>📧</span> Email Address *
                 </label>
                 <input
                   id="donorEmail"
@@ -262,15 +275,16 @@ export default function CreatePledgeScreen() {
                   required
                   aria-required="true"
                   disabled={loading}
-                  placeholder="e.g., john@example.com"
+                  placeholder="your.email@example.com"
+                  style={{ fontSize: '1rem', padding: '12px 16px' }}
                 />
               </div>
             </div>
 
             <div className="form-grid form-grid--two">
               <div className="form-field">
-                <label htmlFor="donorPhone" className="form-label">
-                  Phone number
+                <label htmlFor="donorPhone" className="form-label" style={{ fontWeight: '600', fontSize: '0.95rem' }}>
+                  <span style={{ marginRight: '6px' }}>📱</span> Phone Number *
                 </label>
                 <input
                   id="donorPhone"
@@ -279,20 +293,23 @@ export default function CreatePledgeScreen() {
                   value={donorPhone}
                   onChange={(event) => setDonorPhone(event.target.value)}
                   className="input"
+                  required
+                  aria-required="true"
                   disabled={loading}
-                  placeholder="e.g., +256 701 123456 (for SMS reminders)"
+                  placeholder="+256 700 123456"
+                  style={{ fontSize: '1rem', padding: '12px 16px' }}
                 />
                 <p
                   className="form-hint"
-                  style={{ marginTop: '0.5rem', fontSize: '0.875rem', color: '#64748b' }}
+                  style={{ marginTop: '0.5rem', fontSize: '0.85rem', color: '#64748b' }}
                 >
-                  Optional but recommended for SMS reminders
+                  Required for tracking and SMS reminders
                 </p>
               </div>
 
               <div className="form-field">
-                <label htmlFor="amount" className="form-label">
-                  Pledge amount (UGX) *
+                <label htmlFor="amount" className="form-label" style={{ fontWeight: '600', fontSize: '0.95rem' }}>
+                  <span style={{ marginRight: '6px' }}>💵</span> Pledge Amount (UGX) *
                 </label>
                 <div style={{ position: 'relative' }}>
                   <input
@@ -312,9 +329,10 @@ export default function CreatePledgeScreen() {
                     required
                     aria-required="true"
                     step="any"
-                    min="0"
+                    min="1000"
                     disabled={loading}
-                    placeholder="e.g., 100000"
+                    placeholder="e.g., 50000"
+                    style={{ fontSize: '1rem', padding: '12px 16px', paddingRight: '140px' }}
                   />
                   {formattedAmount && (
                     <span
@@ -324,8 +342,8 @@ export default function CreatePledgeScreen() {
                         top: '50%',
                         transform: 'translateY(-50%)',
                         color: '#10b981',
-                        fontSize: '0.875rem',
-                        fontWeight: '600',
+                        fontSize: '0.95rem',
+                        fontWeight: '700',
                         pointerEvents: 'none',
                       }}
                     >
@@ -337,8 +355,8 @@ export default function CreatePledgeScreen() {
             </div>
 
             <div className="form-field">
-              <label htmlFor="purpose" className="form-label">
-                Purpose
+              <label htmlFor="purpose" className="form-label" style={{ fontWeight: '600', fontSize: '0.95rem' }}>
+                <span style={{ marginRight: '6px' }}>📝</span> Purpose / Message (Optional)
               </label>
               <textarea
                 id="purpose"
@@ -347,14 +365,60 @@ export default function CreatePledgeScreen() {
                 onChange={(event) => setPurpose(event.target.value)}
                 className="textarea"
                 disabled={loading}
-                placeholder="e.g., School Library Fund"
+                placeholder="Share why you're supporting this campaign..."
                 rows={3}
+                style={{ fontSize: '1rem', padding: '12px 16px', lineHeight: '1.5' }}
               />
             </div>
 
-            <div className="form-actions">
-              <button type="submit" className="btn btn-primary" disabled={loading}>
-                {loading ? '⏳ Creating...' : '✓ Create Pledge'}
+            <div className="form-field">
+              <label htmlFor="collectionDate" className="form-label" style={{ fontWeight: '600', fontSize: '0.95rem' }}>
+                <span style={{ marginRight: '6px' }}>📅</span> Collection Date *
+              </label>
+              <input
+                id="collectionDate"
+                name="collectionDate"
+                type="date"
+                value={collectionDate}
+                onChange={(event) => setCollectionDate(event.target.value)}
+                className="input"
+                required
+                aria-required="true"
+                disabled={loading}
+                min={new Date().toISOString().split('T')[0]}
+                style={{ fontSize: '1rem', padding: '12px 16px' }}
+              />
+              <p className="form-hint" style={{ marginTop: '0.5rem', fontSize: '0.85rem', color: '#64748b' }}>
+                When do you plan to fulfill this pledge?
+              </p>
+            </div>
+
+            <div className="form-actions" style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', flexWrap: 'wrap', marginTop: '2rem', paddingTop: '2rem', borderTop: '2px solid #e5e7eb' }}>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                style={{ minWidth: 110, padding: '12px 24px', fontSize: '1rem', fontWeight: '600' }}
+                disabled={loading}
+                onClick={() => { resetForm(); setMessage(null); setError(null); }}
+              >
+                🔄 Reset
+              </button>
+              <button
+                type="submit"
+                className="btn btn-primary"
+                style={{ 
+                  minWidth: 160, 
+                  padding: '12px 32px', 
+                  fontSize: '1rem', 
+                  fontWeight: '700',
+                  background: 'linear-gradient(135deg, #FCD116 0%, #ffdb4d 100%)',
+                  color: '#181818',
+                  border: 'none',
+                  boxShadow: '0 4px 12px rgba(252, 209, 22, 0.3)'
+                }}
+                disabled={loading}
+              >
+                {loading ? '⏳ Processing...' : '💰 Pledge Now'}
               </button>
             </div>
 

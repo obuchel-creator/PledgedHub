@@ -8,13 +8,24 @@ const router = express.Router();
 router.post('/', async (req, res) => {
   try {
     const { name, email, phone, password } = req.body;
-    if (!name || !email || !phone || !password) {
-      return res.status(400).json({ error: 'All fields are required.' });
+    if (!name || !phone || !password) {
+      return res.status(400).json({ error: 'Name, phone, and password are required.' });
     }
-    // Check if user already exists by email
-    const [existing] = await pool.query('SELECT id FROM users WHERE email = ?', [email]);
-    if (existing.length > 0) {
-      return res.status(400).json({ error: 'Email already registered.' });
+    // Treat empty string as no email
+    const safeEmail = email && email.trim() ? email.trim() : null;
+    // Strong password validation
+    const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/;
+    if (!strongPasswordRegex.test(password)) {
+      return res.status(400).json({
+        error: 'Password must be at least 8 characters and include uppercase, lowercase, number, and special character.'
+      });
+    }
+    // If email is provided, check if already exists
+    if (safeEmail) {
+      const [existing] = await pool.query('SELECT id FROM users WHERE email = ?', [safeEmail]);
+      if (existing.length > 0) {
+        return res.status(400).json({ error: 'Email already registered.' });
+      }
     }
     // Check if phone number already exists
     const [existingPhone] = await pool.query('SELECT id FROM users WHERE phone = ?', [phone]);
@@ -24,7 +35,7 @@ router.post('/', async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     const [result] = await pool.query(
       'INSERT INTO users (name, email, phone, password) VALUES (?, ?, ?, ?)',
-      [name, email, phone, hashedPassword]
+      [name, safeEmail, phone, hashedPassword]
     );
     const userId = result.insertId;
     const [users] = await pool.query('SELECT id, name, email, phone FROM users WHERE id = ?', [userId]);

@@ -9,8 +9,8 @@ import { formatCurrency } from '../utils/formatters';
 function DashboardMetrics({ pledges, payments }) {
   // Calculate metrics
   const totalPledges = pledges.length;
-  const totalAmount = pledges.reduce((sum, p) => sum + (p.amount || 0), 0);
-  const paidAmount = payments.reduce((sum, p) => p.status === 'completed' ? sum + (p.amount || 0) : sum, 0);
+  const totalAmount = pledges.reduce((sum, p) => sum + (parseFloat(p.amount) || 0), 0);
+  const paidAmount = payments.reduce((sum, p) => p.status === 'completed' ? sum + (parseFloat(p.amount) || 0) : sum, 0);
   const collectionRate = totalAmount > 0 ? Math.round((paidAmount / totalAmount) * 100) : 0;
   const overduePledges = pledges.filter(p => p.status === 'overdue').length;
   const pendingPledges = pledges.filter(p => p.status === 'pending' || p.status === 'active').length;
@@ -23,7 +23,7 @@ function DashboardMetrics({ pledges, payments }) {
           <span className="metric-card__icon">📊</span>
         </div>
         <p className="metric-card__value">{totalPledges}</p>
-        <p className="metric-card__subtext">{pendingPledges} pending collection</p>
+        <p className="metric-card__description">{pendingPledges} pending collection</p>
       </div>
 
       <div className="metric-card">
@@ -32,7 +32,7 @@ function DashboardMetrics({ pledges, payments }) {
           <span className="metric-card__icon">💰</span>
         </div>
         <p className="metric-card__value">{formatCurrency(totalAmount)}</p>
-        <p className="metric-card__subtext">
+        <p className="metric-card__description">
           {formatCurrency(paidAmount)} collected
         </p>
       </div>
@@ -43,7 +43,7 @@ function DashboardMetrics({ pledges, payments }) {
           <span className="metric-card__icon">✅</span>
         </div>
         <p className="metric-card__value">{collectionRate}%</p>
-        <p className="metric-card__subtext">
+        <p className="metric-card__description">
           <span className={`badge badge--${collectionRate >= 75 ? 'success' : collectionRate >= 50 ? 'warning' : 'danger'}`}>
             {collectionRate >= 75 ? 'Excellent' : collectionRate >= 50 ? 'Good' : 'Needs attention'}
           </span>
@@ -58,7 +58,7 @@ function DashboardMetrics({ pledges, payments }) {
         <p className={`metric-card__value ${overduePledges > 0 ? 'metric-card__value--warning' : ''}`}>
           {overduePledges}
         </p>
-        <p className="metric-card__subtext">
+        <p className="metric-card__description">
           {overduePledges > 0 ? 'Requires attention' : 'All caught up'}
         </p>
       </div>

@@ -1,14 +1,17 @@
 import React from 'react';
-import logoImage from '../assets/pledgehub-logo.png';
+import logoImage from '../assets/pledge hub logo.png';
 
-export default function Logo({ size = 'medium', showText = true, textSize, onlyImage = false }) {
+
+export default function Logo({ size = 'xlarge', showText = true, textSize, onlyImage = false }) {
   const sizes = {
     small: { height: 32, text: '1.1rem' },
     medium: { height: 48, text: '1.5rem' },
     large: { height: 64, text: '2rem' },
+    xlarge: { height: 120, text: '2.5rem' },
+    xxlarge: { height: 180, text: '3rem' },
   };
 
-  const { height, text } = sizes[size] || sizes.medium;
+  const { height, text } = sizes[size] || sizes.xlarge;
   const fontSize = textSize || text;
 
   return (
@@ -20,7 +23,6 @@ export default function Logo({ size = 'medium', showText = true, textSize, onlyI
         textDecoration: 'none',
       }}
     >
-      {/* Logo Image */}
       <img
         src={logoImage}
         alt="PledgeHub Logo"
@@ -31,22 +33,8 @@ export default function Logo({ size = 'medium', showText = true, textSize, onlyI
           display: 'block',
         }}
       />
-      {/* Logo Text - Africa's Talking Style */}
-      {!onlyImage && showText && (
-        <span
-          style={{
-            fontSize,
-            fontWeight: '700',
-            color: '#ffffff',
-            fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif',
-            letterSpacing: '-0.02em',
-            whiteSpace: 'nowrap',
-            lineHeight: '1',
-            textShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
-          }}
-        >
-          PledgeHub
-        </span>
+      {showText && !onlyImage && (
+        <span style={{ fontWeight: 700, fontSize: fontSize, color: '#1a237e', letterSpacing: '0.02em' }}>PledgeHub</span>
       )}
     </div>
   );

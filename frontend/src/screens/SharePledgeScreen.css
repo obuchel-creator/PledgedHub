@@ -1,0 +1,98 @@
+.share-pledge-container {
+  max-width: 480px;
+  margin: 40px auto;
+  background: #181818;
+  border-radius: 12px;
+  box-shadow: 0 2px 16px #0002;
+  padding: 32px 24px;
+  color: #f4f4f4;
+  font-family: inherit;
+}
+.share-pledge-details {
+  margin-bottom: 24px;
+  font-size: 16px;
+  line-height: 1.7;
+}
+.share-pledge-details div {
+  margin-bottom: 8px;
+}
+.share-pledge-actions {
+  margin-top: 32px;
+}
+
+.actions-title {
+  text-align: center;
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: #f4f4f4;
+}
+
+.action-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  width: 100%;
+  padding: 20px;
+  margin-bottom: 12px;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: #252525;
+}
+
+.action-card.primary {
+  background: linear-gradient(135deg, #FCD116 0%, #ffdb4d 100%);
+  color: #181818;
+  border-color: #FCD116;
+}
+
+.action-card.primary:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(252, 209, 22, 0.3);
+  background: linear-gradient(135deg, #ffdb4d 0%, #FCD116 100%);
+}
+
+.action-card.secondary {
+  background: #2a2a2a;
+  color: #f4f4f4;
+  border-color: #3a3a3a;
+}
+
+.action-card.secondary:hover {
+  transform: translateY(-2px);
+  background: #333333;
+  border-color: #FCD116;
+  box-shadow: 0 4px 16px rgba(252, 209, 22, 0.15);
+}
+
+.action-icon {
+  font-size: 32px;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.action-label {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  display: block;
+}
+
+.action-desc {
+  font-size: 14px;
+  opacity: 0.8;
+  display: block;
+}
+
+.action-card.primary .action-desc {
+  opacity: 0.7;
+}
+.share-pledge-loading, .share-pledge-error {
+  text-align: center;
+  margin-top: 60px;
+  color: #f4f4f4;
+  font-size: 18px;
+}

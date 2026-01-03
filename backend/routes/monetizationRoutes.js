@@ -237,6 +237,51 @@ const checkSubscriptionLimit = (actionType) => {
   };
 };
 
+/**
+ * POST /api/monetization/notify
+ * Save email for billing launch notification
+ */
+router.post('/notify', async (req, res) => {
+  try {
+    const { email, activationDate } = req.body;
+    
+    if (!email || !email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return res.status(400).json({ success: false, error: 'Valid email required' });
+    }
+    
+    // Store in database (optional: can also send confirmation email)
+    const { pool } = require('../config/db');
+    const normalizedEmail = email.trim().toLowerCase();
+    
+    // Check if already subscribed
+    const [existing] = await pool.execute(
+      'SELECT id FROM billing_notifications WHERE email = ?',
+      [normalizedEmail]
+    );
+    
+    if (existing && existing.length > 0) {
+      return res.json({ 
+        success: true, 
+        message: 'Email already registered for notifications' 
+      });
+    }
+    
+    // Insert new notification subscription
+    await pool.execute(
+      'INSERT INTO billing_notifications (email, activation_date, created_at) VALUES (?, ?, NOW())',
+      [normalizedEmail, activationDate || new Date(Date.now() + 1000 * 60 * 60 * 24 * 30 * 6)]
+    );
+    
+    res.json({
+      success: true,
+      message: 'Email registered. We will notify you before billing starts.'
+    });
+  } catch (error) {
+    console.error('Notify error:', error);
+    res.status(500).json({ success: false, error: 'Could not save notification' });
+  }
+});
+
 module.exports = {
   router,
   checkSubscriptionLimit

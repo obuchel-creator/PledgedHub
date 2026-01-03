@@ -221,13 +221,23 @@ const PledgeForm = ({ onSubmit, onCancel, initialData = {}, loading = false, use
         />
       </div>
 
-      <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+      <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
         {onCancel && (
-          <Button type="button" variant="secondary" onClick={onCancel} disabled={loading}>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={onCancel}
+            disabled={loading}
+            style={{ minWidth: 100, padding: '6px 14px', fontSize: '0.95rem' }}
+          >
             Cancel
           </Button>
         )}
-        <Button type="submit" disabled={loading}>
+        <Button
+          type="submit"
+          disabled={loading}
+          style={{ minWidth: 120, padding: '6px 16px', fontSize: '0.95rem' }}
+        >
           {loading ? 'Creating...' : 'Create Pledge'}
         </Button>
       </div>

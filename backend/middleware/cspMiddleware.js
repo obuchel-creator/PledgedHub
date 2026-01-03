@@ -13,8 +13,10 @@ module.exports = function cspMiddleware(req, res, next) {
 
   const csp = [
     "default-src 'self'",
-    // Only allow scripts from self and Google OAuth, add 'nonce-<nonce>' if you use inline scripts
-    "script-src 'self' https://accounts.google.com https://www.gstatic.com",
+    // In dev mode, Vite needs 'unsafe-eval' for HMR. Only allow scripts from self and Google OAuth
+    isDev
+      ? "script-src 'self' 'unsafe-eval' https://accounts.google.com https://www.gstatic.com"
+      : "script-src 'self' https://accounts.google.com https://www.gstatic.com",
     // In production, avoid 'unsafe-inline'. In dev, Vite injects inline styles for HMR, so allow it only in dev.
     isDev
       ? "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com"

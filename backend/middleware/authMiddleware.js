@@ -143,27 +143,6 @@ async function protect(req, res, next) {
   }
 }
 
-function requireRole(roleOrRoles) {
-  const allowed = Array.isArray(roleOrRoles) ? roleOrRoles : [roleOrRoles];
-  return (req, res, next) => {
-    if (!req.user) {
-      console.log(`[SECURITY] Unauthorized role check from IP: ${req.ip}`);
-      return res.status(401).json({ 
-        success: false, 
-        message: 'Authentication required.' 
-      });
-    }
-    if (!allowed.includes(req.user.role)) {
-      console.log(`[SECURITY] Forbidden role access attempt by user ${req.user._id} from IP: ${req.ip}`);
-      return res.status(403).json({ 
-        success: false, 
-        message: 'Insufficient permissions.' 
-      });
-    }
-    return next();
-  };
-}
-
 // Removed old exports - using new exports at bottom of file
 
 /**

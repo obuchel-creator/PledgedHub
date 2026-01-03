@@ -5,6 +5,82 @@ const { mobileMoneyService } = require('../services/mobileMoneyService');
 const paymentTrackingService = require('../services/paymentTrackingService');
 
 /**
+ * PUBLIC: Get campaign by numeric ID (no auth required)
+ * GET /api/public/campaigns/id/:id
+ *
+ * Returns campaign details + pledge progress for public fundraising page
+ */
+router.get('/campaigns/id/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!id || isNaN(id)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid campaign ID'
+      });
+    }
+
+    // Get campaign by ID
+    const [campaigns] = await pool.execute(`
+      SELECT 
+        id, title, description, goal_amount, raised_amount,
+        image_url, event_code, share_url, is_public, created_at
+      FROM campaigns
+      WHERE id = ? AND is_public = TRUE AND deleted_at IS NULL
+      LIMIT 1
+    `, [id]);
+
+    if (campaigns.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'Campaign not found or is not public'
+      });
+    }
+
+    const campaign = campaigns[0];
+
+    // Get recent pledges (for social proof, showing first names only)
+    const [pledges] = await pool.execute(`
+      SELECT 
+        SUBSTRING(donor_name, 1, 1) as donor_initial,
+        amount, created_at
+      FROM pledges
+      WHERE campaign_id = ? AND deleted = 0
+      ORDER BY created_at DESC
+      LIMIT 10
+    `, [campaign.id]);
+
+    // Get pledge count
+    const [countResult] = await pool.execute(`
+      SELECT COUNT(*) as count FROM pledges 
+      WHERE campaign_id = ? AND deleted = 0
+    `, [campaign.id]);
+
+    const pledgeCount = countResult[0]?.count || 0;
+
+    res.json({
+      success: true,
+      data: {
+        ...campaign,
+        pledgeCount,
+        recentPledges: pledges.map(p => ({
+          donor: `${p.donor_initial}...`,
+          amount: p.amount,
+          date: p.created_at
+        }))
+      }
+    });
+
+  } catch (error) {
+    console.error('❌ Error fetching campaign by ID:', error.message);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch campaign'
+    });
+  }
+});
+
+/**
  * PUBLIC: Get campaign by URL slug (no auth required)
  * GET /api/public/campaigns/:slug
  * 

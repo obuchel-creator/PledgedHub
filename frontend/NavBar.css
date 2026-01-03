@@ -11,12 +11,18 @@
   z-index: 100;
 }
 .qb-navbar__logo {
-  font-size: 1.5rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
+  font-size: 2.5rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
   margin-right: 2rem;
-  color: #000000;
+  color: #FFCC00;
   font-family: 'Roboto', 'Segoe UI', Arial, sans-serif;
+  min-width: 220px;
+  min-height: 48px;
+  line-height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
 }
 .qb-navbar__links {
   display: flex;

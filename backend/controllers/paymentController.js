@@ -101,20 +101,48 @@ async function listPayments(req, res) {
     const offset = Math.max(0, parseInt(req.query.offset, 10) || 0);
 
     try {
-        // Use the Payment model's list method which has in-memory fallback
-        if (Payment && typeof Payment.list === 'function') {
-            const filter = { limit, offset };
-            if (userId) filter.userId = userId;
-            if (pledgeId) filter.pledgeId = pledgeId;
-            const paymentsData = await Payment.list(filter);
-            return res.status(200).json({ payments: paymentsData });
+        const { pool } = require('../config/db');
+        
+        let sql = `SELECT 
+            id, 
+            pledge_id,
+            pledge_id AS pledgeId,
+            amount, 
+            payment_method AS method,
+            payment_method,
+            payment_date,
+            payment_date AS date,
+            reference_number,
+            reference_number AS referenceNumber,
+            notes,
+            verification_status AS status,
+            verification_status,
+            receipt_number,
+            receipt_photo_url,
+            created_at AS createdAt,
+            created_at AS dateCreated
+         FROM payments WHERE deleted = 0`;
+        
+        const params = [];
+        
+        if (pledgeId) {
+            sql += ` AND pledge_id = ?`;
+            params.push(pledgeId);
         }
-
-        // Fallback: return empty array if Payment model not available
-        return res.status(200).json({ payments: [] });
+        
+        if (userId) {
+            sql += ` AND recorded_by = ?`;
+            params.push(userId);
+        }
+        
+        sql += ` ORDER BY payment_date DESC, created_at DESC LIMIT ? OFFSET ?`;
+        params.push(limit, offset);
+        
+        const [payments] = await pool.execute(sql, params);
+        return res.status(200).json({ success: true, payments: payments || [], data: payments || [] });
     } catch (err) {
         console.error('listPayments error:', err);
-        return res.status(500).json({ error: 'Internal Server Error' });
+        return res.status(500).json({ success: false, error: 'Internal Server Error', details: err.message });
     }
 }
 

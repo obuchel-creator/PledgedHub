@@ -23,7 +23,11 @@ export default function Home() {
         // Handle response format: { success: true, data: [...] } or just [...]
         const items = data?.success ? data.data || [] : Array.isArray(data) ? data : [];
         console.log('HomeScreen: Processed items:', items);
-        setCampaigns(items.slice(0, 5));
+        // Debug: log suggested_amount and goal_amount for each campaign
+        items.forEach((c, i) => {
+          console.log(`[DEBUG] Campaign #${i+1} id=${c.id} title=${c.title} suggested_amount=`, c.suggested_amount, 'goal_amount=', c.goal_amount);
+        });
+        setCampaigns(items); // Show all campaigns for testing
         setError(null);
       })
       .catch((err) => {
@@ -45,23 +49,6 @@ export default function Home() {
     () => [
       {
         id: 'giving-circle',
-        eyebrow: 'Spotlight pledge',
-        title: 'Launch a giving circle in your community',
-        subtitle:
-          'Coordinate pledges with live progress tracking, accountability updates, and instant thank-you notes.',
-        background:
-          'linear-gradient(135deg, rgba(37, 99, 235, 0.92) 0%, rgba(59, 130, 246, 0.88) 45%, rgba(14, 165, 233, 0.8) 100%)',
-        actions: [
-          { label: 'Start a pledge', to: '/create', variant: 'primary' },
-          { label: 'Tour the dashboard', to: '/dashboard', variant: 'ghost' },
-        ],
-        stats: [
-          { label: 'Avg. fulfilment', value: '92%' },
-          { label: 'Active circles', value: '1,284' },
-        ],
-      },
-      {
-        id: 'real-time-tracking',
         eyebrow: 'Product highlight',
         title: 'Track donations in real time with built-in alerts',
         subtitle:
@@ -89,7 +76,7 @@ export default function Home() {
           { label: 'See storytelling tips', to: '/about', variant: 'primary' },
           {
             label: 'Download sample kit',
-            onClick: () => window.open('/sample-kit/index.html', '_blank'),
+            onClick: () => window.open('/sample-templates/pledgehub-sample-kit.zip', '_blank'),
             variant: 'ghost',
           },
         ],
@@ -131,17 +118,23 @@ export default function Home() {
       return Number.isFinite(num) ? num : 0;
     };
 
+    // Debug: log campaign data and suggested/goal amounts
+    if (campaigns && campaigns.length > 0) {
+      const suggestedValues = campaigns.map(c => c.suggested_amount);
+      const goalValues = campaigns.map(c => c.goal_amount);
+      console.log('[DEBUG] All suggested_amounts:', suggestedValues);
+      console.log('[DEBUG] All goal_amounts:', goalValues);
+    }
+
     const totalGoal = campaigns.reduce(
-      (sum, campaign) => sum + safeNumber(campaign.goalAmount || campaign.goal_amount),
+      (sum, campaign) => sum + safeNumber(campaign.goal_amount),
       0,
     );
-    const averageSuggested = campaigns.length
-      ? campaigns.reduce(
-          (sum, campaign) =>
-            sum + safeNumber(campaign.suggestedAmount || campaign.suggested_amount),
-          0,
-        ) / campaigns.length
-      : 0;
+    const suggestedSum = campaigns.reduce(
+      (sum, campaign) => sum + safeNumber(campaign.suggested_amount),
+      0,
+    );
+    const averageSuggested = campaigns.length ? suggestedSum / campaigns.length : 0;
 
     const formatter = new Intl.NumberFormat(undefined, {
       maximumFractionDigits: 0,
@@ -149,13 +142,13 @@ export default function Home() {
 
     return {
       count: campaigns.length,
-      totalGoal: totalGoal > 0 ? formatter.format(totalGoal) : '--',
-      averageSuggested: averageSuggested > 0 ? formatter.format(averageSuggested) : '--',
+      totalGoal: campaigns.length ? formatter.format(totalGoal) : '--',
+      averageSuggested: campaigns.length ? formatter.format(averageSuggested) : '--',
     };
   }, [campaigns]);
 
-  return (
-    <main className="page page--wide" aria-labelledby="home-title" style={{ paddingTop: '1rem' }}>
+    return (
+      <main className="page page--wide" aria-labelledby="home-title" style={{ paddingTop: '1rem', background: 'linear-gradient(135deg, #f5f7fa 0%, #e3ecfa 100%)', minHeight: '100vh' }}>
       <FeedbackButton />
 
       <section
@@ -178,6 +171,13 @@ export default function Home() {
             borderRadius: '28px',
             overflow: 'hidden',
             boxShadow: '0 40px 90px -48px rgba(15, 23, 42, 0.42)',
+            background: 'rgba(255,255,255,0.18)',
+            backdropFilter: 'blur(16px) saturate(180%)',
+            WebkitBackdropFilter: 'blur(16px) saturate(180%)',
+            border: '1.5px solid rgba(255,255,255,0.28)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
           }}
         >
           {heroSlides.map((slide, index) => {
@@ -211,7 +211,19 @@ export default function Home() {
                     bottom: 0,
                     zIndex: 0,
                   }}
-                />
+                >
+                  {/* Overlay for better text visibility */}
+                  <span style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    background: 'rgba(15,23,42,0.48)',
+                    zIndex: 1,
+                    pointerEvents: 'none',
+                  }} />
+                </span>
                 <div
                   className="hero-slide__content"
                   style={{
@@ -242,7 +254,8 @@ export default function Home() {
                       fontWeight: '700',
                       lineHeight: '1.2',
                       marginBottom: '0.875rem',
-                      color: '#ffffff',
+                      color: '#fff',
+                      textShadow: '0 2px 12px rgba(0,0,0,0.32), 0 1px 1px rgba(30,41,59,0.18)',
                     }}
                   >
                     {slide.title}
@@ -252,7 +265,8 @@ export default function Home() {
                     style={{
                       fontSize: '1rem',
                       lineHeight: '1.5',
-                      color: 'rgba(255, 255, 255, 0.9)',
+                      color: '#fff',
+                      textShadow: '0 2px 12px rgba(0,0,0,0.32), 0 1px 1px rgba(30,41,59,0.18)',
                       marginBottom: '1.25rem',
                     }}
                   >
@@ -268,39 +282,19 @@ export default function Home() {
                         marginBottom: '1.25rem',
                       }}
                     >
-                      {slide.stats.map((stat) => (
-                        <div
-                          key={stat.label}
-                          className="hero-slide__stat"
-                          style={{
-                            background: 'rgba(255, 255, 255, 0.15)',
-                            backdropFilter: 'blur(10px)',
-                            border: '1px solid rgba(255, 255, 255, 0.2)',
-                            borderRadius: '10px',
-                            padding: '0.875rem',
-                          }}
-                        >
+                        {slide.stats.map((stat, idx) => (
+                          <React.Fragment key={`${stat.label || 'stat'}-${idx}`}>
                           <dt
                             className="hero-slide__stat-value"
-                            style={{
-                              fontSize: '1.4rem',
-                              fontWeight: '700',
-                              color: '#ffffff',
-                              marginBottom: '0.25rem',
-                            }}
                           >
                             {stat.value}
                           </dt>
                           <dd
                             className="hero-slide__stat-label"
-                            style={{
-                              fontSize: '0.8rem',
-                              color: 'rgba(255, 255, 255, 0.8)',
-                            }}
                           >
                             {stat.label}
                           </dd>
-                        </div>
+                        </React.Fragment>
                       ))}
                     </dl>
                   )}
@@ -400,127 +394,7 @@ export default function Home() {
             );
           })}
 
-          {totalSlides > 1 && (
-            <>
-              <button
-                type="button"
-                className="hero-slider__control hero-slider__control--prev"
-                onClick={handlePrev}
-                aria-label="Previous highlight"
-                style={{
-                  position: 'absolute',
-                  left: '-15px',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  width: '40px',
-                  height: '40px',
-                  background: 'transparent',
-                  border: 'none',
-                  color: '#ffffff',
-                  fontSize: '2.5rem',
-                  fontWeight: 'bold',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  zIndex: 100,
-                  transition: 'all 0.2s ease',
-                  textShadow: '0 2px 8px rgba(0, 0, 0, 0.4)',
-                  opacity: 0.85,
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.opacity = '1';
-                  e.target.style.transform = 'translateY(-50%) scale(1.15)';
-                  e.target.style.textShadow = '0 3px 12px rgba(0, 0, 0, 0.6)';
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.opacity = '0.85';
-                  e.target.style.transform = 'translateY(-50%) scale(1)';
-                  e.target.style.textShadow = '0 2px 8px rgba(0, 0, 0, 0.4)';
-                }}
-              >
-                {'ã'}
-              </button>
-              <button
-                type="button"
-                className="hero-slider__control hero-slider__control--next"
-                onClick={handleNext}
-                aria-label="Next highlight"
-                style={{
-                  position: 'absolute',
-                  right: '-15px',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  width: '40px',
-                  height: '40px',
-                  background: 'transparent',
-                  border: 'none',
-                  color: '#ffffff',
-                  fontSize: '2.5rem',
-                  fontWeight: 'bold',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  zIndex: 100,
-                  transition: 'all 0.2s ease',
-                  textShadow: '0 2px 8px rgba(0, 0, 0, 0.4)',
-                  opacity: 0.85,
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.opacity = '1';
-                  e.target.style.transform = 'translateY(-50%) scale(1.15)';
-                  e.target.style.textShadow = '0 3px 12px rgba(0, 0, 0, 0.6)';
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.opacity = '0.85';
-                  e.target.style.transform = 'translateY(-50%) scale(1)';
-                  e.target.style.textShadow = '0 2px 8px rgba(0, 0, 0, 0.4)';
-                }}
-              >
-                {'õ'}
-              </button>
-              <div
-                className="hero-slider__bullets"
-                role="tablist"
-                aria-label="Carousel navigation"
-                style={{
-                  position: 'absolute',
-                  bottom: '2rem',
-                  left: '50%',
-                  transform: 'translateX(-50%)',
-                  display: 'flex',
-                  gap: '0.75rem',
-                  zIndex: 10,
-                }}
-              >
-                {heroSlides.map((slide, index) => {
-                  const isActive = index === activeSlide;
-                  return (
-                    <button
-                      key={slide.id}
-                      type="button"
-                      className={`hero-slider__bullet${isActive ? ' hero-slider__bullet--active' : ''}`}
-                      onClick={() => goToSlide(index)}
-                      aria-label={`Show slide ${index + 1}: ${slide.title}`}
-                      aria-pressed={isActive}
-                      style={{
-                        width: '12px',
-                        height: '12px',
-                        borderRadius: '50%',
-                        border: 'none',
-                        background: isActive ? '#ffffff' : 'rgba(255, 255, 255, 0.4)',
-                        cursor: 'pointer',
-                        padding: 0,
-                        transition: 'all 0.3s ease',
-                        transform: isActive ? 'scale(1.3)' : 'scale(1)',
-                      }}
-                    />
-                  );
-                })}
-              </div>
-            </>
-          )}
+          {/* Navigation controls removed - clean slider view */}
         </div>
       </section>
 
@@ -569,11 +443,16 @@ export default function Home() {
             className="stat-card"
             aria-labelledby="snapshot-count"
             style={{
-              background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+              background: 'rgba(255,255,255,0.18)',
+              backdropFilter: 'blur(16px) saturate(180%)',
+              WebkitBackdropFilter: 'blur(16px) saturate(180%)',
+              border: '1.5px solid rgba(255,255,255,0.28)',
               padding: '2rem',
               borderRadius: '16px',
-              color: '#ffffff',
-              boxShadow: '0 10px 30px rgba(37, 99, 235, 0.3)',
+              color: '#1e293b',
+              textShadow: '0 1px 6px rgba(255,255,255,0.7), 0 1px 1px rgba(30,41,59,0.12)',
+              boxShadow: '0 10px 30px rgba(37, 99, 235, 0.10)',
+              transition: 'background 0.3s',
             }}
           >
             <p
@@ -582,7 +461,8 @@ export default function Home() {
               style={{
                 fontSize: '0.95rem',
                 fontWeight: '600',
-                color: 'rgba(255, 255, 255, 0.9)',
+                color: '#0f172a',
+                textShadow: '0 1px 6px rgba(255,255,255,0.7), 0 1px 1px rgba(30,41,59,0.12)',
                 marginBottom: '0.75rem',
                 textTransform: 'uppercase',
                 letterSpacing: '0.05em',
@@ -593,10 +473,18 @@ export default function Home() {
             <p
               className="stat-card__value"
               style={{
-                fontSize: '3rem',
+                fontSize: campaignStats.count && campaignStats.count.toString().length > 8 ? '2.1rem' : '3rem',
                 fontWeight: '700',
-                color: '#ffffff',
+                color: '#0f172a',
+                textShadow: '0 1px 6px rgba(255,255,255,0.7), 0 1px 1px rgba(30,41,59,0.12)',
                 marginBottom: '0.5rem',
+                maxWidth: '100%',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                wordBreak: 'break-all',
+                overflowWrap: 'break-word',
+                lineHeight: 1.1,
+                display: 'block',
               }}
             >
               {campaignStats.count}
@@ -605,7 +493,8 @@ export default function Home() {
               className="stat-card__meta"
               style={{
                 fontSize: '0.9rem',
-                color: 'rgba(255, 255, 255, 0.8)',
+                color: '#334155',
+                textShadow: '0 1px 6px rgba(255,255,255,0.7), 0 1px 1px rgba(30,41,59,0.12)',
                 lineHeight: '1.5',
               }}
             >
@@ -617,11 +506,15 @@ export default function Home() {
             className="stat-card"
             aria-labelledby="snapshot-goal"
             style={{
-              background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+              background: 'rgba(255,255,255,0.18)',
+              backdropFilter: 'blur(16px) saturate(180%)',
+              WebkitBackdropFilter: 'blur(16px) saturate(180%)',
+              border: '1.5px solid rgba(255,255,255,0.28)',
               padding: '2rem',
               borderRadius: '16px',
-              color: '#ffffff',
-              boxShadow: '0 10px 30px rgba(16, 185, 129, 0.3)',
+              color: '#1e293b',
+              boxShadow: '0 10px 30px rgba(16, 185, 129, 0.10)',
+              transition: 'background 0.3s',
             }}
           >
             <p
@@ -630,7 +523,8 @@ export default function Home() {
               style={{
                 fontSize: '0.95rem',
                 fontWeight: '600',
-                color: 'rgba(255, 255, 255, 0.9)',
+                color: '#0f172a',
+                textShadow: '0 1px 6px rgba(255,255,255,0.7), 0 1px 1px rgba(30,41,59,0.12)',
                 marginBottom: '0.75rem',
                 textTransform: 'uppercase',
                 letterSpacing: '0.05em',
@@ -641,10 +535,18 @@ export default function Home() {
             <p
               className="stat-card__value"
               style={{
-                fontSize: '3rem',
+                fontSize: campaignStats.totalGoal && campaignStats.totalGoal.length > 8 ? '2.1rem' : '3rem',
                 fontWeight: '700',
-                color: '#ffffff',
+                color: '#0f172a',
+                textShadow: '0 1px 6px rgba(255,255,255,0.7), 0 1px 1px rgba(30,41,59,0.12)',
                 marginBottom: '0.5rem',
+                maxWidth: '100%',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                wordBreak: 'break-all',
+                overflowWrap: 'break-word',
+                lineHeight: 1.1,
+                display: 'block',
               }}
             >
               {campaignStats.totalGoal}
@@ -653,7 +555,8 @@ export default function Home() {
               className="stat-card__meta"
               style={{
                 fontSize: '0.9rem',
-                color: 'rgba(255, 255, 255, 0.8)',
+                color: '#334155',
+                textShadow: '0 1px 6px rgba(255,255,255,0.7), 0 1px 1px rgba(30,41,59,0.12)',
                 lineHeight: '1.5',
               }}
             >
@@ -665,11 +568,15 @@ export default function Home() {
             className="stat-card"
             aria-labelledby="snapshot-suggested"
             style={{
-              background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+              background: 'rgba(255,255,255,0.18)',
+              backdropFilter: 'blur(16px) saturate(180%)',
+              WebkitBackdropFilter: 'blur(16px) saturate(180%)',
+              border: '1.5px solid rgba(255,255,255,0.28)',
               padding: '2rem',
               borderRadius: '16px',
-              color: '#ffffff',
-              boxShadow: '0 10px 30px rgba(245, 158, 11, 0.3)',
+              color: '#1e293b',
+              boxShadow: '0 10px 30px rgba(245, 158, 11, 0.10)',
+              transition: 'background 0.3s',
             }}
           >
             <p
@@ -689,10 +596,17 @@ export default function Home() {
             <p
               className="stat-card__value"
               style={{
-                fontSize: '3rem',
+                fontSize: campaignStats.averageSuggested && campaignStats.averageSuggested.length > 8 ? '2.1rem' : '3rem',
                 fontWeight: '700',
                 color: '#ffffff',
                 marginBottom: '0.5rem',
+                maxWidth: '100%',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                wordBreak: 'break-all',
+                overflowWrap: 'break-word',
+                lineHeight: 1.1,
+                display: 'block',
               }}
             >
               {campaignStats.averageSuggested}
@@ -711,8 +625,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* AI Feature Banner */}
-      <AIFeatureBanner />
 
       <section
         className="section card card--muted"
@@ -764,6 +676,11 @@ export default function Home() {
               fontSize: '0.95rem',
               fontWeight: '600',
               borderRadius: '10px',
+              color: '#16a34a', // Green like the buttons
+              border: '1.5px solid #16a34a',
+              background: 'rgba(34,197,94,0.08)',
+              boxShadow: '0 2px 8px rgba(16,185,129,0.10)',
+              transition: 'background 0.2s, color 0.2s',
             }}
           >
             View all
@@ -829,53 +746,54 @@ export default function Home() {
             </div>
           </div>
         ) : (
-          <ul className="list list--divided" aria-live="polite" style={{ marginTop: '1.5rem' }}>
+          <div
+            className="campaigns-grid"
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+              gap: '2rem',
+              marginTop: '1.5rem',
+            }}
+          >
             {campaigns.map((campaign, index) => {
               const id = campaign?.id ?? campaign?._id ?? index;
               const title = campaign?.title ?? 'Untitled Campaign';
-              const description = campaign?.description || 'No description provided yet.';
+              let description = campaign?.description || 'No description provided yet.';
               const goalAmount = campaign?.goalAmount || campaign?.goal_amount || 0;
               const currentAmount = campaign?.currentAmount || campaign?.current_amount || 0;
               const pledgeCount = campaign?.pledgeCount || campaign?.pledge_count || 0;
-
-              const formatter = new Intl.NumberFormat(undefined, {
-                maximumFractionDigits: 0,
-              });
-
+              const formatter = new Intl.NumberFormat(undefined, { maximumFractionDigits: 0 });
               return (
-                <li key={id} className="list-item">
-                  <div className="list-item__meta">
-                    <span
-                      className="list-item__title"
-                      style={{ color: '#1e293b', fontWeight: 700, fontSize: '1.15rem' }}
-                    >
-                      {title}
-                    </span>
-                    <span
-                      className="list-item__subtitle"
-                      style={{ color: '#334155', fontSize: '0.98rem' }}
-                    >
-                      {description}
-                    </span>
-                    <div
+                <div
+                  key={id}
+                  className="campaign-card campaign-card--pro campaign-card--fixed-height campaign-card--align-actions"
+                >
+                  <div className="campaign-card-content-area">
+                    <span className="campaign-title">{title}</span>
+                    <span className="campaign-description-pro">{description}</span>
+                    <div className="campaign-stats-pro">
+                      <span>üéØ Goal: <span className="campaign-goal">{formatter.format(goalAmount)}</span></span>
+                      <span>üí∞ Raised: <span className="campaign-raised">{formatter.format(currentAmount)}</span></span>
+                      <span>ü§ù {pledgeCount} pledge{pledgeCount !== 1 ? 's' : ''}</span>
+                    </div>
+                  </div>
+                  <div className="campaign-action-row-horizontal campaign-action-row-bottom">
+                    <Link
+                      to={`/campaigns/${id}`}
+                      className="btn btn-primary btn--small"
                       style={{
-                        display: 'flex',
-                        gap: '1rem',
-                        marginTop: '0.5rem',
-                        fontSize: '0.9rem',
-                        color: '#64748b',
+                        background: 'linear-gradient(135deg, rgba(22, 163, 74, 0.95) 0%, rgba(34, 197, 94, 0.9) 45%, rgba(16, 185, 129, 0.85) 100%)',
+                        color: '#fff',
+                        border: 'none',
+                        boxShadow: '0 2px 8px rgba(22,163,74,0.08)',
+                        fontWeight: 700,
+                        letterSpacing: '0.01em',
+                        transition: 'background 0.2s',
                       }}
                     >
-                      <span>Goal: {formatter.format(goalAmount)}</span>
-                      <span>Raised: {formatter.format(currentAmount)}</span>
-                      <span>
-                        {pledgeCount} pledge{pledgeCount !== 1 ? 's' : ''}
-                      </span>
-                    </div>
-                    <div className="list-item__actions" style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
-                      <Link to={`/campaigns/${id}`} className="btn btn-primary btn--small">
-                        View &amp; Pledge
-                      </Link>
+                      View & Pledge
+                    </Link>
+                    <div className="share-btn-container">
                       <ShareButton
                         contentType="campaign"
                         contentData={{
@@ -885,15 +803,28 @@ export default function Home() {
                         }}
                         contentId={id}
                         shareUrl={`${window.location.origin}/campaigns/${id}`}
-                        style="button"
+                        style={{
+                          background: 'linear-gradient(135deg, rgba(22, 163, 74, 0.95) 0%, rgba(34, 197, 94, 0.9) 45%, rgba(16, 185, 129, 0.85) 100%)',
+                          color: '#fff',
+                          border: 'none',
+                          fontWeight: 700,
+                          letterSpacing: '0.01em',
+                          boxShadow: '0 2px 8px rgba(22,163,74,0.08)',
+                          padding: '0.5rem 1.2rem',
+                          borderRadius: '6px',
+                          minWidth: '90px',
+                          minHeight: '36px',
+                          cursor: 'pointer',
+                          transition: 'background 0.2s',
+                        }}
                         size="small"
                       />
                     </div>
                   </div>
-                </li>
+                </div>
               );
             })}
-          </ul>
+          </div>
         )}
       </section>
     </main>

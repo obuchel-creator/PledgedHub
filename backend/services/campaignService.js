@@ -59,7 +59,7 @@ async function getAllCampaigns({ status } = {}) {
                 c.name as title,
                 c.description,
                 c.target_amount as goal_amount,
-                c.target_amount as suggested_amount,
+                c.suggested_amount as suggested_amount,
                 COALESCE(SUM(p.amount), 0) as current_amount,
                 c.status,
                 c.start_date,

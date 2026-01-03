@@ -1,6 +1,7 @@
 const cron = require('node-cron');
 const reminderService = require('../services/reminderService');
 const paymentTrackingService = require('../services/paymentTrackingService');
+const billingNotificationService = require('../services/billingNotificationService');
 
 /**
  * Scheduled Jobs for Automated Reminders and Payment Tracking
@@ -71,6 +72,26 @@ function initializeJobs() {
         name: 'Evening Reminders',
         schedule: '5:00 PM daily',
         job: eveningReminderJob
+    });
+
+    // Pre-billing notifications at 8:30 AM daily
+    const billingNotificationJob = cron.schedule('30 8 * * *', async () => {
+        console.log('⏰ Triggered: Billing pre-notification job');
+        try {
+            const result = await billingNotificationService.sendPreBillingNotifications();
+            console.log('Billing pre-notification result:', result);
+        } catch (error) {
+            console.error('Error in billing pre-notification job:', error);
+        }
+    }, {
+        scheduled: false,
+        timezone: "Africa/Kampala"
+    });
+
+    jobs.push({
+        name: 'Billing Pre-Notifications',
+        schedule: '8:30 AM daily',
+        job: billingNotificationJob
     });
     
     console.log(`✓ ${jobs.length} scheduled jobs initialized`);

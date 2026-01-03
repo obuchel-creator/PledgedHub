@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { getCampaigns, createCampaign } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { Link } from 'react-router-dom';
 import '../styles/CampaignsScreen.css';
+import ShareButton from '../components/ShareButton';
 
 const CampaignsScreen = () => {
   const { user } = useAuth();
@@ -173,53 +175,92 @@ const CampaignsScreen = () => {
             {isAdmin && <p>Create your first campaign to get started!</p>}
           </div>
         ) : (
-          campaigns.map((campaign) => (
-            <div key={campaign.id} className="campaign-card">
-              <div className="campaign-header">
-                <h3>{campaign.name}</h3>
-                {campaign.status && (
-                  <span className={`campaign-status ${campaign.status}`}>
-                    {campaign.status}
-                  </span>
-                )}
-              </div>
-              {campaign.description && (
-                <p className="campaign-description">{campaign.description}</p>
-              )}
-              {(campaign.targetAmount || campaign.goal) && (
-                <div className="campaign-stats">
-                  <div className="stat">
-                    <span className="label">Target:</span>
-                    <span className="value">
-                      UGX {parseInt(campaign.targetAmount || campaign.goal).toLocaleString()}
+          campaigns.map((campaign) => {
+            // Prefer slug, fallback to event_code or id
+            const slug = campaign.slug || campaign.event_code || campaign.id;
+            return (
+              <div key={campaign.id} className="campaign-card">
+                <div className="campaign-header">
+                  <h3>{campaign.name}</h3>
+                  {campaign.status && (
+                    <span className={`campaign-status ${campaign.status}`}>
+                      {campaign.status}
                     </span>
-                  </div>
-                  {(campaign.currentAmount || campaign.raised) && (
+                  )}
+                </div>
+                {campaign.description && (
+                  <p className="campaign-description">{campaign.description}</p>
+                )}
+                {(campaign.targetAmount || campaign.goal) && (
+                  <div className="campaign-stats">
                     <div className="stat">
-                      <span className="label">Raised:</span>
+                      <span className="label">Target:</span>
                       <span className="value">
-                        UGX {parseInt(campaign.currentAmount || campaign.raised).toLocaleString()}
+                        UGX {parseInt(campaign.targetAmount || campaign.goal).toLocaleString()}
                       </span>
                     </div>
-                  )}
+                    {(campaign.currentAmount || campaign.raised) && (
+                      <div className="stat">
+                        <span className="label">Raised:</span>
+                        <span className="value">
+                          UGX {parseInt(campaign.currentAmount || campaign.raised).toLocaleString()}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                )}
+                {(campaign.startDate || campaign.endDate || campaign.start_date || campaign.end_date) && (
+                  <div className="campaign-dates">
+                    {(campaign.startDate || campaign.start_date) && (
+                      <div className="date">
+                        📅 Start: {new Date(campaign.startDate || campaign.start_date).toLocaleDateString()}
+                      </div>
+                    )}
+                    {(campaign.endDate || campaign.end_date) && (
+                      <div className="date">
+                        🏁 End: {new Date(campaign.endDate || campaign.end_date).toLocaleDateString()}
+                      </div>
+                    )}
+                  </div>
+                )}
+                <div style={{ marginTop: '1rem', textAlign: 'right' }}>
+                  <div style={{ display: 'flex', flexDirection: 'row', gap: '0.75rem', alignItems: 'center', justifyContent: 'flex-end' }}>
+                    <Link
+                      to={`/campaign/${slug}`}
+                      className="btn-primary"
+                      style={{
+                        padding: '0.5rem 1.2rem',
+                        borderRadius: '8px',
+                        background: 'rgba(255,255,255,0.18)',
+                        border: '1.5px solid rgba(255,255,255,0.28)',
+                        color: '#1e293b',
+                        textDecoration: 'none',
+                        fontWeight: 600,
+                        fontSize: '1rem',
+                        boxShadow: '0 2px 12px #3b82f633',
+                        transition: 'background 0.2s, transform 0.2s',
+                      }}
+                    >
+                      View & Pledge
+                    </Link>
+                    <ShareButton
+                      contentType="campaign"
+                      contentData={{
+                        title: campaign.name,
+                        goalAmount: campaign.targetAmount || campaign.goal,
+                        raisedAmount: campaign.currentAmount || campaign.raised || 0,
+                      }}
+                      contentId={campaign.id}
+                      shareUrl={`${window.location.origin}/campaign/${slug}`}
+                      style="button"
+                      size="medium"
+                      className="btn-primary"
+                    />
+                  </div>
                 </div>
-              )}
-              {(campaign.startDate || campaign.endDate || campaign.start_date || campaign.end_date) && (
-                <div className="campaign-dates">
-                  {(campaign.startDate || campaign.start_date) && (
-                    <div className="date">
-                      📅 Start: {new Date(campaign.startDate || campaign.start_date).toLocaleDateString()}
-                    </div>
-                  )}
-                  {(campaign.endDate || campaign.end_date) && (
-                    <div className="date">
-                      🏁 End: {new Date(campaign.endDate || campaign.end_date).toLocaleDateString()}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          ))
+              </div>
+            );
+          })
         )}
       </div>
     </div>

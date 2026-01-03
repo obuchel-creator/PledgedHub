@@ -1,0 +1,34 @@
+name: Automated MySQL Backup
+on:
+  schedule:
+    - cron: '0 2 * * *' # Runs daily at 2AM UTC
+  workflow_dispatch:
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    env:
+      MYSQL_HOST: ${{ secrets.MYSQL_HOST }}
+      MYSQL_USER: ${{ secrets.MYSQL_USER }}
+      MYSQL_PASS: ${{ secrets.MYSQL_PASS }}
+      MYSQL_DB: ${{ secrets.MYSQL_DB }}
+      ENCRYPTION_PASSWORD: ${{ secrets.ENCRYPTION_PASSWORD }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Install MySQL client
+        run: sudo apt-get update && sudo apt-get install -y mysql-client openssl
+
+      - name: Dump MySQL database
+        run: |
+          mysqldump -h "$MYSQL_HOST" -u "$MYSQL_USER" -p"$MYSQL_PASS" "$MYSQL_DB" > backup.sql
+
+      - name: Encrypt backup
+        run: |
+          openssl enc -aes-256-cbc -salt -in backup.sql -out backup.sql.enc -k "$ENCRYPTION_PASSWORD"
+
+      # Google Drive upload step removed. Use Google Cloud Storage or another backup method here if needed.
+
+      - name: Clean up
+        run: rm backup.sql backup.sql.enc

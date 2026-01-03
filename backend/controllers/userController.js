@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const userService = require('../services/userService');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'change-me';
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
@@ -389,6 +390,26 @@ async function listAllUsers(req, res) {
     }
 }
 
+/**
+ * Promote a user to admin (admin only)
+ */
+async function promoteToAdmin(req, res) {
+  // Only admins can promote
+  if (!req.user || req.user.role !== 'admin') {
+    return res.status(403).json({ success: false, error: 'Access denied' });
+  }
+  const { identifier } = req.body;
+  if (!identifier) {
+    return res.status(400).json({ success: false, error: 'Identifier required' });
+  }
+  const result = await userService.promoteToAdmin(identifier);
+  if (result.success) {
+    return res.json({ success: true });
+  } else {
+    return res.status(404).json({ success: false, error: result.error });
+  }
+}
+
 module.exports = { 
     createUser, 
     getUser, 
@@ -398,5 +419,6 @@ module.exports = {
     restoreUser,
     listAllUsers,
     updateUserRole,
-    login 
+    login,
+    promoteToAdmin 
 };

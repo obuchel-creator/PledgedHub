@@ -8,12 +8,25 @@ export default defineConfig({
     server: {
         port: 5173,
         hmr: { overlay: false },
-        proxy: { '/api': 'http://localhost:5001' }
+        proxy: { '/api': 'http://localhost:5001' },
+        historyApiFallback: true
     },
     preview: {
         port: 4173
     },
-    build: { outDir: 'dist' },
+    build: {
+        outDir: 'dist',
+        chunkSizeWarningLimit: 1200,
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    react: ['react', 'react-dom'],
+                    router: ['react-router-dom'],
+                    charts: ['recharts']
+                }
+            }
+        }
+    },
     resolve: { alias: { '@': '/src' } },
     esbuild: {
         jsx: 'automatic',

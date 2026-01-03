@@ -19,9 +19,9 @@ describe('ForgotPasswordScreen', () => {
         <ForgotPasswordScreen />
       </MemoryRouter>
     );
-    fireEvent.click(screen.getByRole('button'));
-    // No crash, button still present
-    expect(screen.getByRole('button')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /Send reset link/i }));
+    // No crash, primary button still present
+    expect(screen.getByRole('button', { name: /Send reset link/i })).toBeInTheDocument();
   });
 });
 

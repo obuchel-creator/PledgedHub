@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import {
   getPledge,
   getPayments,
@@ -51,7 +51,8 @@ export default function PledgeDetailScreen(props) {
 
   const navigate = useNavigate();
   const { user } = useAuth();
-  const id = resolveId(props);
+  const { id: routeId } = useParams();
+  const id = routeId || resolveId(props);
 
   const formatCurrency = (value) => {
     const num = Number(value);
@@ -75,19 +76,30 @@ export default function PledgeDetailScreen(props) {
     let canceled = false;
 
     const fetchData = async () => {
-      if (!id) {
-        setError('Unable to determine which pledge to show.');
+      if (!id || id === 'undefined' || id === 'null') {
+        console.error('❌ [PledgeDetailScreen] Invalid pledge ID:', id);
+        setError('Unable to determine which pledge to show. The pledge ID is missing or invalid.');
         setLoading(false);
         return;
       }
 
+      console.log('🔵 [PledgeDetailScreen] Fetching pledge with ID:', id);
       setLoading(true);
       setError('');
 
       try {
         const fetchedPledge = await getPledge(id);
         if (canceled) return;
-        setPledge(fetchedPledge || null);
+        
+        if (!fetchedPledge) {
+          setError('Pledge not found. It may have been deleted or does not exist.');
+          setPledge(null);
+          setLoading(false);
+          return;
+        }
+        
+        console.log('✅ [PledgeDetailScreen] Pledge fetched successfully:', fetchedPledge);
+        setPledge(fetchedPledge);
 
         let fetchedPayments = [];
         try {
@@ -100,7 +112,8 @@ export default function PledgeDetailScreen(props) {
         setPayments(Array.isArray(fetchedPayments) ? fetchedPayments : []);
       } catch (err) {
         if (canceled) return;
-        setError(err?.message || 'Unable to load this pledge right now.');
+        console.error('❌ [PledgeDetailScreen] Error fetching pledge:', err);
+        setError(err?.message || 'Unable to load this pledge right now. Please try again later.');
       } finally {
         if (canceled) return;
         setLoading(false);
@@ -797,7 +810,7 @@ export default function PledgeDetailScreen(props) {
                   campaignTitle: pledge?.campaign_title || pledge?.title,
                 }}
                 contentId={pledge?.id}
-                shareUrl={`${window.location.origin}/pledges/${pledge?.id}`}
+                shareUrl={`${window.location.origin}/share/pledge/${pledge?.id}`}
                 style="button"
                 size="medium"
               />
@@ -1058,9 +1071,9 @@ export default function PledgeDetailScreen(props) {
               }}
             >
               <span style={{ fontWeight: '600', color: '#6b7280', minWidth: '80px' }}>Name:</span>
-              <span style={{ fontWeight: '600' }}>{pledge?.donor_name || 'Anonymous'}</span>
+              <span style={{ fontWeight: '600' }}>{pledge?.donor_name || pledge?.donorName || 'Anonymous'}</span>
             </p>
-            {pledge?.donor_email && (
+            {(pledge?.donor_email || pledge?.donorEmail) && (
               <p
                 style={{
                   margin: 0,
@@ -1074,10 +1087,10 @@ export default function PledgeDetailScreen(props) {
                 <span style={{ fontWeight: '600', color: '#6b7280', minWidth: '80px' }}>
                   Email:
                 </span>
-                <span>{pledge.donor_email}</span>
+                <span>{pledge.donor_email || pledge.donorEmail}</span>
               </p>
             )}
-            {pledge?.donor_phone && (
+            {(pledge?.donor_phone || pledge?.donorPhone) && (
               <p
                 style={{
                   margin: 0,
@@ -1091,7 +1104,7 @@ export default function PledgeDetailScreen(props) {
                 <span style={{ fontWeight: '600', color: '#6b7280', minWidth: '80px' }}>
                   Phone:
                 </span>
-                <span>{pledge.donor_phone}</span>
+                <span>{pledge.donor_phone || pledge.donorPhone}</span>
               </p>
             )}
           </div>
@@ -1240,22 +1253,36 @@ export default function PledgeDetailScreen(props) {
           <ul className="list list--divided" aria-live="polite">
             {payments.map((payment, index) => {
               const key = payment?.id || payment?._id || `${payment?.amount || 'amount'}-${index}`;
-              const donor = payment?.donorName || 'Anonymous';
               const amount = formatCurrency(payment?.amount);
+              const paymentDate = formatDate(payment?.payment_date || payment?.date || payment?.createdAt);
+              const method = payment?.payment_method || payment?.method || 'Cash';
+              const status = payment?.verification_status || payment?.status || 'Pending';
+              const reference = payment?.reference_number || payment?.receipt_number || '';
 
               return (
                 <li key={key} className="list-item">
                   <div className="list-item__meta">
-                    <span className="list-item__title">{donor}</span>
-                    <span className="list-item__subtitle">{amount}</span>
-                    <span className="list-item__subtitle">
-                      {formatDate(payment?.createdAt || payment?.date)}
+                    <span className="list-item__title">
+                      {amount} - {method}
                     </span>
-                    {payment?.message ? (
-                      <span className="section__body" style={{ fontSize: '0.92rem' }}>
-                        {payment.message}
+                    <span className="list-item__subtitle">
+                      {paymentDate}
+                      {reference && ` • Ref: ${reference}`}
+                    </span>
+                    <span 
+                      className="list-item__subtitle" 
+                      style={{ 
+                        color: status === 'verified' ? '#10b981' : status === 'rejected' ? '#ef4444' : '#f59e0b',
+                        fontWeight: '600'
+                      }}
+                    >
+                      Status: {status.charAt(0).toUpperCase() + status.slice(1)}
+                    </span>
+                    {payment?.notes && (
+                      <span className="section__body" style={{ fontSize: '0.92rem', marginTop: '0.5rem' }}>
+                        {payment.notes}
                       </span>
-                    ) : null}
+                    )}
                   </div>
                 </li>
               );

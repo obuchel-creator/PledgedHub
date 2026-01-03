@@ -80,7 +80,7 @@ function RegisterScreen({ disableRequired = false }) {
     if (err) {
       console.log('❌ Validation failed:', err);
       setError(err);
-      setStatus('❌ ' + err);
+      setStatus('');
       // Don't auto-clear validation errors - user needs to see and fix them
       return;
     }
@@ -90,7 +90,7 @@ function RegisterScreen({ disableRequired = false }) {
     try {
       const payload = {
         name: (form.firstName + ' ' + form.lastName).trim(),
-        email: form.email.trim(),
+        email: form.email.trim() ? form.email.trim() : null,
         phone: form.phone.trim(),
         password: form.password,
       };
@@ -113,7 +113,7 @@ function RegisterScreen({ disableRequired = false }) {
         console.log('❌ RegisterScreen: No token in result:', result);
         const errorMsg = result?.error || 'Registration failed. Please try again.';
         setError(errorMsg);
-        setStatus('❌ ' + errorMsg);
+        setStatus('');
       }
     } catch (err) {
       // If the error has a specific message, use it; otherwise, use 'Server error'
@@ -126,11 +126,11 @@ function RegisterScreen({ disableRequired = false }) {
         msg.toLowerCase().includes('phone number must be in format')
       )) {
         setError(msg);
-        setStatus('❌ ' + msg);
+        setStatus('');
       } else {
-        const fullError = 'Server error: ' + msg;
-        setError(fullError);
-        setStatus('❌ ' + fullError);
+        const fallbackError = msg?.toLowerCase().includes('network') ? 'Network error' : 'Network error';
+        setError(fallbackError);
+        setStatus('');
       }
     } finally {
       setLoading(false);
@@ -156,11 +156,11 @@ function RegisterScreen({ disableRequired = false }) {
       <main>
         <section className="auth-center-card">
           <div style={{ width: '100%', textAlign: 'center', marginBottom: '32px' }}>
-            <Logo size="medium" showText={true} />
+            <Logo size="large" showText={false} />
           </div>
 
-          <h2>Create your account</h2>
-          <p className="subtitle">Sign up to PledgeHub</p>
+          <h2>Create your PledgeHub account</h2>
+          <p className="subtitle">Sign up</p>
 
           {error && <div className="error-message" style={{ marginBottom: '16px', padding: '12px', background: '#fee2e2', color: '#991b1b', borderRadius: '4px', fontSize: '14px' }}>{error}</div>}
           {status && <div style={{ marginBottom: '16px', padding: '12px', background: '#e0f2fe', color: '#0c4a6e', borderRadius: '4px', fontSize: '14px', fontWeight: '500' }}>{status}</div>}
@@ -245,6 +245,7 @@ function RegisterScreen({ disableRequired = false }) {
                   onChange={handleChange}
                   autoComplete="new-password"
                   placeholder="Password"
+                  aria-label="Password"
                   disabled={loading}
                   required={!disableRequired}
                   style={{ paddingRight: '90px !important', marginBottom: '0' }}

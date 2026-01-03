@@ -17,15 +17,14 @@ const ALLOWED_UPDATE = [
 ];
 
 async function create(data = {}) {
-    // Map incoming `title` to DB `name` (table requires name)
-    if (data.title && !data.name) {
-        data.name = data.title;
+    // The pledges table doesn't have a 'name' or 'title' column
+    // It has: donor_name, purpose, amount, etc.
+    
+    // Always set deleted = 0 unless explicitly set
+    if (!('deleted' in data)) {
+        data.deleted = 0;
     }
-
-    if (!data.name) {
-        throw new Error('name (or title) is required');
-    }
-
+    
     const fields = [];
     const placeholders = [];
     const params = [];
@@ -53,7 +52,16 @@ async function findById(id) {
     if (id == null) return null;
     try {
         const [rows] = await pool.execute(`SELECT * FROM \`${TABLE}\` WHERE id = ? LIMIT 1`, [id]);
-        return (rows && rows[0]) || null;
+        const row = (rows && rows[0]) || null;
+        if (!row) return null;
+        
+        // Convert numeric string fields to actual numbers
+        return {
+            ...row,
+            amount: row.amount ? parseFloat(row.amount) : 0,
+            amount_paid: row.amount_paid ? parseFloat(row.amount_paid) : 0,
+            balance: row.balance ? parseFloat(row.balance) : 0
+        };
     } catch (err) {
         console.error('DB error in findById:', err);
         throw err;
@@ -64,15 +72,23 @@ async function list(filter = {}) {
     const where = [];
     const params = [];
 
+    // Always filter for deleted = 0 unless explicitly overridden
+    if (!('deleted' in filter)) {
+        where.push('deleted = 0');
+    } else if (filter.deleted !== undefined) {
+        where.push('deleted = ?');
+        params.push(filter.deleted);
+    }
+
     if (filter.ownerId != null) {
         where.push('ownerId = ?');
         params.push(filter.ownerId);
     }
 
     if (filter.search) {
-        where.push('(name LIKE ? OR title LIKE ? OR description LIKE ? OR message LIKE ?)');
+        where.push('(donor_name LIKE ? OR purpose LIKE ? OR notes LIKE ?)');
         const term = `%${filter.search}%`;
-        params.push(term, term, term, term);
+        params.push(term, term, term);
     }
 
     let sql = `SELECT * FROM \`${TABLE}\``;
@@ -89,7 +105,13 @@ async function list(filter = {}) {
 
     try {
         const [rows] = await pool.execute(sql, params);
-        return rows || [];
+        // Convert numeric string fields to actual numbers for the frontend
+        return (rows || []).map(row => ({
+            ...row,
+            amount: row.amount ? parseFloat(row.amount) : 0,
+            amount_paid: row.amount_paid ? parseFloat(row.amount_paid) : 0,
+            balance: row.balance ? parseFloat(row.balance) : 0
+        }));
     } catch (err) {
         console.error('DB error in list:', err);
         throw err;

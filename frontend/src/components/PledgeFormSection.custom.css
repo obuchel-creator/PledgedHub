@@ -1,0 +1,26 @@
+.pledge-purpose-select-wrapper {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+.pledge-purpose-select {
+  width: 100%;
+  min-width: 220px;
+  padding-right: 2.5rem;
+  appearance: none;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  height: 2.5rem;
+  font-size: 1rem;
+}
+.pledge-purpose-select-wrapper::after {
+  content: '\25BC';
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: #2196f3;
+  font-size: 1.1rem;
+}

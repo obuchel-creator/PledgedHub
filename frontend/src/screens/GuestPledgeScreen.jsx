@@ -3,7 +3,9 @@ import { useParams, useNavigate } from 'react-router-dom';
 import '../styles/GuestPledgeScreen.css';
 
 export default function GuestPledgeScreen() {
-  const { slug } = useParams(); // URL slug like "school-building"
+  const params = useParams();
+  const slug = params.slug;
+  const id = params.id;
   const navigate = useNavigate();
 
   // Campaign data
@@ -26,14 +28,26 @@ export default function GuestPledgeScreen() {
   // Load campaign
   useEffect(() => {
     loadCampaign();
-  }, [slug]);
+    // eslint-disable-next-line
+  }, [slug, id]);
 
   const loadCampaign = async () => {
     try {
       setLoading(true);
       setError(null);
 
-      const res = await fetch(`/api/public/campaigns/${slug}`);
+      let url = '';
+      if (slug) {
+        url = `/api/public/campaigns/${slug}`;
+      } else if (id) {
+        url = `/api/public/campaigns/id/${id}`;
+      } else {
+        setError('No campaign identifier provided');
+        setLoading(false);
+        return;
+      }
+
+      const res = await fetch(url);
       const data = await res.json();
 
       if (!data.success) {
@@ -381,7 +395,7 @@ export default function GuestPledgeScreen() {
         </p>
       </div>
 
-      {/* Share QR */}
+      {/* Share Section */}
       <div className="share-section">
         <p>📱 Scan QR code to join the fundraiser</p>
         {campaign.event_code && (
@@ -389,6 +403,42 @@ export default function GuestPledgeScreen() {
             Or enter code: <strong>{campaign.event_code}</strong>
           </p>
         )}
+        <button
+          className="share-btn"
+          style={{
+            marginTop: '1rem',
+            background: 'linear-gradient(90deg, #3b82f6 0%, #1d4ed8 100%)',
+            color: '#fff',
+            border: 'none',
+            borderRadius: '8px',
+            padding: '0.7rem 1.5rem',
+            fontWeight: 600,
+            fontSize: '1rem',
+            cursor: 'pointer',
+            boxShadow: '0 2px 12px #3b82f633',
+            transition: 'background 0.2s, transform 0.2s',
+          }}
+          onClick={async () => {
+            // Always use a valid slug or fallback
+            const slug = campaign.slug || campaign.event_code || campaign.id || '';
+            const shareUrl = window.location.origin + `/campaign/${slug}`;
+            const shareText = `Support the campaign: ${campaign.title}\n${shareUrl}`;
+            if (navigator.share) {
+              try {
+                await navigator.share({ title: campaign.title, text: shareText, url: shareUrl });
+              } catch (e) { /* user cancelled */ }
+            } else {
+              try {
+                await navigator.clipboard.writeText(shareUrl);
+                alert('Link copied to clipboard!');
+              } catch (e) {
+                window.prompt('Copy this link:', shareUrl);
+              }
+            }
+          }}
+        >
+          🔗 Share Campaign
+        </button>
       </div>
     </div>
   );

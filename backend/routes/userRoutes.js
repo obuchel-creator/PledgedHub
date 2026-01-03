@@ -249,4 +249,14 @@ router.post(
     })
 );
 
+// POST /users/promote -> promote user to admin (admin only)
+router.post(
+    '/promote',
+    protect,
+    requireRole('admin'),
+    asyncHandler(async (req, res, next) => {
+        await userController.promoteToAdmin(req, res, next);
+    })
+);
+
 module.exports = router;

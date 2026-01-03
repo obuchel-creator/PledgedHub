@@ -1,6 +1,7 @@
 // Batch create pledges
 async function batchCreatePledges(req, res) {
     try {
+        const { pool } = require('../config/db');
         const pledges = Array.isArray(req.body) ? req.body : [];
         if (!pledges.length) {
             return res.status(400).json({ error: 'No pledges provided' });
@@ -11,7 +12,6 @@ async function batchCreatePledges(req, res) {
             return res.status(400).json({ error: 'No valid pledges in batch' });
         }
         // Prepare bulk insert
-        const db = require('../config/db');
         const values = validPledges.map(p => [
             p.campaign_id || null,
             p.title.trim(),
@@ -23,15 +23,15 @@ async function batchCreatePledges(req, res) {
             Number(p.amount),
             p.status || 'pending',
             null,
-            p.purpose || p.message || ''
+            p.purpose || p.message || '',
+            0 // deleted
         ]);
         const insertSql = `INSERT INTO pledges (
             campaign_id, name, donor_name, donor_email, donor_phone, 
-            purpose, collection_date, amount, status, payment_method, notes, created_at
-        ) VALUES ${values.map(() => '(?,?,?,?,?,?,?,?,?,?,?,NOW())').join(',')}`;
+            purpose, collection_date, amount, status, payment_method, notes, deleted, created_at
+        ) VALUES ${values.map(() => '(?,?,?,?,?,?,?,?,?,?,?,?,NOW())').join(',')}`;
         const flatValues = values.flat();
-        const [result] = await db.execute(insertSql, flatValues);
-        // Optionally: fetch inserted rows (not required for batch)
+        const [result] = await pool.execute(insertSql, flatValues);
         return res.status(201).json({ success: true, inserted: result.affectedRows });
     } catch (err) {
         console.error('❌ [BATCH PLEDGE CREATE] Error:', err);
@@ -46,6 +46,42 @@ const pledgeVerificationService = require('../services/pledgeVerificationService
 async function createPledge(req, res) {
     try {
         const { title, amount, donorName, donor_name, donor_email, donor_phone, purpose, collection_date, status, message, date, campaign_id } = req.body || {};
+
+        // Require collection_date (date pledge is to be collected)
+        if (!collection_date || typeof collection_date !== 'string' || !collection_date.trim()) {
+            return res.status(400).json({
+                success: false,
+                error: 'Collection date (collection_date) is required and must be a non-empty string.',
+                details: { received_collection_date: collection_date }
+            });
+        }
+        // Validate collection_date is a valid date string (YYYY-MM-DD)
+        const collectionDateObj = new Date(collection_date);
+        if (isNaN(collectionDateObj.getTime())) {
+            return res.status(400).json({
+                success: false,
+                error: 'Collection date (collection_date) must be a valid date in YYYY-MM-DD format.',
+                details: { received_collection_date: collection_date }
+            });
+        }
+
+        // Require pledge date (date field)
+        if (!date || typeof date !== 'string' || !date.trim()) {
+            return res.status(400).json({
+                success: false,
+                error: 'Pledge date (date) is required and must be a non-empty string.',
+                details: { received_date: date }
+            });
+        }
+        // Validate pledge date is a valid date string (ISO or YYYY-MM-DD)
+        const pledgeDateObj = new Date(date);
+        if (isNaN(pledgeDateObj.getTime())) {
+            return res.status(400).json({
+                success: false,
+                error: 'Pledge date (date) must be a valid date string (ISO or YYYY-MM-DD).',
+                details: { received_date: date }
+            });
+        }
         
         // Require donor_phone for notification readiness
         const phoneValue = donor_phone || req.body.phone;
@@ -57,30 +93,8 @@ async function createPledge(req, res) {
             });
         }
 
-        // Enhanced title validation
-        if (!title) {
-            return res.status(400).json({ 
-                success: false,
-                error: 'Title is required', 
-                details: { received_title: title, title_type: typeof title }
-            });
-        }
-        
-        if (typeof title !== 'string') {
-            return res.status(400).json({ 
-                success: false,
-                error: 'Title must be a string', 
-                details: { received_title: title, title_type: typeof title }
-            });
-        }
-        
-        if (!title.trim()) {
-            return res.status(400).json({ 
-                success: false,
-                error: 'Title cannot be empty', 
-                details: { received_title: title, trimmed_title: title.trim() }
-            });
-        }
+        // Note: 'title' is optional - used to populate purpose/notes field
+        // Database doesn't have a 'title' column
 
         // Enhanced amount validation
         if (amount == null) {
@@ -108,141 +122,115 @@ async function createPledge(req, res) {
             });
         }
 
-        // Try database insertion first
-        const { pool } = require('../config/db');
-        try {
-
-
-                        // Robust helpers: never return undefined
-                        const safeString = (v, fallback = '') =>
-                            typeof v === 'string' && v.trim() !== '' ? v : fallback;
-
-                        const safeNumber = (v, fallback = 0) =>
-                            typeof v === 'number' && !isNaN(v) ? v : fallback;
-
-                        const sqlParams = [
-                            typeof campaign_id !== 'undefined' ? campaign_id : null,
-                            safeString(title, 'Untitled').trim(), // name
-                            safeString(title, 'Untitled').trim(), // title
-                            safeString(donor_name, safeString(donorName, 'Anonymous')),
-                            safeString(donor_email, null),
-                            safeString(donor_phone, null),
-                            safeString(purpose, safeString(message, '')),
-                            safeString(collection_date, new Date().toISOString().split('T')[0]),
-                            safeNumber(numericAmount, 0),
-                            safeString(status, 'pending'),
-                            null, // payment_method placeholder
-                            safeString(purpose, safeString(message, ''))
-                        ];
-
-                        console.log('🔎 [PLEDGE CREATE] SQL PARAMS:', JSON.stringify(sqlParams));
-                        console.log('🔎 [PLEDGE CREATE] SQL PARAMS:', JSON.stringify(sqlParams));
-                        process.stdout.write('\x1b[33m[DEBUG SQL PARAMS]\x1b[0m ' + JSON.stringify(sqlParams) + '\n');
-                        if (process.stdout.flush) process.stdout.flush();
-
-            const insertSql = `
-                INSERT INTO pledges (
-                    campaign_id, name, title, donor_name, donor_email, donor_phone, 
-                    purpose, collection_date, amount, status, payment_method, notes, created_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
-            `;
-            const [result] = await pool.execute(insertSql, sqlParams);
-
-            console.log('✅ [PLEDGE CREATE] Database insertion successful:', result);
-
-            // Fetch the created pledge
-            const [rows] = await pool.execute('SELECT * FROM pledges WHERE id = ?', [result.insertId]);
-            const createdPledge = rows[0];
-
-            // Send verification email if donor has email
-            if (donor_email && typeof donor_email === 'string' && donor_email.trim()) {
-              console.log('📧 [PLEDGE CREATE] Sending verification email to:', donor_email);
-              const verificationResult = await pledgeVerificationService.sendVerificationEmail(
-                result.insertId,
-                donor_email.trim(),
-                donor_name || donorName || 'Donor'
-              );
-              
-              if (!verificationResult.success) {
+        // Always use the Pledge model for creation to ensure field mapping and DB consistency
+        // Note: pledges table does NOT have 'title' or 'name' columns - only donor_name, purpose, etc.
+        const payload = {
+            campaign_id: typeof campaign_id !== 'undefined' ? campaign_id : null,
+            donor_name: typeof donor_name === 'string' ? donor_name : (typeof donorName === 'string' ? donorName : 'Anonymous'),
+            donor_email: typeof donor_email === 'string' ? donor_email : null,
+            donor_phone: typeof donor_phone === 'string' ? donor_phone : null,
+            purpose: typeof purpose === 'string' ? purpose : (typeof message === 'string' ? message : ''),
+            collection_date: typeof collection_date === 'string' ? collection_date : new Date().toISOString().split('T')[0],
+            amount: typeof amount === 'number' && !isNaN(amount) ? amount : Number(amount) || 0,
+            status: typeof status === 'string' ? status : 'pending',
+            notes: typeof purpose === 'string' ? purpose : (typeof message === 'string' ? message : ''),
+            created_at: new Date()
+        };
+        const result = await Pledge.create(payload);
+        // Send verification email if donor has email
+        if (payload.donor_email && typeof payload.donor_email === 'string' && payload.donor_email.trim()) {
+            const verificationResult = await pledgeVerificationService.sendVerificationEmail(
+                result.id,
+                payload.donor_email.trim(),
+                payload.donor_name || 'Donor'
+            );
+            if (!verificationResult.success) {
                 console.warn('⚠️  [PLEDGE CREATE] Failed to send verification email:', verificationResult.error);
-              } else {
-                console.log('✅ [PLEDGE CREATE] Verification email sent successfully');
-              }
             }
-
-            // If pledge is linked to a campaign, update campaign amount
-            if (campaign_id) {
-                console.log('🔵 [PLEDGE CREATE] Updating campaign amount for campaign:', campaign_id);
-                await campaignService.updateCampaignAmount(campaign_id);
-            }
-
-            return res.status(201).json({ 
-              success: true, 
-              pledge: createdPledge,
-              message: 'Pledge created! Please verify your email to confirm.'
-            });
-        } catch (dbError) {
-            console.error('❌ [PLEDGE CREATE] Database error:', dbError);
-            
-            // Fallback to in-memory model
-            // Ensure no undefined values in fallback payload
-            const payload = {
-                title: typeof title === 'string' ? title.trim() : 'Untitled',
-                name: typeof title === 'string' ? title.trim() : 'Untitled',
-                amount: typeof amount === 'number' && !isNaN(amount) ? amount : 0,
-                donor_name: typeof donor_name === 'string' ? donor_name : (typeof donorName === 'string' ? donorName : 'Anonymous'),
-                message: typeof message === 'string' ? message : '',
-                date: date ? new Date(date) : new Date(),
-                createdBy: req.user && req.user._id ? req.user._id : 'test-user-id',
-                campaign_id: typeof campaign_id !== 'undefined' ? campaign_id : null
-            };
-
-            console.log('🔵 [PLEDGE CREATE] Falling back to in-memory model');
-            const result = await Pledge.create(payload);
-            console.log('✅ [PLEDGE CREATE] In-memory creation successful:', result);
-
-            // If pledge is linked to a campaign, update campaign amount
-            if (campaign_id) {
-                console.log('🔵 [PLEDGE CREATE] Updating campaign amount for campaign:', campaign_id);
-                await campaignService.updateCampaignAmount(campaign_id);
-            }
-
-            return res.status(201).json({ success: true, pledge: result });
         }
-    } catch (err) {
-        console.error('❌ [PLEDGE CREATE] Error occurred:', err);
-        console.error('❌ [PLEDGE CREATE] Error stack:', err.stack);
-        console.error('❌ [PLEDGE CREATE] Error details:', {
-            name: err.name,
-            message: err.message,
-            code: err.code,
-            errno: err.errno,
-            sqlState: err.sqlState,
-            sqlMessage: err.sqlMessage
+        // If pledge is linked to a campaign, update campaign amount
+        if (payload.campaign_id) {
+            await campaignService.updateCampaignAmount(payload.campaign_id);
+        }
+        return res.status(201).json({
+            success: true,
+            pledge: result,
+            message: 'Pledge created! Please verify your email to confirm.'
         });
-        return res.status(500).json({ 
-            error: 'Server error', 
-            details: {
-                message: err.message,
-                type: err.name || 'Unknown error'
-            }
+    } catch (err) {
+        // Return specific error if possible
+        if (err && err.message) {
+            // If error is a known validation or DB error, return as is
+            return res.status(400).json({
+                success: false,
+                error: err.message,
+                details: err
+            });
+        }
+        // Fallback: unknown error
+        return res.status(500).json({
+            success: false,
+            error: 'An unknown error occurred while creating the pledge. Please check your input and try again.',
+            details: err
         });
     }
 }
 
+const { pool } = require('../config/db');
 async function getPledge(req, res) {
     try {
         const id = parseInt(req.params.id, 10);
-
-        const pledge = await Pledge.findById(id);
-        if (!pledge) {
-            return res.status(404).json({ error: 'Pledge not found' });
+        // Fetch pledge details
+        const [pledges] = await pool.execute(
+            `SELECT 
+                id,
+                donor_name AS title,
+                donor_name,
+                donor_email,
+                donor_phone,
+                amount,
+                collection_date,
+                status,
+                purpose,
+                notes,
+                amount_paid,
+                balance,
+                last_reminder_sent,
+                reminder_count,
+                campaign_id,
+                user_id,
+                payment_method,
+                payment_reference,
+                created_at,
+                updated_at
+             FROM pledges WHERE id = ? AND deleted = 0 LIMIT 1`,
+            [id]
+        );
+        if (!pledges || !pledges[0]) {
+            return res.status(404).json({ success: false, error: 'Pledge not found' });
         }
-
-        return res.status(200).json({ pledge });
+        const pledge = pledges[0];
+        // Fetch payment history
+        const [payments] = await pool.execute(
+            `SELECT 
+                id, 
+                amount, 
+                payment_method,
+                payment_date,
+                reference_number,
+                notes,
+                verification_status,
+                receipt_number,
+                receipt_photo_url,
+                created_at
+             FROM payments WHERE pledge_id = ? AND deleted = 0 ORDER BY payment_date DESC, created_at DESC`,
+            [id]
+        );
+        pledge.paymentHistory = payments || [];
+        return res.status(200).json({ success: true, data: pledge });
     } catch (err) {
-        console.error('getPledge error:', err);
-        return res.status(500).json({ error: 'Server error' });
+        console.error('❌ [GET PLEDGE] Error:', err);
+        return res.status(500).json({ success: false, error: 'Server error', details: err.message });
     }
 }
 

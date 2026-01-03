@@ -46,6 +46,7 @@ const publicRoutes = require('./routes/publicRoutes');
 const bankSettingsRoutes = require('./routes/bankSettingsRoutes');
 const payoutRoutes = require('./routes/payoutRoutes');
 const cashPaymentRoutes = require('./routes/cashPaymentRoutes');
+const deploymentRoutes = require('./routes/deploymentRoutes');
 
 // Import middleware
 const { authenticateToken, requireAdmin, requireStaff } = require('./middleware/authMiddleware');
@@ -139,6 +140,7 @@ app.use('/api/oauth', oauthRoutes);
 app.use('/api/feedback', feedbackRoutes);
 app.use('/api/simple-payment', securityService.rateLimiters.payment, simplePaymentRoutes);
 app.use('/api/public', publicRoutes); // Guest fundraising routes (NO AUTH)
+app.use('/api/deployment', deploymentRoutes); // Monetization phase info (PUBLIC)
 
 // Protected routes (authentication required)
 app.use('/api/pledges', pledgeRoutes);

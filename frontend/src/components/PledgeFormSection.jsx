@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import './PledgeFormSection.custom.css';
+import Modal from './Modal';
 import PropTypes from 'prop-types';
 import { PLEDGE_PURPOSE_OPTIONS } from '../constants/pledge';
 
@@ -6,6 +8,7 @@ import { PLEDGE_PURPOSE_OPTIONS } from '../constants/pledge';
  * PledgeFormSection Component
  * Standalone pledge form with improved UX and separated concerns
  */
+
 function PledgeFormSection({ 
   onSubmit, 
   pledgeForm, 
@@ -13,14 +16,38 @@ function PledgeFormSection({
   isSubmitting = false, 
   message = null 
 }) {
-  const [showForm, setShowForm] = useState(false);
+  const [showOtherModal, setShowOtherModal] = useState(false);
+  const [customPurposeDraft, setCustomPurposeDraft] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     await onSubmit(e);
-    if (message?.type === 'success') {
-      setShowForm(false);
+  };
+
+  // When user selects 'Other', open modal and clear draft
+  const handlePurposeChange = (e) => {
+    if (e.target.value === 'Other') {
+      setCustomPurposeDraft(pledgeForm.customPurpose || "");
+      setShowOtherModal(true);
     }
+    onFieldChange(e);
+  };
+
+  const handleOtherModalOk = () => {
+    // Simulate event for parent handler
+    onFieldChange({
+      target: {
+        name: 'customPurpose',
+        value: customPurposeDraft
+      }
+    });
+    setShowOtherModal(false);
+  };
+
+  const handleOtherModalCancel = () => {
+    setShowOtherModal(false);
+    // Optionally clear customPurpose if modal cancelled
+    // onFieldChange({ target: { name: 'customPurpose', value: '' } });
   };
 
   return (
@@ -33,13 +60,7 @@ function PledgeFormSection({
             the cracks.
           </p>
         </div>
-        <button
-          className={`btn btn--secondary btn--small ${showForm ? 'btn--active' : ''}`}
-          onClick={() => setShowForm(!showForm)}
-          aria-expanded={showForm}
-        >
-          {showForm ? 'Cancel' : 'Add Pledge'}
-        </button>
+        {/* Removed top Cancel/Add Pledge toggle button for cleaner UX */}
       </div>
 
       {message?.text && (
@@ -52,12 +73,11 @@ function PledgeFormSection({
         </div>
       )}
 
-      {showForm && (
-        <form
-          className="pledge-form"
-          onSubmit={handleSubmit}
-          noValidate
-        >
+      <form
+        className="pledge-form"
+        onSubmit={handleSubmit}
+        noValidate
+      >
           <div className="pledge-form__grid">
             <div className="form-field">
               <label htmlFor="pledge-fullName" className="form-label">
@@ -133,38 +153,38 @@ function PledgeFormSection({
               <label htmlFor="pledge-purpose" className="form-label">
                 What are you pledging for? *
               </label>
-              <select
-                id="pledge-purpose"
-                name="purpose"
-                className="select"
-                value={pledgeForm.purpose}
-                onChange={onFieldChange}
-                disabled={isSubmitting}
-              >
-                {PLEDGE_PURPOSE_OPTIONS.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
+              <div className="pledge-purpose-select-wrapper">
+                <select
+                  id="pledge-purpose"
+                  name="purpose"
+                  className="pledge-purpose-select"
+                  value={pledgeForm.purpose}
+                  onChange={handlePurposeChange}
+                  disabled={isSubmitting}
+                >
+                  {PLEDGE_PURPOSE_OPTIONS.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
 
-            {pledgeForm.purpose === 'Other' && (
+            {/* Modal for custom purpose if 'Other' is selected */}
+            <Modal
+              isOpen={showOtherModal}
+              onClose={handleOtherModalCancel}
+              onSubmit={handleOtherModalOk}
+              value={customPurposeDraft}
+              onChange={e => setCustomPurposeDraft(e.target.value)}
+              title="Describe the pledge"
+              placeholder="e.g. Choir honorarium"
+            />
+            {pledgeForm.purpose === 'Other' && pledgeForm.customPurpose && (
               <div className="form-field form-field--full">
-                <label htmlFor="pledge-customPurpose" className="form-label">
-                  Describe the pledge
-                </label>
-                <input
-                  id="pledge-customPurpose"
-                  name="customPurpose"
-                  type="text"
-                  className="input"
-                  value={pledgeForm.customPurpose}
-                  onChange={onFieldChange}
-                  placeholder="e.g. Choir honorarium"
-                  disabled={isSubmitting}
-                  required
-                />
+                <label className="form-label">Custom purpose</label>
+                <div className="input" style={{ background: '#f7f7f7', color: '#333' }}>{pledgeForm.customPurpose}</div>
               </div>
             )}
 
@@ -201,10 +221,14 @@ function PledgeFormSection({
             </div>
           </div>
 
-          <div className="pledge-form__actions">
+          <div
+            className="pledge-form__actions"
+            style={{ display: 'flex', flexDirection: 'row', gap: '1rem', justifyContent: 'flex-end', flexWrap: 'wrap', marginTop: '1.5rem' }}
+          >
             <button
               type="submit"
               className="btn btn--primary"
+              style={{ minWidth: '120px', padding: '0.5rem 1rem', fontSize: '0.95rem', whiteSpace: 'nowrap' }}
               disabled={isSubmitting}
             >
               {isSubmitting ? 'Creating Pledge...' : 'Create Pledge'}
@@ -212,14 +236,14 @@ function PledgeFormSection({
             <button
               type="button"
               className="btn btn--secondary"
-              onClick={() => setShowForm(false)}
+              style={{ minWidth: '100px', padding: '0.5rem 1rem', fontSize: '0.95rem' }}
+              onClick={() => {}}
               disabled={isSubmitting}
             >
               Cancel
             </button>
           </div>
         </form>
-      )}
     </section>
   );
 }

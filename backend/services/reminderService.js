@@ -2,6 +2,8 @@ const { pool } = require('../config/db');
 const smsService = require('./smsService');
 const emailService = require('./emailService');
 const messageGenerator = require('./messageGenerator');
+const deploymentConfig = require('../config/deploymentConfig');
+const monetizationService = require('./monetizationService');
 
 /**
  * Reminder Service
@@ -183,16 +185,53 @@ async function sendReminder(pledge, type) {
             pledgeId: pledge.id,
             type,
             sms: { sent: false },
-            email: { sent: false }
+            email: { sent: false },
+            gracePeriod: false,
+            monetizationPhase: null
         };
+
+        // DEPLOYMENT-AWARE: Get current monetization phase
+        const phase = deploymentConfig.getCurrentPhase();
+        results.monetizationPhase = phase.phase;
+        results.gracePeriod = deploymentConfig.isInGracePeriod();
         
         // Send SMS if phone number exists (check both phone_number and donor_phone fields)
         const phoneNumber = pledge.phone_number || pledge.donor_phone;
         if (phoneNumber) {
             try {
-                await smsService.sendSMS(phoneNumber, message.sms);
-                results.sms.sent = true;
-                console.log(`✓ SMS sent to ${pledge.donor_name} (${phoneNumber})`);
+                // GRACE PERIOD: During grace period, SMS is unlimited
+                // MONETIZATION ACTIVE: Check user limits
+                let canSend = { allowed: true, reason: 'Grace period' };
+                
+                if (!results.gracePeriod && pledge.user_id) {
+                    canSend = await monetizationService.canSendSMS(pledge.user_id);
+                }
+
+                if (canSend.allowed) {
+                    await smsService.sendSMS(phoneNumber, message.sms);
+                    results.sms.sent = true;
+                    
+                    // Track SMS usage even during grace period
+                    if (pledge.user_id) {
+                        await monetizationService.incrementUsage(pledge.user_id, 'sms');
+                    }
+                    
+                    if (results.gracePeriod) {
+                        console.log(`✓ SMS sent to ${pledge.donor_name} (${phoneNumber}) [GRACE PERIOD - FREE]`);
+                    } else {
+                        console.log(`✓ SMS sent to ${pledge.donor_name} (${phoneNumber}) [${canSend.remaining} remaining]`);
+                    }
+                } else {
+                    // SMS blocked by monetization limits
+                    console.log(`⚠️  SMS blocked for ${pledge.donor_name}: ${canSend.reason}. Routing to email...`);
+                    results.sms.blocked = true;
+                    results.sms.reason = canSend.reason;
+                    
+                    // Force email as fallback when SMS blocked
+                    if (!pledge.email && !pledge.donor_email) {
+                        console.error(`❌ Cannot send reminder to ${pledge.donor_name}: SMS blocked and no email available`);
+                    }
+                }
             } catch (smsError) {
                 console.error(`✗ SMS failed for ${pledge.donor_name}:`, smsError.message);
                 results.sms.error = smsError.message;
@@ -210,6 +249,12 @@ async function sendReminder(pledge, type) {
                     html: message.email.html
                 });
                 results.email.sent = true;
+                
+                // Track email usage
+                if (pledge.user_id) {
+                    await monetizationService.incrementUsage(pledge.user_id, 'email');
+                }
+                
                 console.log(`✅ Email sent successfully to ${pledge.donor_name} (${emailAddress})`);
             } catch (emailError) {
                 console.error(`❌ Email failed for ${pledge.donor_name}:`, emailError.message);

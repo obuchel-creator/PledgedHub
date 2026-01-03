@@ -1,0 +1,189 @@
+.campaign-action-row-horizontal {
+  flex-wrap: nowrap;
+}
+.campaign-action-row-horizontal > * {
+  min-width: 0;
+  flex-shrink: 1;
+}
+/* --- Bulletproof Card Alignment Fix --- */
+.campaign-card {
+  display: flex;
+  flex-direction: column;
+  height: 370px;
+  min-height: 370px;
+  max-height: 370px;
+  box-sizing: border-box;
+}
+
+.campaign-card-content-area {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 0.5rem;
+}
+
+/* Clamp description to 3 lines, cross-browser */
+.campaign-description-pro {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  line-clamp: 3;
+  min-height: 3.6em;
+  max-height: 3.6em;
+}
+
+.campaign-action-row-horizontal {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: auto;
+}
+/* --- End Card Alignment Fix --- */
+
+/* Professional campaign card layout */
+.campaigns-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2rem;
+}
+.campaign-card--pro,
+.campaign-card--fixed-height {
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 6px 32px 0 rgba(37,99,235,0.10);
+  padding: 2rem 1.5rem 1.5rem 1.5rem;
+  border: 1.5px solid #e0e7ef;
+  transition: box-shadow 0.2s, transform 0.2s;
+  cursor: pointer;
+  position: relative;
+  max-width: 100%;
+  align-self: stretch;
+  height: 370px;
+  min-height: 370px;
+  max-height: 370px;
+  box-sizing: border-box;
+  align-items: stretch;
+  justify-content: stretch;
+  overflow: hidden;
+}
+/* removed empty ruleset */
+.campaign-card--align-actions > .campaign-action-row-horizontal.campaign-action-row-bottom {
+  margin-top: auto;
+  margin-bottom: 1.2rem;
+}
+/* removed empty ruleset */
+.campaign-card--align-actions {
+  display: flex;
+  flex-direction: column;
+}
+.campaign-card--align-actions > .campaign-action-row-horizontal.campaign-action-row-bottom {
+  margin-top: auto;
+  margin-bottom: 1.2rem;
+}
+.campaign-action-row-horizontal {
+  display: flex;
+  flex-direction: row;
+  gap: 0.75rem;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+.campaign-action-row-horizontal .btn,
+.campaign-action-row-horizontal .btn-primary {
+  height: 40px !important;
+  display: flex;
+  align-items: center;
+}
+.campaign-action-row-horizontal .share-btn-container {
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+/* HomeScreen custom fixes for text visibility and campaign button alignment */
+
+/* Strong white text and shadow for all hero slide text */
+/* Strong white text and shadow for all hero slide text */
+.hero-slide__title, .hero-slide__subtitle, .hero-slide__eyebrow, .hero-slide__stat-value, .hero-slide__stat-label {
+  color: #fff !important;
+  text-shadow: 0 3px 18px rgba(0,0,0,0.55), 0 1px 1px rgba(30,41,59,0.22) !important;
+}
+
+/* Ultra-readable stat value: large, bold, with outline and background */
+.hero-slide__stat-value {
+  font-size: 2.5rem !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.01em;
+  color: #fff !important;
+  text-shadow: 0 4px 18px rgba(0,0,0,0.95), 0 1px 1px rgba(30,41,59,0.22) !important;
+  background: rgba(15,23,42,0.65);
+  padding: 0.25em 0.7em;
+  border-radius: 0.7em;
+  display: inline-block;
+  margin-bottom: 0.15em;
+}
+
+/* Ultra-readable stat label: bold, with outline and background */
+/* Pure white stat label with strong shadow and dark background for contrast */
+.hero-slide__stat-label {
+  font-size: 1.15rem !important;
+  font-weight: 700 !important;
+  color: #fff !important;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.85) !important;
+  background: rgba(15,23,42,0.55);
+  padding: 0.18em 0.6em;
+  border-radius: 0.6em;
+  display: inline-block;
+}
+
+.hero-slide__eyebrow {
+  color: rgba(255,255,255,0.92) !important;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-shadow: 0 1px 8px rgba(0,0,0,0.32);
+}
+
+.hero-slide__stat-value, .hero-slide__stat-label {
+  color: #fff !important;
+  text-shadow: 0 1px 8px rgba(0,0,0,0.32);
+}
+
+.hero-slide__background {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 0;
+}
+/* Stronger overlay for better text contrast */
+.hero-slide__background::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(15,23,42,0.68);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.campaign-action-row {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+.campaign-action-row .btn,
+.campaign-action-row .btn-primary {
+  height: 40px !important;
+  display: flex;
+  align-items: center;
+}
+.campaign-action-row .share-btn-container {
+  height: 40px;
+  display: flex;
+  align-items: center;
+}

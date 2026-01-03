@@ -7,8 +7,7 @@ import PasswordInput from '../components/PasswordInput';
 
 export default function Login() {
   const [form, setForm] = useState({
-    username: '',
-    phone: '',
+    identifier: '', // can be email, username, or phone
     password: '',
   });
   const [showPassword, setShowPassword] = useState(false);
@@ -20,21 +19,15 @@ export default function Login() {
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
     setError('');
-    };
-    // Real-time validation for username/phone
-    if (e.target.name === 'phone' && e.target.value && !/^\+256\d{9}$/.test(e.target.value)) {
-      setError('Phone number must be in format +256XXXXXXXXX');
-    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
     try {
-      // Prefer username, then phone, then fallback to email (if backend supports)
       const payload = {
-        username: form.username.trim(),
-        phone: form.phone.trim(),
+        email: form.identifier.trim(), // always send as 'email' for backend compatibility
         password: form.password,
       };
       const response = await loginUser(payload);
@@ -43,7 +36,7 @@ export default function Login() {
         localStorage.setItem('pledgehub_token', response.token);
         navigate('/dashboard');
       } else {
-        setError(response?.message || 'Invalid login response');
+        setError(response?.error || response?.message || 'Invalid login response');
       }
     } catch (err) {
       setError(err.message || 'Login failed. Please try again.');
@@ -73,29 +66,19 @@ export default function Login() {
         tabIndex={0}
         autoComplete="on"
       >
-        <h2 style={{ textAlign: 'center', marginBottom: 8, color: '#222', fontWeight: 700, fontSize: 28 }}>Sign in to PledgeHub</h2>
+        <h2 style={{ textAlign: 'center', marginBottom: 8, color: '#222', fontWeight: 700, fontSize: 28 }}>Sign in</h2>
         <div style={{ color: '#666', textAlign: 'center', fontSize: 15, marginBottom: 8 }}>Enter your credentials to continue</div>
 
         <TextInput
-          id="username"
-          name="username"
-          label="Username"
-          value={form.username}
+          id="identifier"
+          name="identifier"
+          label="Email, Username, or Phone"
+          value={form.identifier}
           onChange={handleChange}
           autoComplete="username"
-          placeholder="Username"
+          placeholder="Enter email, username, or phone"
           disabled={loading}
           required
-        />
-        <TextInput
-          id="phone"
-          name="phone"
-          label="Phone Number"
-          value={form.phone}
-          onChange={handleChange}
-          autoComplete="tel"
-          placeholder="e.g. +256771234567"
-          disabled={loading}
         />
         <PasswordInput
           id="password"

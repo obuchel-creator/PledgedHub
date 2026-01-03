@@ -19,6 +19,15 @@ const crypto = require('crypto');
  * - Automatic Threat Response
  */
 
+// Development mode detection
+const isDevelopment = process.env.NODE_ENV === 'development' || 
+                      process.env.NODE_ENV === 'test' ||
+                      process.env.DISABLE_RATE_LIMIT === 'true';
+
+if (isDevelopment) {
+    console.log('⚠️  [SECURITY] Running in DEVELOPMENT mode - lenient security settings enabled');
+}
+
 // In-memory storage for security tracking (use Redis in production)
 const securityStore = {
     blockedIPs: new Set(),
@@ -32,15 +41,22 @@ const securityStore = {
  * Prevents brute force attacks and DDoS
  */
 const createRateLimiter = (windowMs = 15 * 60 * 1000, max = 100) => {
+    // In development mode, use much higher limits
+    const devMax = isDevelopment ? max * 10 : max;
+    
     return rateLimit({
         windowMs, // Time window in milliseconds
-        max, // Max requests per window
+        max: devMax, // Max requests per window (10x in development)
         message: {
             error: 'Too many requests from this IP, please try again later.',
             retryAfter: Math.ceil(windowMs / 1000 / 60) + ' minutes'
         },
         standardHeaders: true,
         legacyHeaders: false,
+        skip: (req) => {
+            // Skip rate limiting entirely if DISABLE_RATE_LIMIT is true
+            return process.env.DISABLE_RATE_LIMIT === 'true';
+        },
         handler: (req, res) => {
             const ip = req.ip || req.connection.remoteAddress;
             logSuspiciousActivity(ip, 'RATE_LIMIT_EXCEEDED', req);
@@ -56,8 +72,8 @@ const createRateLimiter = (windowMs = 15 * 60 * 1000, max = 100) => {
 
 // Different rate limits for different endpoints
 const rateLimiters = {
-    // Strict limit for authentication
-    auth: createRateLimiter(15 * 60 * 1000, 5), // 5 requests per 15 minutes
+    // Strict limit for authentication (lenient in dev: 50 vs 5)
+    auth: createRateLimiter(15 * 60 * 1000, isDevelopment ? 50 : 5),
     
     // Moderate limit for API calls
     api: createRateLimiter(15 * 60 * 1000, 100), // 100 requests per 15 minutes
@@ -243,6 +259,11 @@ function validateCSRFToken(req, res, next) {
 function checkBlockedIP(req, res, next) {
     const ip = req.ip || req.connection.remoteAddress;
     
+    // Skip IP blocking in development mode
+    if (isDevelopment) {
+        return next();
+    }
+    
     if (securityStore.blockedIPs.has(ip)) {
         console.log(`[SECURITY] Blocked IP attempted access: ${ip}`);
         return res.status(403).json({
@@ -258,6 +279,12 @@ function checkBlockedIP(req, res, next) {
  * Block an IP address
  */
 function blockIP(ip, reason = 'Suspicious activity') {
+    // Don't block IPs in development mode
+    if (isDevelopment) {
+        console.log(`[SECURITY] Would block IP in production: ${ip} - Reason: ${reason}`);
+        return;
+    }
+    
     securityStore.blockedIPs.add(ip);
     console.log(`[SECURITY] IP blocked: ${ip} - Reason: ${reason}`);
     
@@ -266,6 +293,25 @@ function blockIP(ip, reason = 'Suspicious activity') {
         securityStore.blockedIPs.delete(ip);
         console.log(`[SECURITY] IP unblocked: ${ip}`);
     }, 24 * 60 * 60 * 1000);
+}
+
+/**
+ * Unblock an IP address (manual)
+ */
+function unblockIP(ip) {
+    if (securityStore.blockedIPs.has(ip)) {
+        securityStore.blockedIPs.delete(ip);
+        console.log(`[SECURITY] IP manually unblocked: ${ip}`);
+        return true;
+    }
+    return false;
+}
+
+/**
+ * Check if an IP is blocked
+ */
+function isIPBlocked(ip) {
+    return securityStore.blockedIPs.has(ip);
 }
 
 /**
@@ -307,8 +353,11 @@ function trackFailedLogin(identifier) {
     const attempts = securityStore.failedLogins.get(identifier) || 0;
     securityStore.failedLogins.set(identifier, attempts + 1);
     
-    // Lock account after 5 failed attempts
-    if (attempts + 1 >= 5) {
+    // In development, use higher threshold (20 vs 5)
+    const threshold = isDevelopment ? 20 : 5;
+    
+    // Lock account after threshold failed attempts
+    if (attempts + 1 >= threshold) {
         console.log(`[SECURITY] Account locked due to failed logins: ${identifier}`);
         return true; // Account should be locked
     }
@@ -435,6 +484,8 @@ module.exports = {
     validateCSRFToken,
     checkBlockedIP,
     blockIP,
+    unblockIP,
+    isIPBlocked,
     logSuspiciousActivity,
     trackFailedLogin,
     resetFailedLogins,
@@ -443,5 +494,6 @@ module.exports = {
     getSecurityStats,
     xssClean: xss(),
     mongoSanitize: mongoSanitize(),
-    hpp: hpp()
+    hpp: hpp(),
+    securityStore // Export for testing/debugging
 };

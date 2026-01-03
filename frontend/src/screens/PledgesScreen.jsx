@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getPledges } from '../services/api';
+import { useNavigate } from 'react-router-dom';
 import './PledgesScreen.css';
 
 export default function PledgesScreen() {
@@ -10,6 +11,7 @@ export default function PledgesScreen() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [sortBy, setSortBy] = useState('date-desc');
   const [viewMode, setViewMode] = useState('table'); // 'table' or 'card'
+  const navigate = useNavigate();
 
   useEffect(() => {
     loadPledges();
@@ -22,14 +24,26 @@ export default function PledgesScreen() {
   const loadPledges = async () => {
     setLoading(true);
     try {
+      console.log('🔵 [PLEDGES SCREEN] Calling getPledges API...');
       const result = await getPledges();
-      if (result?.success && result?.data) {
-        setPledges(result.data);
-      } else {
-        setPledges([]);
+      console.log('🔵 [PLEDGES SCREEN] API Result:', result);
+      
+      // Accept both { data: [...] } and { data: { pledges: [...] } } and { pledges: [...] }
+      let pledgesArr = [];
+      if (result?.success) {
+        if (Array.isArray(result.data)) {
+          pledgesArr = result.data;
+        } else if (Array.isArray(result.data?.pledges)) {
+          pledgesArr = result.data.pledges;
+        } else if (Array.isArray(result.pledges)) {
+          pledgesArr = result.pledges;
+        }
       }
+      console.log('🔵 [PLEDGES SCREEN] Extracted pledges array:', pledgesArr);
+      console.log('🔵 [PLEDGES SCREEN] Number of pledges:', pledgesArr.length);
+      setPledges(pledgesArr);
     } catch (err) {
-      console.error('Failed to load pledges:', err);
+      console.error('❌ [PLEDGES SCREEN] Failed to load pledges:', err);
       setPledges([]);
     } finally {
       setLoading(false);
@@ -193,7 +207,7 @@ export default function PledgesScreen() {
               <option value="date-asc">Oldest First</option>
               <option value="amount-desc">Highest Amount</option>
               <option value="amount-asc">Lowest Amount</option>
-              <option value="name">Donor Name (A-Z)</option>
+              <option value="name">Name (A-Z)</option>
             </select>
           </div>
 
@@ -232,16 +246,8 @@ export default function PledgesScreen() {
             </button>
             <button
               onClick={handleRefresh}
-              style={{
-                padding: '10px 15px',
-                background: 'transparent',
-                color: '#d4d4d4',
-                border: '1px solid #333333',
-                borderRadius: '6px',
-                cursor: 'pointer',
-                fontSize: '13px',
-                transition: 'all 0.3s ease'
-              }}
+              disabled={loading}
+              className={`refresh-btn ${loading ? 'spinning' : ''}`}
             >
               🔄 Refresh
             </button>
@@ -259,7 +265,7 @@ export default function PledgesScreen() {
             </div>
             <button 
               className="pledges-empty-btn"
-              onClick={() => window.location.href = '/create-pledge'}
+              onClick={() => window.location.href = '/create'}
             >
               + Create Pledge
             </button>
@@ -270,7 +276,6 @@ export default function PledgesScreen() {
               <thead>
                 <tr>
                   <th>Donor Name</th>
-                  <th>Email</th>
                   <th>Amount</th>
                   <th>Purpose</th>
                   <th>Status</th>
@@ -284,7 +289,6 @@ export default function PledgesScreen() {
                     <td>
                       <span className="pledge-id">#{pledge.id}</span> {pledge.donor_name}
                     </td>
-                    <td>{pledge.donor_email}</td>
                     <td><span className="pledge-amount">{formatCurrency(pledge.amount)}</span></td>
                     <td>{pledge.purpose || '-'}</td>
                     <td>
@@ -295,8 +299,20 @@ export default function PledgesScreen() {
                     <td>{formatDate(pledge.collection_date)}</td>
                     <td>
                       <div className="pledge-actions">
-                        <button className="action-btn">Edit</button>
-                        <button className="action-btn">View</button>
+                        <button 
+                          className="action-btn"
+                          onClick={() => navigate(`/pledges/${pledge.id}`)}
+                        >
+                          View Details
+                        </button>
+                        <button
+                          className="action-btn"
+                          onClick={() => {
+                            window.open(`/share/pledge/${pledge.id}`, '_blank');
+                          }}
+                        >
+                          Share
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -343,8 +359,20 @@ export default function PledgesScreen() {
                 </div>
 
                 <div className="pledge-card-actions">
-                  <button className="card-action-btn">Edit</button>
-                  <button className="card-action-btn">View</button>
+                  <button 
+                    className="card-action-btn"
+                    onClick={() => navigate(`/pledges/${pledge.id}`)}
+                  >
+                    View Details
+                  </button>
+                  <button
+                    className="card-action-btn"
+                    onClick={() => {
+                      window.open(`/share/pledge/${pledge.id}`, '_blank');
+                    }}
+                  >
+                    Share
+                  </button>
                 </div>
               </div>
             ))}

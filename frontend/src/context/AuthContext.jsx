@@ -68,19 +68,22 @@ export function AuthProvider({ children }) {
     try {
       const data = await loginUser(credentials);
       console.log('🔐 AuthContext: loginUser returned:', data);
-      
       // Check if response indicates an error
       if (data && data.success === false) {
         console.log('🔐 AuthContext: Login failed with error:', data.error);
         return data; // Return error response so LoginScreen can display it
       }
-      
       const newToken = data && (data.token || data.accessToken);
       if (newToken) {
         console.log('🔐 AuthContext: Login successful, token received');
         localStorage.setItem(TOKEN_KEY, newToken);
         setToken(newToken);
-        await refreshUser();
+        // Try to fetch user, but if it fails, set a minimal user object
+        const userData = await refreshUser();
+        if (!userData || !userData.user) {
+          if (data.user) setUser(data.user);
+          else setUser({ email: credentials.email }); // fallback minimal user
+        }
         return data;
       } else if (data && data.user) {
         console.log('🔐 AuthContext: Login response received without token');

@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+
+import pledgeHubLogo from '../assets/pledge hub logo.png';
 import './Navbar.modern.css';
 
 export default function Navbar() {
@@ -62,8 +64,7 @@ export default function Navbar() {
       <div className="navbar-container">
         {/* Logo */}
         <Link to="/" className="navbar-logo">
-          <span className="navbar-logo-icon">🤝</span>
-          <span className="navbar-logo-text">PledgeHub</span>
+          <img src={pledgeHubLogo} alt="PledgeHub Logo" className="navbar-logo-icon" style={{ height: '4.5rem', width: 'auto', verticalAlign: 'middle' }} />
         </Link>
 
         {/* Desktop Navigation */}

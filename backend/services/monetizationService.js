@@ -5,6 +5,7 @@
 
 const { pool } = require('../config/db');
 const db = { query: pool.query.bind(pool), execute: pool.execute.bind(pool) };
+const billingNotificationService = require('./billingNotificationService');
 const {
   isMonetizationActive,
   getSubscriptionStatus,
@@ -12,6 +13,7 @@ const {
   PRICING_TIERS,
   TRANSACTION_FEE
 } = require('../config/monetization');
+const deploymentConfig = require('../config/deploymentConfig');
 
 class MonetizationService {
   
@@ -20,6 +22,17 @@ class MonetizationService {
    */
   async canPerformAction(userId, actionType) {
     try {
+      // DEPLOYMENT-AWARE: Check if we're in grace period
+      if (deploymentConfig.isInGracePeriod()) {
+        return { 
+          allowed: true, 
+          reason: 'Grace period active - all features free',
+          gracePeriod: true,
+          daysRemaining: deploymentConfig.getCurrentPhase().daysRemaining
+        };
+      }
+
+      // Legacy check for monetization status
       if (!isMonetizationActive()) {
         return { allowed: true, reason: 'Monetization not active yet' };
       }
@@ -177,6 +190,14 @@ class MonetizationService {
     const endDate = new Date(now);
     endDate.setMonth(endDate.getMonth() + durationMonths);
 
+    // Get current tier and email for tracking changes
+    const [existingUsers] = await db.query(
+      'SELECT subscription_tier, email FROM users WHERE id = ?',
+      [userId]
+    );
+    const previousTier = existingUsers?.[0]?.subscription_tier || 'FREE';
+    const userEmail = existingUsers?.[0]?.email || null;
+
     // Update user's subscription
     await db.query(
       `UPDATE users 
@@ -196,6 +217,14 @@ class MonetizationService {
        VALUES (?, ?, 'active', ?, ?, 'monthly', ?, ?, ?)`,
       [userId, tierName, tier.price, tier.currency, now, endDate, paymentMethod]
     );
+
+    // Track upgrade/downgrade to suppress duplicate notifications
+    await billingNotificationService.recordSubscriptionChange({
+      userId,
+      email: userEmail,
+      fromTier: previousTier,
+      toTier: tierName
+    });
 
     return {
       subscriptionId: result.insertId,
@@ -253,7 +282,96 @@ class MonetizationService {
    * Check if monetization is active
    */
   isActive() {
-    return isMonetizationActive();
+    // DEPLOYMENT-AWARE: Use deployment config instead of hardcoded value
+    return deploymentConfig.isMonetizationActive();
+  }
+
+  /**
+   * Get current deployment phase information
+   */
+  getDeploymentPhase() {
+    return deploymentConfig.getCurrentPhase();
+  }
+
+  /**
+   * Check if a feature is available in the current phase
+   */
+  isFeatureAvailable(feature) {
+    return deploymentConfig.getFeatureStatus(feature);
+  }
+
+  /**
+   * SMS enforcement with grace period awareness
+   */
+  async canSendSMS(userId) {
+    try {
+      // GRACE PERIOD: Allow unlimited SMS during grace period
+      if (deploymentConfig.isInGracePeriod()) {
+        return { 
+          allowed: true, 
+          reason: 'Grace period active - unlimited SMS',
+          gracePeriod: true,
+          remaining: 'unlimited',
+          daysUntilEnforcement: deploymentConfig.getCurrentPhase().daysRemaining
+        };
+      }
+
+      // MONETIZATION ACTIVE: Check tier limits
+      const [users] = await db.query('SELECT * FROM users WHERE id = ?', [userId]);
+      if (!users || users.length === 0) {
+        return { allowed: false, reason: 'User not found' };
+      }
+
+      const user = users[0];
+      const tier = PRICING_TIERS[user.subscription_tier || 'FREE'];
+      const usageStats = await this.getUserUsageStats(userId);
+
+      // Check SMS limit (-1 means unlimited)
+      if (tier.limits.sms === -1) {
+        return { allowed: true, remaining: 'unlimited' };
+      }
+
+      const remaining = tier.limits.sms - usageStats.smsThisMonth;
+      
+      if (remaining <= 0) {
+        return {
+          allowed: false,
+          reason: 'SMS limit exceeded',
+          limit: tier.limits.sms,
+          used: usageStats.smsThisMonth,
+          suggestedTier: this._suggestUpgradeTier(user.subscription_tier, 'sms')
+        };
+      }
+
+      // Warning if close to limit
+      if (remaining <= 10) {
+        return {
+          allowed: true,
+          remaining,
+          warning: `Only ${remaining} SMS remaining this month`,
+          suggestUpgrade: remaining <= 5
+        };
+      }
+
+      return { allowed: true, remaining };
+    } catch (error) {
+      console.error('Error checking SMS limit:', error);
+      return { allowed: true, reason: 'Error checking limits, allowing SMS' };
+    }
+  }
+
+  /**
+   * Helper: Suggest upgrade tier based on exceeded resource
+   */
+  _suggestUpgradeTier(currentTier, exceededResource) {
+    const tierOrder = ['FREE', 'BASIC', 'PRO', 'ENTERPRISE'];
+    const currentIndex = tierOrder.indexOf(currentTier || 'FREE');
+    
+    if (currentIndex < tierOrder.length - 1) {
+      return tierOrder[currentIndex + 1];
+    }
+    
+    return 'ENTERPRISE';
   }
 
   /**
@@ -276,6 +394,13 @@ class MonetizationService {
    * Cancel subscription
    */
   async cancelSubscription(userId) {
+    const [existing] = await db.query(
+      'SELECT subscription_tier, email FROM users WHERE id = ?',
+      [userId]
+    );
+    const previousTier = existing?.[0]?.subscription_tier || 'FREE';
+    const userEmail = existing?.[0]?.email || null;
+
     await db.query(
       `UPDATE users 
        SET subscription_status = 'cancelled',
@@ -290,6 +415,13 @@ class MonetizationService {
        WHERE user_id = ? AND status = 'active'`,
       [userId]
     );
+
+    await billingNotificationService.recordSubscriptionChange({
+      userId,
+      email: userEmail,
+      fromTier: previousTier,
+      toTier: 'FREE'
+    });
 
     return { success: true, message: 'Subscription cancelled' };
   }

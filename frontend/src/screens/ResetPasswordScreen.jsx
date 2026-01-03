@@ -257,7 +257,7 @@ export default function ResetPasswordScreen() {
                   marginBottom: '16px',
                 }}
               >
-                <Logo size="medium" showText={false} />
+                <Logo size="large" showText={false} />
               </div>
               <h1
                 style={{

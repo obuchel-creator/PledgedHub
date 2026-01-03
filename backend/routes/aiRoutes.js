@@ -1,7 +1,30 @@
+
 const express = require('express');
 const router = express.Router();
+const { authenticateToken, requireAdmin, requireStaff } = require('../middleware/authMiddleware');
 const aiService = require('../services/aiService');
 const Pledge = require('../models/Pledge');
+/**
+ * POST /api/ai/finance-query
+ * Body: { question: string }
+ * Returns: { success, response }
+ * Admin/staff only
+ */
+router.post('/finance-query', authenticateToken, requireStaff, async (req, res) => {
+    const { question } = req.body;
+    if (!question || typeof question !== 'string') {
+        return res.status(400).json({ success: false, error: 'Missing or invalid question' });
+    }
+    try {
+        if (!aiService.isAIAvailable()) {
+            return res.status(503).json({ success: false, error: 'AI service unavailable' });
+        }
+        const response = await aiService.generateChatResponse(question, 'Finance/Accounting Dashboard');
+        return res.json({ success: true, response });
+    } catch (error) {
+        return res.status(500).json({ success: false, error: error.message });
+    }
+});
 
 /**
  * Temporary simple auth middleware

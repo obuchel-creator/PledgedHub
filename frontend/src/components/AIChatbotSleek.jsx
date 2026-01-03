@@ -277,76 +277,127 @@ export default function AIChatbot() {
     <>
       {/* CSS Animations */}
       <style>{`
-                @keyframes pulse {
-                    0%, 70%, 100% { transform: scale(1); opacity: 0.5; }
-                    35% { transform: scale(1.2); opacity: 1; }
-                }
-                @keyframes slideUp {
-                    from { transform: translateY(100%) scale(0.8); opacity: 0; }
-                    to { transform: translateY(0) scale(1); opacity: 1; }
-                }
-                @keyframes slideDown {
-                    from { transform: translateY(0) scale(1); opacity: 1; }
-                    to { transform: translateY(100%) scale(0.8); opacity: 0; }
-                }
-                @keyframes float {
-                    0%, 100% { transform: translateY(0px); }
-                    50% { transform: translateY(-4px); }
-                }
-                @keyframes glow {
-                    0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.3); }
-                    50% { box-shadow: 0 0 30px rgba(59, 130, 246, 0.5), 0 0 40px rgba(59, 130, 246, 0.3); }
-                }
-                @keyframes gradient {
-                    0% { background-position: 0% 50%; }
-                    50% { background-position: 100% 50%; }
-                    100% { background-position: 0% 50%; }
-                }
-                .chatbot-button {
-                    animation: float 3s ease-in-out infinite;
-                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                }
-                .chatbot-button:hover {
-                    animation: glow 2s ease-in-out infinite;
-                    transform: translateY(-2px) scale(1.05);
-                }
-                .chatbot-window {
-                    animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                }
-                .message-enter {
-                    animation: slideUp 0.2s ease-out;
-                }
-                .quick-action-btn {
-                    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-                }
-                .quick-action-btn:hover {
-                    transform: translateY(-2px);
-                    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
-                }
-                @media (max-width: 768px) {
-                    .chatbot-window {
-                        width: calc(100vw - 20px) !important;
-                        height: ${isMinimized ? '50px' : '400px'} !important;
-                        right: 10px !important;
-                        bottom: 75px !important;
-                        maxHeight: calc(100vh - 100px) !important;
-                    }
-                    .chatbot-button {
-                        width: 50px !important;
-                        height: 50px !important;
-                        bottom: 15px !important;
-                        right: 15px !important;
-                    }
-                }
-                @media (max-width: 480px) {
-                    .chatbot-window {
-                        width: calc(100vw - 10px) !important;
-                        height: ${isMinimized ? '45px' : '350px'} !important;
-                        right: 5px !important;
-                        bottom: 70px !important;
-                    }
-                }
-            `}</style>
+        @keyframes pulse {
+          0%, 70%, 100% { transform: scale(1); opacity: 0.5; }
+          35% { transform: scale(1.2); opacity: 1; }
+        }
+        @keyframes slideUp {
+          from { transform: translateY(100%) scale(0.8); opacity: 0; }
+          to { transform: translateY(0) scale(1); opacity: 1; }
+        }
+        @keyframes slideDown {
+          from { transform: translateY(0) scale(1); opacity: 1; }
+          to { transform: translateY(100%) scale(0.8); opacity: 0; }
+        }
+        @keyframes float {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-4px); }
+        }
+        @keyframes glow {
+          0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.3); }
+          50% { box-shadow: 0 0 30px rgba(59, 130, 246, 0.5), 0 0 40px rgba(59, 130, 246, 0.3); }
+        }
+        @keyframes gradient {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+        .chatbot-button {
+          animation: float 3s ease-in-out infinite;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          box-shadow: 0 8px 32px 0 rgba(59,130,246,0.25), 0 1.5px 6px 0 rgba(0,0,0,0.10);
+        }
+        .chatbot-button:hover {
+          animation: glow 2s ease-in-out infinite;
+          transform: translateY(-2px) scale(1.08);
+          filter: brightness(1.08) saturate(1.2);
+        }
+        .chatbot-window {
+          animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          box-shadow: 0 25px 60px 0 rgba(59,130,246,0.18), 0 1.5px 6px 0 rgba(0,0,0,0.10);
+          border: 1.5px solid rgba(59,130,246,0.13);
+          background: rgba(15,23,42,0.97);
+          backdrop-filter: blur(32px) saturate(1.2);
+        }
+        .message-enter {
+          animation: slideUp 0.2s ease-out;
+        }
+        .quick-action-btn {
+          transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+          background: linear-gradient(90deg, rgba(59,130,246,0.10) 0%, rgba(16,185,129,0.10) 100%);
+          border: 1.2px solid rgba(59,130,246,0.18);
+        }
+        .quick-action-btn:hover {
+          transform: translateY(-2px) scale(1.04);
+          box-shadow: 0 8px 25px rgba(59, 130, 246, 0.18);
+          background: linear-gradient(90deg, rgba(59,130,246,0.18) 0%, rgba(16,185,129,0.18) 100%);
+        }
+        .chatbot-textarea {
+          background: linear-gradient(120deg, rgba(59,130,246,0.13) 0%, rgba(16,185,129,0.10) 100%);
+          border: 1.5px solid rgba(59,130,246,0.18);
+          border-radius: 16px;
+          color: #fff;
+          font-size: 0.95rem;
+          padding: 0.85rem 1rem;
+          min-height: 22px;
+          max-height: 90px;
+          outline: none;
+          box-shadow: 0 2px 12px 0 rgba(59,130,246,0.08);
+          transition: border 0.2s, box-shadow 0.2s, background 0.2s;
+          resize: none;
+        }
+        .chatbot-textarea:focus {
+          border: 1.5px solid #3b82f6;
+          background: linear-gradient(120deg, rgba(59,130,246,0.18) 0%, rgba(16,185,129,0.13) 100%);
+          box-shadow: 0 0 0 2px #3b82f6, 0 2px 12px 0 rgba(59,130,246,0.13);
+        }
+        .send-btn {
+          background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+          border: none;
+          border-radius: 12px;
+          color: #fff;
+          padding: 0.75rem;
+          min-width: 44px;
+          height: 44px;
+          font-size: 1.1rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          box-shadow: 0 2px 12px 0 rgba(59,130,246,0.13);
+          transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+        }
+        .send-btn:active {
+          transform: scale(0.96);
+        }
+        .send-btn:disabled {
+          background: rgba(107, 114, 128, 0.3);
+          cursor: not-allowed;
+        }
+        @media (max-width: 768px) {
+          .chatbot-window {
+            width: calc(100vw - 20px) !important;
+            height: ${isMinimized ? '50px' : '400px'} !important;
+            right: 10px !important;
+            bottom: 75px !important;
+            maxHeight: calc(100vh - 100px) !important;
+          }
+          .chatbot-button {
+            width: 50px !important;
+            height: 50px !important;
+            bottom: 15px !important;
+            right: 15px !important;
+          }
+        }
+        @media (max-width: 480px) {
+          .chatbot-window {
+            width: calc(100vw - 10px) !important;
+            height: ${isMinimized ? '45px' : '350px'} !important;
+            right: 5px !important;
+            bottom: 70px !important;
+          }
+        }
+      `}</style>
 
       {/* Floating Action Button */}
       <div
@@ -687,47 +738,25 @@ export default function AIChatbot() {
                     onKeyPress={handleKeyPress}
                     placeholder="Ask me anything..."
                     disabled={loading}
-                    style={{
-                      flex: 1,
-                      background: 'rgba(255, 255, 255, 0.1)',
-                      border: '1px solid rgba(255, 255, 255, 0.2)',
-                      borderRadius: '12px',
-                      padding: '0.75rem',
-                      color: 'white',
-                      fontSize: '0.85rem',
-                      resize: 'none',
-                      minHeight: '18px',
-                      maxHeight: '80px',
-                      fontFamily: 'inherit',
-                      outline: 'none',
-                      transition: 'all 0.2s ease',
-                      backdropFilter: 'blur(10px)',
-                    }}
+                    className="chatbot-textarea"
                     rows={1}
                   />
                   <button
                     onClick={handleSend}
                     disabled={loading || !input.trim()}
-                    style={{
-                      background:
-                        loading || !input.trim()
-                          ? 'rgba(107, 114, 128, 0.3)'
-                          : 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
-                      border: 'none',
-                      borderRadius: '10px',
-                      color: 'white',
-                      padding: '0.75rem',
-                      cursor: loading || !input.trim() ? 'not-allowed' : 'pointer',
-                      fontSize: '0.9rem',
-                      transition: 'all 0.2s ease',
-                      minWidth: '40px',
-                      height: '40px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
+                    className="send-btn"
                   >
-                    {loading ? '⏳' : '🚀'}
+                    {loading ? (
+                      <span style={{display:'flex',alignItems:'center',gap:'0.3rem'}}>
+                        <span className="dot-flashing" style={{width:'8px',height:'8px',borderRadius:'50%',background:'#fff',animation:'pulse 1s infinite'}}></span>
+                        <span>Sending</span>
+                      </span>
+                    ) : (
+                      <span style={{display:'flex',alignItems:'center',gap:'0.2rem'}}>
+                        <span style={{fontSize:'1.2rem'}}>🚀</span>
+                        <span style={{fontWeight:600}}>Send</span>
+                      </span>
+                    )}
                   </button>
                 </div>
               </div>

@@ -6,8 +6,16 @@ export function AccountingDashboardScreen() {
     balanceSheet: null,
     incomeStatement: null,
     trialBalance: null,
-    summary: null
+    summary: null,
+    aiInsights: [],
+    aiSuggestions: [],
+    aiForecast: null
   });
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState('');
+  const [financeQuery, setFinanceQuery] = useState('');
+  const [financeQueryResult, setFinanceQueryResult] = useState(null);
+  const [financeQueryLoading, setFinanceQueryLoading] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState('summary');
@@ -19,27 +27,62 @@ export function AccountingDashboardScreen() {
 
   const fetchReports = async () => {
     setLoading(true);
+    setAiLoading(true);
     try {
       const token = localStorage.getItem('token');
       const headers = { 'Authorization': `Bearer ${token}` };
 
-      const [bs, is, tb, summary] = await Promise.all([
-        fetch(`/api/accounting/reports/balance-sheet?asOfDate=${asOfDate}`, { headers }).then(r => r.json()),
-        fetch(`/api/accounting/reports/income-statement?startDate=${asOfDate}&endDate=${asOfDate}`, { headers }).then(r => r.json()),
-        fetch(`/api/accounting/reports/trial-balance?asOfDate=${asOfDate}`, { headers }).then(r => r.json()),
-        fetch(`/api/accounting/reports/financial-summary?asOfDate=${asOfDate}`, { headers }).then(r => r.json())
-      ]);
-
-      setReports({
-        balanceSheet: bs.data,
-        incomeStatement: is.data,
-        trialBalance: tb.data,
-        summary: summary.data
-      });
+      // Fetch AI-powered dashboard data
+      const aiRes = await fetch('/api/accounting/reports/dashboard', { headers });
+      const aiData = await aiRes.json();
+      if (aiData.success) {
+        setReports({
+          balanceSheet: aiData.data.balanceSheet,
+          incomeStatement: aiData.data.incomeYTD,
+          trialBalance: null, // You can fetch trial balance separately if needed
+          summary: aiData.data.balanceSheet, // For summary tab
+          aiInsights: aiData.data.aiInsights || [],
+          aiSuggestions: aiData.data.aiSuggestions || [],
+          aiForecast: aiData.data.aiForecast || null
+        });
+      } else {
+        setAiError(aiData.error || 'Failed to load AI dashboard data');
+      }
     } catch (err) {
       setError('Failed to load accounting reports');
+      setAiError('Failed to load AI dashboard data');
     } finally {
       setLoading(false);
+      setAiLoading(false);
+    }
+  };
+  // Finance Query Handler
+  const handleFinanceQuery = async (e) => {
+    e.preventDefault();
+    setFinanceQueryLoading(true);
+    setFinanceQueryResult(null);
+    setAiError('');
+    try {
+      const token = localStorage.getItem('token');
+      const headers = {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      };
+      const res = await fetch('/api/ai/finance-query', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ question: financeQuery })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setFinanceQueryResult(data.response);
+      } else {
+        setAiError(data.error || 'AI query failed');
+      }
+    } catch (err) {
+      setAiError('AI query failed');
+    } finally {
+      setFinanceQueryLoading(false);
     }
   };
 
@@ -56,6 +99,65 @@ export function AccountingDashboardScreen() {
 
   return (
     <div className="accounting-container">
+            {/* AI Insights, Suggestions, Forecasts */}
+            <div className="ai-section">
+              <h2>AI-Powered Financial Insights</h2>
+              {aiLoading ? <div>Loading AI insights...</div> : null}
+              {aiError && <div className="error-message">{aiError}</div>}
+              {reports.aiInsights && reports.aiInsights.length > 0 && (
+                <div className="ai-insights">
+                  <h4>Insights</h4>
+                  <ul>
+                    {reports.aiInsights.map((insight, idx) => (
+                      <li key={idx} className={`insight-${insight.type}`}> <strong>{insight.title}:</strong> {insight.message} </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {reports.aiSuggestions && reports.aiSuggestions.length > 0 && (
+                <div className="ai-suggestions">
+                  <h4>Suggestions</h4>
+                  <ul>
+                    {reports.aiSuggestions.map((s, idx) => (
+                      <li key={idx}><strong>{s.title}:</strong> {s.description} <span style={{color:'#888'}}>({s.priority})</span></li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {reports.aiForecast && reports.aiForecast.forecast && (
+                <div className="ai-forecast">
+                  <h4>Revenue Forecast (Next 6 Months)</h4>
+                  <ul>
+                    {reports.aiForecast.forecast.map((f, idx) => (
+                      <li key={idx}>{f.period}: UGX {f.revenue.toLocaleString('en-UG')}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+
+            {/* Finance Query UI (admin/staff only) */}
+            <div className="finance-query-section">
+              <h3>Ask AI About Your Finances</h3>
+              <form onSubmit={handleFinanceQuery} style={{marginBottom:'1em'}}>
+                <input
+                  type="text"
+                  value={financeQuery}
+                  onChange={e => setFinanceQuery(e.target.value)}
+                  placeholder="e.g. What was our net income last quarter?"
+                  style={{width:'60%',padding:'0.5em'}}
+                  required
+                />
+                <button type="submit" disabled={financeQueryLoading} style={{marginLeft:'1em'}}>Ask</button>
+              </form>
+              {financeQueryLoading && <div>Thinking...</div>}
+              {financeQueryResult && (
+                <div className="ai-query-result" style={{background:'#f6f8fa',padding:'1em',borderRadius:'6px'}}>
+                  <strong>AI Response:</strong>
+                  <div>{financeQueryResult}</div>
+                </div>
+              )}
+            </div>
       <div className="accounting-header">
         <div>
           <h1>Accounting Dashboard</h1>

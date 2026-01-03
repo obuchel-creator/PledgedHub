@@ -20,13 +20,13 @@ async function getDashboardMetrics(userId, dateRange = {}) {
         COUNT(*) as total_transactions,
         AVG(amount) as avg_transaction
       FROM payments
-      WHERE user_id = ? AND created_at BETWEEN ? AND ?
+      WHERE created_at BETWEEN ? AND ?
     `;
     const [revenueData] = await db.query(revenueQuery, [userId, startDate, endDate]);
 
     // Total revenue (all time for comparison)
     const [allTimeRevenue] = await db.query(
-      'SELECT SUM(amount) as total FROM payments WHERE user_id = ?',
+      'SELECT SUM(amount) as total FROM payments',
       [userId]
     );
 
@@ -38,7 +38,7 @@ async function getDashboardMetrics(userId, dateRange = {}) {
         SUM(goal_amount) as total_goals,
         SUM(current_amount) as total_raised
       FROM campaigns
-      WHERE user_id = ? AND created_at BETWEEN ? AND ?
+      WHERE created_at BETWEEN ? AND ?
     `, [userId, startDate, endDate]);
 
     // Pledges overview
@@ -49,7 +49,7 @@ async function getDashboardMetrics(userId, dateRange = {}) {
         SUM(CASE WHEN status = 'paid' THEN 1 ELSE 0 END) as fulfilled_pledges,
         SUM(CASE WHEN status = 'paid' THEN amount ELSE 0 END) as fulfilled_amount
       FROM pledges
-      WHERE user_id = ? AND created_at BETWEEN ? AND ?
+      WHERE created_at BETWEEN ? AND ?
     `, [userId, startDate, endDate]);
 
     // Donor statistics
@@ -58,7 +58,7 @@ async function getDashboardMetrics(userId, dateRange = {}) {
         COUNT(DISTINCT donor_email) as unique_donors,
         COUNT(DISTINCT CASE WHEN created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY) THEN donor_email END) as active_donors
       FROM pledges
-      WHERE user_id = ? AND created_at BETWEEN ? AND ?
+      WHERE created_at BETWEEN ? AND ?
     `, [userId, startDate, endDate]);
 
     // Calculate trends (compare with previous period)
@@ -67,7 +67,7 @@ async function getDashboardMetrics(userId, dateRange = {}) {
     prevStartDate.setDate(prevStartDate.getDate() - periodDays);
     
     const [prevRevenue] = await db.query(
-      'SELECT SUM(amount) as total FROM payments WHERE user_id = ? AND created_at BETWEEN ? AND ?',
+      'SELECT SUM(amount) as total FROM payments WHERE created_at BETWEEN ? AND ?',
       [userId, prevStartDate.toISOString(), startDate]
     );
 
@@ -141,7 +141,7 @@ async function getRevenueTrend(userId, groupBy = 'day', dateRange = {}) {
         COUNT(*) as transactions,
         AVG(amount) as avg_amount
       FROM payments
-      WHERE user_id = ? AND created_at BETWEEN ? AND ?
+      WHERE created_at BETWEEN ? AND ?
       GROUP BY period
       ORDER BY period ASC
     `;
@@ -185,7 +185,7 @@ async function getCampaignPerformance(userId, dateRange = {}) {
         DATEDIFF(NOW(), c.created_at) as days_active
       FROM campaigns c
       LEFT JOIN pledges p ON c.id = p.campaign_id
-      WHERE c.user_id = ? AND c.created_at BETWEEN ? AND ?
+      WHERE c.created_at BETWEEN ? AND ?
       GROUP BY c.id, c.name, c.target_amount, c.status, c.created_at
       ORDER BY COALESCE(SUM(p.amount), 0) DESC
     `;
@@ -231,7 +231,7 @@ async function getDonorCohortAnalysis(userId) {
           COUNT(*) as total_pledges,
           SUM(amount) as total_amount
         FROM pledges
-        WHERE user_id = ?
+        
         GROUP BY donor_email
       ) as donor_cohorts
       GROUP BY cohort_month
@@ -274,7 +274,7 @@ async function getDonorLifetimeValue(userId) {
         DATEDIFF(MAX(created_at), MIN(created_at)) as donor_lifespan_days,
         AVG(amount) as avg_pledge_amount
       FROM pledges
-      WHERE user_id = ?
+      
       GROUP BY donor_email, donor_name
       HAVING COUNT(*) >= 1
       ORDER BY lifetime_value DESC
@@ -319,7 +319,7 @@ async function getPaymentMethodBreakdown(userId, dateRange = {}) {
         SUM(amount) as total_amount,
         AVG(amount) as avg_amount
       FROM payments
-      WHERE user_id = ? AND created_at BETWEEN ? AND ?
+      WHERE created_at BETWEEN ? AND ?
       GROUP BY payment_method
       ORDER BY total_amount DESC
     `;

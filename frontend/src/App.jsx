@@ -26,6 +26,7 @@ import HomeScreen from './screens/HomeScreen';
 import CreatePledgeScreen from './screens/CreatePledgeScreen';
 import AboutScreen from './screens/AboutScreen';
 import PledgeDetailScreen from './screens/PledgeDetailScreen';
+import PledgesScreen from './screens/PledgesScreen';
 import AdvancedAnalyticsScreen from './screens/AdvancedAnalyticsScreen';
 import FundraisingScreen from './screens/FundraisingScreen';
 import AccountingScreen from './screens/AccountingScreen';
@@ -42,13 +43,18 @@ import PrivacyScreen from './screens/PrivacyScreen';
 import TermsScreen from './screens/TermsScreen';
 import VerifyPledgeScreen from './screens/VerifyPledgeScreen';
 import ProfileScreen from './screens/ProfileScreen';
+import SharePledgeScreen from './screens/SharePledgeScreen';
+import DemoDashboardScreen from './screens/DemoDashboardScreen';
+import PricingScreen from './screens/PricingScreen';
 
 function App() {
   console.log('🟢 App component: Rendering');
   return (
     <Router>
       <Navbar />
-      <Routes>
+      <div style={{ minHeight: 'calc(100vh - 60px - 48px)', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ flex: 1 }}>
+          <Routes>
         <Route path="/" element={<HomeScreen />} />
         <Route path="/login" element={<LoginScreen />} />
         <Route path="/register" element={<RegisterScreen />} />
@@ -70,9 +76,21 @@ function App() {
         <Route path="/about" element={<AboutScreen />} />
         <Route path="/fundraising" element={<FundraisingScreen />} />
         <Route path="/campaign/:slug" element={<GuestPledgeScreen />} />
+        <Route path="/campaigns/:id" element={<GuestPledgeScreen />} />
+        <Route path="/explore" element={<DemoDashboardScreen />} />
         <Route path="/pledges/:id" element={
           <ProtectedRoute>
             <PledgeDetailScreen />
+          </ProtectedRoute>
+        } />
+        <Route path="/pledge/:id" element={
+          <ProtectedRoute>
+            <PledgeDetailScreen />
+          </ProtectedRoute>
+        } />
+        <Route path="/pledges" element={
+          <ProtectedRoute>
+            <PledgesScreen />
           </ProtectedRoute>
         } />
         <Route
@@ -150,11 +168,18 @@ function App() {
           </ProtectedRoute>
         } />
         <Route path="/help" element={<HelpScreen />} />
+        <Route path="/pricing" element={<PricingScreen />} />
         <Route path="/privacy" element={<PrivacyScreen />} />
         <Route path="/terms" element={<TermsScreen />} />
         <Route path="/verify-pledge" element={<VerifyPledgeScreen />} />
+        <Route path="/share/pledge/:id" element={<SharePledgeScreen />} />
         <Route path="*" element={<NotFoundScreen />} />
-      </Routes>
+          </Routes>
+        </div>
+        <footer style={{ background: '#f8fafc', color: '#1e293b', textAlign: 'center', padding: '1.2rem 0', fontSize: '1.08rem', borderTop: '2px solid #e5e7eb', fontWeight: 'bold', letterSpacing: '0.02em', textShadow: '0 1px 6px #fff, 0 1px 1px #e5e7eb' }}>
+          &copy; {new Date().getFullYear()} PledgeHub. All rights reserved.
+        </footer>
+      </div>
     </Router>
   );
 }

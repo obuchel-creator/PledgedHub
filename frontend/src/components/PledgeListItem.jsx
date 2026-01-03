@@ -9,12 +9,20 @@ import { parsePledgeMessage } from '../utils/pledgeHelpers';
  * Individual pledge row with status, amount, and quick actions
  */
 function PledgeListItem({ pledge }) {
-  const id = pledge?.id || pledge?._id || pledge?.pledgeId;
+  // More robust ID extraction - check all possible ID fields
+  const id = pledge?.id || pledge?._id || pledge?.pledgeId || pledge?.pledge_id;
+  
+  // Log for debugging if ID is missing
+  if (!id) {
+    console.warn('⚠️ [PledgeListItem] Pledge missing ID field:', pledge);
+  }
+  
+  console.log('🔍 [PledgeListItem] Rendering pledge:', { id, hasId: !!id, pledge });
   const details = parsePledgeMessage(pledge?.message);
-  const purposeDisplay = details.purpose || pledge?.title || pledge?.name || 'Pledge';
-  const donorName = pledge?.donorName || pledge?.fullName || 'Anonymous';
-  const pledgeDateDisplay = formatDateShort(details.pledgeDate || pledge?.date);
-  const collectionDateDisplay = formatDateShort(details.collectionDate);
+  const purposeDisplay = details.purpose || pledge?.title || pledge?.name || pledge?.purpose || 'Pledge';
+  const donorName = pledge?.donorName || pledge?.donor_name || pledge?.fullName || 'Anonymous';
+  const pledgeDateDisplay = formatDateShort(details.pledgeDate || pledge?.date || pledge?.created_at);
+  const collectionDateDisplay = formatDateShort(details.collectionDate || pledge?.collection_date);
   const amountDisplay = formatCurrency(pledge?.amount ?? pledge?.goal) || 'Amount unavailable';
 
   // Determine status badge
@@ -45,12 +53,23 @@ function PledgeListItem({ pledge }) {
         </div>
       </div>
       <div className="pledge-list-item__actions">
-        <Link
-          to={`/pledges/${id}`}
-          className="btn btn--secondary btn--small"
-        >
-          View Details
-        </Link>
+        {id ? (
+          <Link
+            to={`/pledges/${id}`}
+            className="btn btn--secondary btn--small"
+          >
+            View Details
+          </Link>
+        ) : (
+          <button
+            disabled
+            className="btn btn--secondary btn--small"
+            style={{ opacity: 0.5, cursor: 'not-allowed' }}
+            title="Pledge ID not available"
+          >
+            View Details
+          </button>
+        )}
       </div>
     </div>
   );
@@ -61,15 +80,20 @@ PledgeListItem.propTypes = {
     id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     _id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     pledgeId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    pledge_id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     title: PropTypes.string,
     name: PropTypes.string,
+    purpose: PropTypes.string,
     donorName: PropTypes.string,
+    donor_name: PropTypes.string,
     fullName: PropTypes.string,
     amount: PropTypes.number,
     goal: PropTypes.number,
     status: PropTypes.string,
     message: PropTypes.string,
     date: PropTypes.string,
+    created_at: PropTypes.string,
+    collection_date: PropTypes.string,
   }).isRequired,
 };
 

@@ -13,3 +13,13 @@ globalThis.__VITE_ENV__ = {
   VITE_APP_VERSION: '1.0.0',
   MODE: 'test',
 };
+
+// Provide a default fetch mock so components can call fetch without errors in Jest
+if (typeof global.fetch === 'undefined') {
+  global.fetch = jest.fn(async () => ({
+    ok: true,
+    status: 200,
+    json: async () => ({}),
+    text: async () => '',
+  }));
+}

@@ -255,7 +255,41 @@ export async function getPledge(id) {
   if (id === undefined || id === null)
     return Promise.reject(new Error('getPledge: id is required'));
   const client = await getClient();
-  return handleRequest(client.get(`pledges/${encodeURIComponent(String(id))}`));
+  console.log('[API] getPledge: Requesting pledge with id:', id);
+  try {
+    // Try with token (if available)
+    const result = await handleRequest(client.get(`pledges/${encodeURIComponent(String(id))}`));
+    console.log('[API] getPledge: Got result:', result);
+    // If result is { success: true, data: pledge }, return just the pledge
+    if (result && result.success === true && result.data) {
+      console.log('[API] getPledge: Unwrapping data:', result.data);
+      return result.data;
+    }
+    // If API returned a structured error, bubble it up so callers can show a proper message
+    if (result && result.success === false) {
+      const message = result.error || 'Pledge not found';
+      throw new Error(message);
+    }
+    return result;
+  } catch (err) {
+    console.error('[API] getPledge: Error with token, trying public endpoint:', err);
+    // If unauthorized, try public share endpoint
+    const url = buildUrl(`pledges/public/${encodeURIComponent(String(id))}`);
+    return fetch(url, { method: 'GET', headers: { 'Content-Type': 'application/json' } })
+      .then(async res => {
+        if (!res.ok) throw new Error('Pledge not found');
+        const data = await res.json();
+        console.log('[API] getPledge: Public endpoint returned:', data);
+        // Return just the pledge data
+        if (data && data.data) return data.data;
+        if (data && data.success === false) throw new Error(data.error || 'Pledge not found');
+        return data;
+      })
+      .catch(err => {
+        console.error('[API] getPledge: Public endpoint failed:', err);
+        throw new Error('Pledge not found');
+      });
+  }
 }
 
 /**
@@ -271,11 +305,7 @@ export async function verifyPledge(token) {
 
 export async function createPledge(data) {
   if (!data) return Promise.reject(new Error('createPledge: data is required'));
-  const { default: axios } = await import('axios');
-  const client = axios.create({
-    baseURL: BASE_URL || undefined,
-    headers: { 'Content-Type': 'application/json' },
-  });
+  const client = await getClient();  // Use authenticated client
   return handleRequest(client.post('pledges', data));
 }
 
@@ -287,7 +317,29 @@ export async function createPayment(data) {
 
 export async function getPayments(query = {}) {
   const client = await getClient();
-  return handleRequest(client.get('payments', { params: query }));
+  
+  // Support both getPayments(id) and getPayments({ pledgeId: id })
+  let params = query;
+  if (typeof query === 'string' || typeof query === 'number') {
+    params = { pledgeId: query };
+  }
+  
+  const response = await handleRequest(client.get('payments', { params }));
+  
+  // Handle both { payments: [...] } and { data: [...] } response formats
+  if (response && typeof response === 'object') {
+    if (Array.isArray(response.payments)) {
+      return response.payments;
+    }
+    if (Array.isArray(response.data)) {
+      return response.data;
+    }
+    if (Array.isArray(response)) {
+      return response;
+    }
+  }
+  
+  return [];
 }
 
 export async function loginUser(credentials) {
@@ -364,9 +416,19 @@ export async function getCurrentUser() {
   return handleRequest(client.get('auth/me'));
 }
 
-export async function forgotPassword(email) {
+
+/**
+ * Request password reset (email or phone)
+ * @param {string} email - Email address (optional)
+ * @param {string} phone - Phone number (optional)
+ * @returns {Promise<Object>}
+ */
+export async function forgotPassword(email, phone) {
   const client = await getClient();
-  return handleRequest(client.post('auth/forgot-password', { email }));
+  const payload = {};
+  if (email) payload.email = email;
+  if (phone) payload.phone = phone;
+  return handleRequest(client.post('auth/forgot-password', payload));
 }
 
 export async function resetPassword(token, password) {

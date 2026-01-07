@@ -25,7 +25,8 @@ const isDevelopment = process.env.NODE_ENV === 'development' ||
                       process.env.DISABLE_RATE_LIMIT === 'true';
 
 if (isDevelopment) {
-    console.log('⚠️  [SECURITY] Running in DEVELOPMENT mode - lenient security settings enabled');
+    const logger = require('../utils/logger');
+    logger.warn('[SECURITY] Running in DEVELOPMENT mode - lenient security settings enabled');
 }
 
 // In-memory storage for security tracking (use Redis in production)

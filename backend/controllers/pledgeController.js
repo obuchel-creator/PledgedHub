@@ -14,7 +14,6 @@ async function batchCreatePledges(req, res) {
         // Prepare bulk insert
         const values = validPledges.map(p => [
             p.campaign_id || null,
-            p.title.trim(),
             p.donor_name || p.donorName || 'Anonymous',
             p.donor_email || null,
             p.donor_phone || null,
@@ -27,9 +26,9 @@ async function batchCreatePledges(req, res) {
             0 // deleted
         ]);
         const insertSql = `INSERT INTO pledges (
-            campaign_id, name, donor_name, donor_email, donor_phone, 
+            campaign_id, donor_name, donor_email, donor_phone, 
             purpose, collection_date, amount, status, payment_method, notes, deleted, created_at
-        ) VALUES ${values.map(() => '(?,?,?,?,?,?,?,?,?,?,?,?,NOW())').join(',')}`;
+        ) VALUES ${values.map(() => '(?,?,?,?,?,?,?,?,?,?,?,NOW())').join(',')}`;
         const flatValues = values.flat();
         const [result] = await pool.execute(insertSql, flatValues);
         return res.status(201).json({ success: true, inserted: result.affectedRows });
@@ -45,7 +44,7 @@ const pledgeVerificationService = require('../services/pledgeVerificationService
 
 async function createPledge(req, res) {
     try {
-        const { title, amount, donorName, donor_name, donor_email, donor_phone, purpose, collection_date, status, message, date, campaign_id } = req.body || {};
+        const { title, amount, donor_name, donor_email, donor_phone, purpose, collection_date, status, message, date, campaign_id } = req.body || {};
 
         // Require collection_date (date pledge is to be collected)
         if (!collection_date || typeof collection_date !== 'string' || !collection_date.trim()) {
@@ -124,9 +123,10 @@ async function createPledge(req, res) {
 
         // Always use the Pledge model for creation to ensure field mapping and DB consistency
         // Note: pledges table does NOT have 'title' or 'name' columns - only donor_name, purpose, etc.
+        // Only allow valid pledge fields
         const payload = {
             campaign_id: typeof campaign_id !== 'undefined' ? campaign_id : null,
-            donor_name: typeof donor_name === 'string' ? donor_name : (typeof donorName === 'string' ? donorName : 'Anonymous'),
+            donor_name: typeof donor_name === 'string' ? donor_name : 'Anonymous',
             donor_email: typeof donor_email === 'string' ? donor_email : null,
             donor_phone: typeof donor_phone === 'string' ? donor_phone : null,
             purpose: typeof purpose === 'string' ? purpose : (typeof message === 'string' ? message : ''),
@@ -136,6 +136,12 @@ async function createPledge(req, res) {
             notes: typeof purpose === 'string' ? purpose : (typeof message === 'string' ? message : ''),
             created_at: new Date()
         };
+        // Remove any unsupported fields from req.body
+        Object.keys(payload).forEach((key) => {
+            if (typeof payload[key] === 'undefined') {
+                delete payload[key];
+            }
+        });
         const result = await Pledge.create(payload);
         // Send verification email if donor has email
         if (payload.donor_email && typeof payload.donor_email === 'string' && payload.donor_email.trim()) {

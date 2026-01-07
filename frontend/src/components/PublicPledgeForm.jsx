@@ -77,10 +77,10 @@ export default function PublicPledgeForm() {
         Make a Pledge
       </h2>
       <label>
-        Name*
+        Donor Name*
         <input
-          name="name"
-          value={form.name}
+          name="donor_name"
+          value={form.donor_name}
           onChange={handleChange}
           required
           style={{ width: '100%', marginBottom: 12 }}

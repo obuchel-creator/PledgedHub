@@ -9,7 +9,6 @@ const ALLOWED_UPDATE = [
     'status', 
     'ownerId', 
     'raised', 
-    'name',
     'amount_paid',
     'balance_remaining',
     'last_payment_date',

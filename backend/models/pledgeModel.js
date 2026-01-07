@@ -123,7 +123,7 @@ class Pledge {
     this.campaign_id = data.campaign_id != null ? data.campaign_id : null;
     this.title = toOptionalString(data.title) || '';
     this.amount = toNumber(data.amount, 0);
-    this.donorName = toOptionalString(data.donorName) || toOptionalString(data.name) || 'Anonymous';
+    this.donor_name = toOptionalString(data.donor_name) || toOptionalString(data.donorName) || toOptionalString(data.name) || 'Anonymous';
     this.message = normalizeMessage(data.message);
     this.date = cloneDate(data.date) || cloneDate(data.pledgeDate) || now;
     this.createdBy = toOptionalString(data.createdBy) || toOptionalString(data.userId) || null;

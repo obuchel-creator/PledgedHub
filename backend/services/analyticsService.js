@@ -15,12 +15,12 @@ async function getDrilldownByPurpose(purpose, start, end) {
 }
 
 async function getDrilldownByCampaign(campaign, start, end) {
-    let where = 'WHERE p.deleted = 0 AND c.name = ?';
+    let where = 'WHERE p.deleted = 0 AND c.title = ?';
     let params = [campaign];
     if (start) { where += ' AND p.collection_date >= ?'; params.push(start); }
     if (end) { where += ' AND p.collection_date <= ?'; params.push(end); }
     const [rows] = await pool.execute(`
-        SELECT p.id, p.donor_name, p.donor_email, p.donor_phone, p.amount, p.status, p.collection_date, p.description as purpose, c.name as campaign
+        SELECT p.id, p.donor_name, p.donor_email, p.donor_phone, p.amount, p.status, p.collection_date, p.description as purpose, c.title as campaign
         FROM pledges p
         JOIN campaigns c ON p.campaign_id = c.id
         ${where}
@@ -123,7 +123,7 @@ async function getCampaigns() {
         params.push(arguments[1]);
     }
     const [rows] = await pool.execute(`
-        SELECT c.name AS campaign, COUNT(p.id) AS pledges, COALESCE(SUM(p.amount),0) AS amount, SUM(p.status = 'paid') AS paid
+        SELECT c.title AS campaign, COUNT(p.id) AS pledges, COALESCE(SUM(p.amount),0) AS amount, SUM(p.status = 'paid') AS paid
         FROM campaigns c
         LEFT JOIN pledges p ON p.campaign_id = c.id${where ? ' AND 1=1'+where : ''}
         GROUP BY c.id

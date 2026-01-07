@@ -69,18 +69,45 @@ router.get('/public/:id', async (req, res) => {
 const { createPledge, getPledge, listPledges, updatePledge, deletePledge, batchCreatePledges } = require('../controllers/pledgeController');
 const { authenticateToken, requireStaff } = require('../middleware/authMiddleware');
 const pledgeVerificationService = require('../services/pledgeVerificationService');
+const {
+  validateEmail,
+  validatePhone,
+  validateAmount,
+  validateRequired,
+  sendError
+} = require('../utils/requestValidator');
+
 
 // Batch create pledges
 // POST /batch
 // Protected: Staff/Admin only
 router.post('/batch', authenticateToken, requireStaff, batchCreatePledges);
 
+
 /**
  * Create a new pledge
  * POST /
  * Protected: Public - allow anyone to create a pledge
+ * Adds validation middleware
  */
-router.post('/', createPledge);
+router.post('/', (req, res, next) => {
+  const { donor_name, donor_email, donor_phone, amount } = req.body;
+  // Validate required fields
+  const requiredFields = [
+    { value: donor_name, name: 'Donor name' },
+    { value: donor_email, name: 'Donor email' },
+    { value: donor_phone, name: 'Donor phone' },
+    { value: amount, name: 'Amount' }
+  ];
+  for (const field of requiredFields) {
+    const check = validateRequired(field.value, field.name);
+    if (!check.valid) return sendError(res, 400, check.error);
+  }
+  if (!validateEmail(donor_email)) return sendError(res, 400, 'Invalid email format');
+  if (!validatePhone(donor_phone)) return sendError(res, 400, 'Invalid phone format');
+  if (!validateAmount(amount)) return sendError(res, 400, 'Invalid amount');
+  next();
+}, createPledge);
 
 /**
  * Verify pledge email
@@ -102,12 +129,18 @@ router.post('/verify/:token', async (req, res) => {
   }
 });
 
+
 /**
- * Get all pledges
+ * Get all pledges (paginated)
  * GET /
+ * Query: ?page=1&limit=20
  * Protected: Authenticated users (Staff/Admin see all, Donors see own)
  */
-router.get('/', authenticateToken, listPledges);
+router.get('/', authenticateToken, (req, res, next) => {
+  req.query.page = parseInt(req.query.page) > 0 ? parseInt(req.query.page) : 1;
+  req.query.limit = parseInt(req.query.limit) > 0 ? parseInt(req.query.limit) : 20;
+  next();
+}, listPledges);
 
 /**
  * Get a pledge by id
@@ -116,12 +149,20 @@ router.get('/', authenticateToken, listPledges);
  */
 router.get('/:id', authenticateToken, getPledge);
 
+
 /**
  * Update a pledge
  * PUT /:id
  * Protected: Staff/Admin only
+ * Adds validation middleware
  */
-router.put('/:id', authenticateToken, requireStaff, updatePledge);
+router.put('/:id', authenticateToken, requireStaff, (req, res, next) => {
+  const { donor_name, donor_email, donor_phone, amount } = req.body;
+  if (donor_email && !validateEmail(donor_email)) return sendError(res, 400, 'Invalid email format');
+  if (donor_phone && !validatePhone(donor_phone)) return sendError(res, 400, 'Invalid phone format');
+  if (amount && !validateAmount(amount)) return sendError(res, 400, 'Invalid amount');
+  next();
+}, updatePledge);
 
 /**
  * Delete a pledge

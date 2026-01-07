@@ -1,4 +1,5 @@
 ﻿const path = require('path');
+const logger = require('./utils/logger');
 const express = require('express');
 const cors = require('cors');
 const session = require('express-session');
@@ -10,9 +11,9 @@ require('dotenv').config({ path: path.join(__dirname, '.env') });
 let db;
 try {
   db = require('./config/db');
-  console.log('✅ Database connection initialized');
+  logger.info('✅ Database connection initialized');
 } catch (dbError) {
-  console.error('❌ Database connection failed:', dbError.message);
+  logger.error('❌ Database connection failed:', dbError.message);
   process.exit(1);
 }
 
@@ -74,10 +75,25 @@ app.use(securityService.preventSQLInjection);
 app.use(securityService.preventXSS);
 
 // CORS configuration
+const allowedOrigins = process.env.NODE_ENV === 'production'
+  ? [process.env.FRONTEND_URL || 'https://pledgehub.com']
+  : [
+      'http://localhost:5173',
+      'http://localhost:5174',
+      'http://localhost:3000',
+      'http://127.0.0.1:5173'
+    ];
 const corsOptions = {
-  origin: process.env.NODE_ENV === 'production' 
-    ? process.env.FRONTEND_URL || 'https://pledgehub.com'
-    : ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:3000', 'http://127.0.0.1:5173'],
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps, curl, etc.)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    } else {
+      logger.warn('Blocked CORS origin', { origin });
+      return callback(new Error('Not allowed by CORS'), false);
+    }
+  },
   credentials: true,
   optionsSuccessStatus: 200,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
@@ -133,9 +149,9 @@ app.get('/api/test', (req, res) => res.json({
 // ========================================
 
 // Public routes (no authentication required)
-app.use('/api/auth', authRoutes);
+app.use('/api/auth', securityService.rateLimiters.auth, authRoutes);
 app.use('/api/auth', userRoutes);
-app.use('/api/register', registerRoute);
+app.use('/api/register', securityService.rateLimiters.auth, registerRoute);
 app.use('/api/oauth', oauthRoutes);
 app.use('/api/feedback', feedbackRoutes);
 app.use('/api/simple-payment', securityService.rateLimiters.payment, simplePaymentRoutes);
@@ -299,7 +315,7 @@ app.use((req, res) => {
 
 // Global error handler
 app.use((err, req, res, next) => {
-  console.error('🚨 Unhandled Error:', {
+  logger.error('🚨 Unhandled Error:', {
     message: err.message,
     status: err.status || err.statusCode || 500,
     method: req.method,
@@ -324,7 +340,7 @@ app.use((err, req, res, next) => {
 
 if (require.main === module) {
   const server = app.listen(PORT, () => {
-    console.log(`
+    logger.info(`
 ╔════════════════════════════════════════╗
 ║     PledgeHub Backend Server Ready     ║
 ╠════════════════════════════════════════╣
@@ -339,25 +355,25 @@ if (require.main === module) {
     try {
       cronScheduler.initializeJobs();
       cronScheduler.startJobs();
-      console.log('✅ Cron scheduler initialized');
+      logger.info('✅ Cron scheduler initialized');
     } catch (cronError) {
-      console.error('❌ Failed to initialize cron jobs:', cronError.message);
+      logger.error('❌ Failed to initialize cron jobs:', cronError.message);
     }
   });
 
   // Graceful shutdown
   process.on('SIGTERM', () => {
-    console.log('📛 SIGTERM received, shutting down gracefully...');
+    logger.info('📛 SIGTERM received, shutting down gracefully...');
     server.close(() => {
-      console.log('✅ Server closed');
+      logger.info('✅ Server closed');
       process.exit(0);
     });
   });
 
   process.on('SIGINT', () => {
-    console.log('📛 SIGINT received, shutting down gracefully...');
+    logger.info('📛 SIGINT received, shutting down gracefully...');
     server.close(() => {
-      console.log('✅ Server closed');
+      logger.info('✅ Server closed');
       process.exit(0);
     });
   });

@@ -41,12 +41,13 @@ const ShareButton = ({
   console.log('🔵 ShareButton state - showDropdown:', showDropdown);
 
   // Handle share action
-  const handleShare = async (channel) => {
+  const handleShare = async (channel, e) => {
+    if (e) e.stopPropagation();
     console.log('🟢 Share clicked for platform:', channel, 'URL:', url);
-    
     // Track the share
     await trackShare(contentType, contentId, channel);
 
+    let shouldClose = true;
     switch (channel) {
       case 'whatsapp':
         shareViaWhatsApp(shareContent.text, url);
@@ -66,25 +67,34 @@ const ShareButton = ({
       case 'email':
         shareViaEmail(shareContent.title, shareContent.text, url);
         break;
-      case 'copy':
+      case 'copy': {
         const result = await copyToClipboard(url);
         if (result.success) {
           setCopySuccess(true);
           setTimeout(() => setCopySuccess(false), 2000);
+        } else {
+          shouldClose = false;
         }
-        break;
-      case 'native':
+        // Delay closing dropdown for copy feedback
+        setTimeout(() => setShowDropdown(false), 400);
+        return;
+      }
+      case 'native': {
         const nativeResult = await shareViaNative(shareContent.title, shareContent.text, url);
         if (nativeResult.success) {
           setShareSuccess(true);
           setTimeout(() => setShareSuccess(false), 2000);
+        } else {
+          shouldClose = false;
         }
-        break;
+        // Delay closing dropdown for native share feedback
+        setTimeout(() => setShowDropdown(false), 400);
+        return;
+      }
       default:
         break;
     }
-
-    setShowDropdown(false);
+    if (shouldClose) setShowDropdown(false);
   };
 
   // Size styles
@@ -113,10 +123,19 @@ const ShareButton = ({
     return (
       <div style={{ position: 'relative', display: 'inline-block' }}>
         <button
-          onClick={() => {
+          onClick={(e) => {
+            e.stopPropagation();
             console.log('🔵 ShareButton clicked, showDropdown was:', showDropdown);
             setShowDropdown(!showDropdown);
           }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              setShowDropdown((v) => !v);
+            }
+          }}
+          aria-haspopup="menu"
+          aria-expanded={showDropdown}
           className={`${currentSize.button} bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all duration-300 flex items-center gap-2 ${className}`}
           style={{
             border: 'none',
@@ -136,7 +155,6 @@ const ShareButton = ({
             {/* Backdrop */}
             <div
               onClick={() => {
-                console.log('🟡 Backdrop clicked, closing dropdown');
                 setShowDropdown(false);
               }}
               style={{
@@ -148,6 +166,8 @@ const ShareButton = ({
                 zIndex: 998,
                 backgroundColor: 'rgba(0,0,0,0.2)',
               }}
+              tabIndex={-1}
+              aria-hidden="true"
             />
             
             {/* Dropdown Menu */}
@@ -174,7 +194,7 @@ const ShareButton = ({
                 <ShareOption
                   icon="📱"
                   label="Share..."
-                  onClick={() => handleShare('native')}
+                  onClick={(e) => handleShare('native', e)}
                 />
               )}
 
@@ -183,7 +203,7 @@ const ShareButton = ({
                 icon="💬"
                 label="WhatsApp"
                 color="#25D366"
-                onClick={() => handleShare('whatsapp')}
+                onClick={(e) => handleShare('whatsapp', e)}
               />
 
               {/* SMS (mobile only) */}
@@ -192,7 +212,7 @@ const ShareButton = ({
                   icon="📲"
                   label="SMS"
                   color="#4CAF50"
-                  onClick={() => handleShare('sms')}
+                  onClick={(e) => handleShare('sms', e)}
                 />
               )}
 
@@ -201,7 +221,7 @@ const ShareButton = ({
                 icon="📘"
                 label="Facebook"
                 color="#1877F2"
-                onClick={() => handleShare('facebook')}
+                onClick={(e) => handleShare('facebook', e)}
               />
 
               {/* Twitter */}
@@ -209,7 +229,7 @@ const ShareButton = ({
                 icon="🐦"
                 label="Twitter / X"
                 color="#1DA1F2"
-                onClick={() => handleShare('twitter')}
+                onClick={(e) => handleShare('twitter', e)}
               />
 
               {/* LinkedIn */}
@@ -217,7 +237,7 @@ const ShareButton = ({
                 icon="💼"
                 label="LinkedIn"
                 color="#0A66C2"
-                onClick={() => handleShare('linkedin')}
+                onClick={(e) => handleShare('linkedin', e)}
               />
 
               {/* Email */}
@@ -225,7 +245,7 @@ const ShareButton = ({
                 icon="✉️"
                 label="Email"
                 color="#EA4335"
-                onClick={() => handleShare('email')}
+                onClick={(e) => handleShare('email', e)}
               />
 
               <div style={{ borderTop: '1px solid #e5e7eb', margin: '8px 0' }} />
@@ -235,7 +255,7 @@ const ShareButton = ({
                 icon={copySuccess ? "✅" : "🔗"}
                 label={copySuccess ? "Copied!" : "Copy Link"}
                 color={copySuccess ? "#10B981" : "#6B7280"}
-                onClick={() => handleShare('copy')}
+                onClick={(e) => handleShare('copy', e)}
               />
             </div>
           </>

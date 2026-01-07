@@ -1071,9 +1071,9 @@ export default function PledgeDetailScreen(props) {
               }}
             >
               <span style={{ fontWeight: '600', color: '#6b7280', minWidth: '80px' }}>Name:</span>
-              <span style={{ fontWeight: '600' }}>{pledge?.donor_name || pledge?.donorName || 'Anonymous'}</span>
+              <span style={{ fontWeight: '600' }}>{pledge?.donor_name || 'Anonymous'}</span>
             </p>
-            {(pledge?.donor_email || pledge?.donorEmail) && (
+            {(pledge?.donor_email) && (
               <p
                 style={{
                   margin: 0,

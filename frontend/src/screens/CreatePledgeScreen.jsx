@@ -5,7 +5,7 @@ import './FormScreens.css';
 export default function CreatePledgeScreen() {
   const [campaigns, setCampaigns] = useState([]);
   const [campaignId, setCampaignId] = useState('');
-  const [donorName, setDonorName] = useState('');
+  const [donor_name, setDonorName] = useState('');
   const [donorEmail, setDonorEmail] = useState('');
   const [donorPhone, setDonorPhone] = useState('');
   const [amount, setAmount] = useState('');
@@ -50,7 +50,7 @@ export default function CreatePledgeScreen() {
   };
 
   const validate = () => {
-    if (!donorName.trim()) {
+    if (!donor_name.trim()) {
       setError('⚠️ Donor name is required.');
       return false;
     }
@@ -106,14 +106,11 @@ export default function CreatePledgeScreen() {
     try {
       await createPledge({
         campaign_id: campaignId || null,
-        title: purpose.trim() || `Pledge from ${donorName.trim()}`,
-        amount: Number(amount),
-        donorName: donorName.trim(),
-        donor_name: donorName.trim(),
         donor_email: donorEmail.trim().toLowerCase(),
         donor_phone: donorPhone.trim() || null,
         purpose: purpose.trim() || 'General donation',
         collection_date: collectionDate,
+        amount: Number(amount),
         status: 'pending',
         message: purpose.trim() || 'General donation',
         date: new Date().toISOString(),
@@ -247,10 +244,10 @@ export default function CreatePledgeScreen() {
                   <span style={{ marginRight: '6px' }}>👤</span> Your Full Name *
                 </label>
                 <input
-                  id="donorName"
-                  name="donorName"
+                  id="donor_name"
+                  name="donor_name"
                   type="text"
-                  value={donorName}
+                  value={donor_name}
                   onChange={(event) => setDonorName(event.target.value)}
                   className="input"
                   required

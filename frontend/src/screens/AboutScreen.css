@@ -12,7 +12,9 @@
 }
 
 .about-screen {
-  background: var(--bg-base);
+  background: var(--bg-base, #f9fafb);
+  background-color: #fff; /* Edge fallback */
+  color: var(--text, #1f2937);
   background-image: var(--gradient-1), var(--gradient-2), var(--gradient-3);
   background-attachment: fixed;
   min-height: 100vh;
@@ -20,6 +22,10 @@
   position: relative;
 }
 
+.page, .section, .page-header {
+  background: var(--surface, #fff);
+  color: var(--text, #1f2937);
+}
 .page {
   max-width: 1200px;
   margin: 0 auto;
@@ -72,8 +78,34 @@
   box-shadow: 0 4px 12px -4px rgba(15, 23, 42, 0.1), 0 2px 6px rgba(15, 23, 42, 0.05);
 }
 
-.section.card {
+
+.section.card,
+.about-screen .section.card,
+.page .section.card {
+  background: #fff !important;
+  color: #111 !important;
+  border: 1px solid #e5e7eb !important;
+  box-shadow: 0 4px 12px -4px rgba(15, 23, 42, 0.1), 0 2px 6px rgba(15, 23, 42, 0.05) !important;
   transition: all 0.3s ease;
+}
+
+@media (prefers-color-scheme: dark) {
+  .section.card,
+  .about-screen .section.card,
+  .page .section.card {
+    background: #fff !important;
+    color: #111 !important;
+    border: 1px solid #e5e7eb !important;
+    box-shadow: 0 4px 12px -4px rgba(15, 23, 42, 0.1), 0 2px 6px rgba(15, 23, 42, 0.05) !important;
+  }
+}
+@media (prefers-color-scheme: dark) {
+  .section.card {
+    background: #fff !important;
+    color: #1f2937 !important;
+    box-shadow: 0 4px 12px -4px rgba(15, 23, 42, 0.1), 0 2px 6px rgba(15, 23, 42, 0.05) !important;
+    border: 1px solid #e5e7eb !important;
+  }
 }
 
 .section.card:hover {

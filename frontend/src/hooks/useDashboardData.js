@@ -87,9 +87,7 @@ export default function useDashboardData() {
       const finalPurpose = form.purpose === 'Other' ? form.customPurpose : form.purpose;
 
       console.log('📝 [PLEDGE CREATE] Submitting pledge:', {
-        title: finalPurpose || `Pledge from ${form.fullName}`,
         amount: Number(form.amount),
-        donorName: form.fullName,
         donor_name: form.fullName,
         donor_email: form.email,
         donor_phone: form.phone,
@@ -101,14 +99,12 @@ export default function useDashboardData() {
       });
 
       const result = await createPledge({
-        title: finalPurpose || `Pledge from ${form.fullName}`,
-        amount: Number(form.amount),
-        donorName: form.fullName,
         donor_name: form.fullName,
         donor_email: form.email,
         donor_phone: form.phone,
         purpose: finalPurpose,
         collection_date: form.collectionDate,
+        amount: Number(form.amount),
         status: 'pending',
         message: finalPurpose,
         date: new Date().toISOString(),

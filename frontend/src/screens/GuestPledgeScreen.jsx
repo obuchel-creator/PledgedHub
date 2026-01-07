@@ -15,7 +15,7 @@ export default function GuestPledgeScreen() {
 
   // Form state
   const [amount, setAmount] = useState('');
-  const [donorName, setDonorName] = useState('');
+  const [donor_name, setDonorName] = useState('');
   const [donorPhone, setDonorPhone] = useState('+256');
   const [donorEmail, setDonorEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -111,7 +111,7 @@ export default function GuestPledgeScreen() {
         body: JSON.stringify({
           campaign_slug: slug,
           amount: parseFloat(amount),
-          donor_name: donorName || 'Anonymous',
+          donor_name: donor_name || 'Anonymous',
           donor_phone: normalizedPhone,
           donor_email: donorEmail || null
         })
@@ -216,11 +216,10 @@ export default function GuestPledgeScreen() {
             <div className="payment-methods">
               <label className="payment-option">
                 <input
-                  type="radio"
-                  value="mtn"
-                  checked={paymentMethod === 'mtn'}
-                  onChange={(e) => setPaymentMethod(e.target.value)}
-                />
+                    type="radio"
+                    checked={paymentMethod === 'mtn'}
+                    onChange={(e) => setPaymentMethod(e.target.value)}
+                  />
                 <span>📱 MTN Mobile Money</span>
               </label>
 
@@ -254,7 +253,7 @@ export default function GuestPledgeScreen() {
             >
               {isSubmitting ? '⏳ Processing...' : `Pay ${formatCurrency(pledgeCreated.amount)}`}
             </button>
-
+                        donor_name: donor_name || 'Anonymous',
             <button
               onClick={() => {
                 setPledgeCreated(null);
@@ -290,7 +289,7 @@ export default function GuestPledgeScreen() {
         <div className="stat-card raised">
           <div className="stat-icon">💰</div>
           <div className="stat-content">
-            <div className="stat-value">{formatCurrency(campaign.raised_amount)}</div>
+                        value={donor_name}
             <div className="stat-label">Raised</div>
           </div>
         </div>
@@ -450,7 +449,7 @@ export default function GuestPledgeScreen() {
                   id="name"
                   type="text"
                   placeholder="Enter your name or stay anonymous"
-                  value={donorName}
+                  value={donor_name}
                   onChange={(e) => setDonorName(e.target.value)}
                   className="modern-input"
                 />

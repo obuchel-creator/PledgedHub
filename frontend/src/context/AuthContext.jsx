@@ -11,7 +11,10 @@ const AuthContext = createContext({
   register: async () => {},
   logout: () => {},
   refreshUser: async () => {},
+
 });
+
+export { AuthContext };
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);

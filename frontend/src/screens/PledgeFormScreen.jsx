@@ -52,7 +52,12 @@ export default function PledgeFormScreen() {
         setLoading(false);
         return;
       }
-      const payload = { ...form };
+      const payload = {
+        donor_name: form.donor_name,
+        amount: form.amount,
+        purpose: form.purpose,
+        collection_date: form.collection_date
+      };
       let res;
       if (isEdit) {
         res = await putWithAuth(`/api/pledges/${id}`, payload);

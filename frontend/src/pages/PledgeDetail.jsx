@@ -120,7 +120,7 @@ export default function PledgeDetail() {
           <div style={{ flex: 1, minWidth: '200px' }}>
             <h3 style={{ marginTop: 0, marginBottom: '8px', color: '#374151' }}>Pledge Details</h3>
             <div style={{ display: 'grid', gap: '8px' }}>
-              <div><strong>Donor Name:</strong> {pledge.donorName || pledge.donor_name || 'Anonymous'}</div>
+              <div><strong>Donor Name:</strong> {pledge.donor_name || 'Anonymous'}</div>
               <div><strong>Date Pledged:</strong> {pledge.datePledged ? new Date(pledge.datePledged).toLocaleDateString() : pledge.date ? new Date(pledge.date).toLocaleDateString() : '-'}</div>
               <div><strong>Collection Date:</strong> {pledge.collectionDate ? new Date(pledge.collectionDate).toLocaleDateString() : pledge.collection_date ? new Date(pledge.collection_date).toLocaleDateString() : '-'}</div>
               <div><strong>Amount Pledged:</strong> UGX {pledge.amount?.toLocaleString() || '-'}</div>

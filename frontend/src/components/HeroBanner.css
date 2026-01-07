@@ -1,0 +1,140 @@
+.hero-banner {
+  position: relative;
+  width: 100%;
+  min-height: 370px;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2.5rem;
+  border-radius: 22px;
+  box-shadow: 0 6px 36px rgba(0,0,0,0.10);
+  overflow: hidden;
+  animation: hero-slide-in 0.7s cubic-bezier(.4,1.4,.6,1) 1;
+}
+.hero-banner__gradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, rgba(22,163,74,0.82) 0%, rgba(26,35,126,0.68) 100%);
+  z-index: 1;
+  pointer-events: none;
+}
+.hero-banner__overlay {
+  position: relative;
+  z-index: 2;
+  color: #1a237e;
+  padding: 3.2rem 2.2rem 2.5rem 2.2rem;
+  border-radius: 22px;
+  max-width: 650px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 2px 24px rgba(0,0,0,0.13);
+  background: rgba(0,0,0,0.18);
+  /* Fallback for browsers that do not support backdrop-filter */
+  /* Use a more opaque background if backdrop-filter is not supported */
+  -webkit-backdrop-filter: blur(2.5px);
+  backdrop-filter: blur(2.5px);
+  /* fallback for no support */
+  @supports not ((-webkit-backdrop-filter: blur(2.5px)) or (backdrop-filter: blur(2.5px))) {
+    background: rgba(0,0,0,0.38);
+  }
+}
+.hero-banner__title.pro-title {
+  font-size: 2.7rem;
+  font-weight: 900;
+  margin-bottom: 0.6rem;
+  letter-spacing: -1.5px;
+  color: #1a237e;
+  text-shadow: 0 2px 12px rgba(0,0,0,0.13);
+}
+.hero-banner__subtitle.pro-subtitle {
+  font-size: 1.45rem;
+  font-weight: 600;
+  margin-bottom: 1.1rem;
+  color: #bbf7d0;
+  text-shadow: 0 1px 8px rgba(22,163,74,0.13);
+}
+.hero-banner__desc.pro-desc {
+  font-size: 1.18rem;
+  margin-bottom: 1.5rem;
+  color: #64748b;
+  opacity: 0.97;
+}
+.hero-banner__cta {
+  display: inline-block;
+  background: linear-gradient(90deg, #16a34a 60%, #22d3ee 100%);
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.08rem;
+  padding: 0.7rem 2.1rem;
+  border-radius: 999px;
+  margin-bottom: 1.3rem;
+  margin-top: 0.2rem;
+  text-decoration: none;
+  box-shadow: 0 2px 12px rgba(22,163,74,0.13);
+  transition: background 0.2s, box-shadow 0.2s, transform 0.13s;
+  outline: none;
+}
+.hero-banner__cta:hover, .hero-banner__cta:focus {
+  background: linear-gradient(90deg, #22d3ee 0%, #16a34a 100%);
+  box-shadow: 0 4px 24px rgba(34,211,238,0.18);
+  transform: translateY(-2px) scale(1.04);
+}
+.hero-banner__dots {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.7rem;
+}
+.hero-banner__dots span {
+  display: inline-block;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: #fff;
+  opacity: 0.32;
+  cursor: pointer;
+  transition: opacity 0.2s, background 0.2s, transform 0.13s;
+  border: 2px solid #16a34a;
+}
+.hero-banner__dots span.active {
+  opacity: 1;
+  background: #16a34a;
+  transform: scale(1.18);
+}
+.animate-fade-in {
+  animation: fadeIn 0.7s cubic-bezier(.4,1.4,.6,1) 1;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes hero-slide-in {
+  from { opacity: 0; transform: scale(0.98) translateY(30px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+@media (max-width: 700px) {
+  .hero-banner {
+    min-height: 170px;
+    border-radius: 10px;
+  }
+  .hero-banner__overlay {
+    padding: 1.2rem 0.5rem 1rem 0.5rem;
+    border-radius: 10px;
+    max-width: 98vw;
+  }
+  .hero-banner__title.pro-title {
+    font-size: 1.3rem;
+  }
+  .hero-banner__subtitle.pro-subtitle {
+    font-size: 1.05rem;
+  }
+  .hero-banner__desc.pro-desc {
+    font-size: 0.97rem;
+  }
+  .hero-banner__cta {
+    font-size: 0.98rem;
+    padding: 0.5rem 1.2rem;
+  }
+}

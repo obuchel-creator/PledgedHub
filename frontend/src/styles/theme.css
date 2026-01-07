@@ -2,28 +2,25 @@
 
 /* Variables - Professional Color Scheme */
 :root {
-  /* Primary: Deep Blue - Trust & Stability */
-  --primary: #2563eb;
-  --primary-dark: #1e40af;
-  --primary-light: #3b82f6;
-  
-  /* Secondary: Emerald Green - Growth & Impact */
-  --secondary: #10b981;
-  --secondary-dark: #059669;
-  --secondary-light: #34d399;
-  
-  /* Accent: Gold - Premium & Achievement */
-  --accent: #f59e0b;
-  --accent-dark: #d97706;
-  --accent-light: #fbbf24;
-  
-  /* Legacy compatibility */
+  /* Brand: Deep Navy, Gold, Soft Gray */
+  --primary: #17223b;           /* Deep navy blue */
+  --primary-dark: #10182a;
+  --primary-light: #263159;
+
+  --secondary: #eab308;         /* Gold (accent) */
+  --secondary-dark: #b38600;
+  --secondary-light: #fef9c3;
+
+  --accent: #a3a3a3;            /* Soft gray accent */
+  --accent-dark: #737373;
+  --accent-light: #e5e7eb;
+
   --bg: #ffffff;
-  --text: #1f2937;
+  --text: #17223b;
   --muted: #6b7280;
   --border: #e5e7eb;
-  --input-bg: #f9fafb;
-  --focus-rgb: 37, 99, 235; /* Primary Blue */
+  --input-bg: #f3f4f6;
+  --focus-rgb: 23, 34, 59; /* Primary Deep Navy */
   --container-max-width: 1100px;
   --radius: 8px;
   --base-line: 1.6;
@@ -32,28 +29,28 @@
 /* Light Theme - Professional */
 body.light-theme {
   --bg: #ffffff;
-  --text: #1f2937;
+  --text: #17223b;
   --muted: #6b7280;
-  --primary: #2563eb;
-  --secondary: #10b981;
-  --accent: #f59e0b;
+  --primary: #17223b;
+  --secondary: #eab308;
+  --accent: #a3a3a3;
   --border: #e5e7eb;
-  --input-bg: #f9fafb;
+  --input-bg: #f3f4f6;
   background: var(--bg);
   color: var(--text);
 }
 
 /* Dark Theme - Professional */
 body.dark-theme {
-  --bg: #111827;
+  --bg: #10182a;
   --text: #f3f4f6;
-  --muted: #d1d5db;
-  --primary: #3b82f6;
-  --secondary: #34d399;
-  --accent: #fbbf24;
-  --border: #374151;
-  --input-bg: #1f2937;
-  --focus-rgb: 59, 130, 246;
+  --muted: #e5e7eb;
+  --primary: #263159;
+  --secondary: #eab308;
+  --accent: #a3a3a3;
+  --border: #23293a;
+  --input-bg: #17223b;
+  --focus-rgb: 234, 179, 8;
   background: var(--bg);
   color: var(--text);
 }

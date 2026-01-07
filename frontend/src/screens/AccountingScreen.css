@@ -1,16 +1,61 @@
+/* Accessibility & Focus States */
+.tab-button:focus-visible,
+.btn:focus-visible,
+.btn-primary:focus-visible,
+.btn-secondary:focus-visible,
+.form-group input:focus-visible,
+.form-group textarea:focus-visible,
+.form-group select:focus-visible {
+  outline: 2px solid var(--secondary);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(var(--focus-rgb), 0.18);
+  border-color: var(--secondary);
+}
+
+/* Button hover/focus for accessibility */
+.btn-primary:hover,
+.btn-primary:focus-visible {
+  background: var(--secondary-dark);
+  color: var(--primary-dark);
+}
+.btn-secondary:hover,
+.btn-secondary:focus-visible {
+  background: var(--accent);
+  color: var(--primary);
+}
+
+/* High contrast for table rows on hover/focus */
+.entries-table tbody tr:hover,
+.accounts-table tbody tr:hover,
+.trial-balance-table tbody tr:hover,
+.entries-table tbody tr:focus-visible,
+.accounts-table tbody tr:focus-visible,
+.trial-balance-table tbody tr:focus-visible {
+  background: var(--accent-light);
+  outline: 2px solid var(--secondary);
+}
+
+/* Ensure sufficient contrast for .net-income-row */
+.net-income-row {
+  font-weight: 700;
+  font-size: 1.1rem;
+  background: var(--primary-light);
+  color: var(--secondary);
+  border: 2px solid var(--secondary-dark);
+}
 .accounting-page {
-  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+  background: var(--primary);
   min-height: 100vh;
   padding-top: 4.5rem;
   padding-bottom: 3rem;
 }
 
 .accounting-header {
-  background: linear-gradient(135deg, #2563eb 0%, #1e40af 50%, #f093fb 100%);
-  color: white;
+  background: var(--primary-dark);
+  color: var(--secondary);
   padding: 2.5rem;
   text-align: center;
-  box-shadow: 0 10px 30px rgba(37, 99, 235, 0.3);
+  box-shadow: 0 10px 30px rgba(23, 34, 59, 0.18);
 }
 
 .accounting-header h1 {
@@ -55,35 +100,35 @@
   display: flex;
   gap: 1rem;
   padding: 2rem;
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--bg);
   border-radius: 8px;
   margin: 2rem;
   flex-wrap: wrap;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+  box-shadow: 0 4px 12px rgba(23, 34, 59, 0.08);
 }
 
 .tab-button {
   padding: 0.75rem 1.5rem;
-  border: 2px solid #e0e0e0;
-  background: white;
+  border: 2px solid var(--border);
+  background: var(--bg);
   border-radius: 6px;
   cursor: pointer;
   font-weight: 600;
   font-size: 0.95rem;
   transition: all 0.3s ease;
-  color: #333;
+  color: var(--primary);
 }
 
 .tab-button:hover {
-  border-color: #2563eb;
-  color: #2563eb;
+  border-color: var(--secondary);
+  color: var(--secondary);
 }
 
 .tab-button.active {
-  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
-  color: white;
-  border-color: transparent;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+  background: var(--secondary);
+  color: var(--primary-dark);
+  border-color: var(--secondary-dark);
+  box-shadow: 0 4px 12px rgba(234, 179, 8, 0.18);
 }
 
 /* Tab Content */
@@ -102,11 +147,11 @@
 }
 
 .financial-card {
-  background: white;
+  background: var(--bg);
   border-radius: 12px;
   padding: 1.75rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  border-left: 6px solid #2563eb;
+  box-shadow: 0 4px 12px rgba(23, 34, 59, 0.08);
+  border-left: 6px solid var(--secondary);
   transition: all 0.3s ease;
 }
 
@@ -117,7 +162,7 @@
 
 .financial-card h3 {
   font-size: 0.95rem;
-  color: #999;
+  color: var(--muted);
   text-transform: uppercase;
   letter-spacing: 1px;
   margin-bottom: 0.75rem;
@@ -127,13 +172,13 @@
 .financial-card .amount {
   font-size: 2rem;
   font-weight: 700;
-  color: #333;
+  color: var(--primary);
   margin: 0.5rem 0;
 }
 
 .financial-card .label {
   font-size: 0.85rem;
-  color: #999;
+  color: var(--muted);
   display: block;
 }
 
@@ -160,7 +205,6 @@
 .financial-card.equity h3 {
   color: #2196f3;
 }
-
 .financial-card.revenue {
   border-left-color: #4caf50;
 }
@@ -169,42 +213,43 @@
   color: #4caf50;
 }
 
+.financial-card.assets {
+/* Removed stray closing brace above */
+  border-left-color: var(--secondary);
+}
+.financial-card.assets h3 {
+  color: var(--secondary);
+}
+.financial-card.liabilities {
+  border-left-color: var(--accent);
+}
+.financial-card.liabilities h3 {
+  color: var(--accent);
+}
+.financial-card.equity {
+  border-left-color: var(--primary-light);
+}
+.financial-card.equity h3 {
+  color: var(--primary-light);
+}
+.financial-card.revenue {
+  border-left-color: var(--secondary-dark);
+}
+.financial-card.revenue h3 {
+  color: var(--secondary-dark);
+}
 .financial-card.expenses {
-  border-left-color: #c62828;
+  border-left-color: var(--accent-dark);
 }
-
 .financial-card.expenses h3 {
-  color: #c62828;
+  color: var(--accent-dark);
 }
-
 .financial-card.net-income {
-  border-left-color: #2563eb;
+  border-left-color: var(--primary);
 }
 
 .financial-card.net-income h3 {
-  color: #2563eb;
-}
-
-.financial-card .amount.positive {
-  color: #4caf50;
-}
-
-.financial-card .amount.negative {
-  color: #c62828;
-}
-
-/* Accounting Equation */
-.accounting-equation {
-  background: white;
-  border-radius: 12px;
-  padding: 2rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  margin-bottom: 2rem;
-}
-
-.accounting-equation h3 {
-  margin-bottom: 1.5rem;
-  color: #333;
+  color: var(--primary);
 }
 
 .equation-display {
@@ -216,13 +261,15 @@
 }
 
 .equation-item {
-  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
-  color: white;
+  background: var(--primary-light);
+  color: var(--secondary);
   padding: 1.5rem;
   border-radius: 8px;
   flex: 1;
   min-width: 150px;
   text-align: center;
+  /* Edge fallback for gradients */
+  background-image: none;
 }
 
 .equation-label {
@@ -238,20 +285,21 @@
   font-weight: 700;
 }
 
-.equation-operator {
-  font-size: 1.5rem;
-  color: #2563eb;
-  font-weight: bold;
+  .financial-card .amount.positive {
+    color: var(--secondary);
+  }
+  .financial-card .amount.negative {
+    color: var(--accent-dark);
 }
 
 /* Journal Section */
 .journal-section,
 .accounts-section,
 .reports-section {
-  background: white;
+  background: var(--bg);
   border-radius: 12px;
   padding: 2rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(23, 34, 59, 0.08);
   margin-bottom: 2rem;
 }
 
@@ -270,7 +318,7 @@
 .form-group label {
   display: block;
   margin-bottom: 0.5rem;
-  color: #333;
+  color: var(--primary);
   font-weight: 600;
   font-size: 0.95rem;
 }
@@ -280,7 +328,7 @@
 .form-group select {
   width: 100%;
   padding: 0.75rem 1rem;
-  border: 2px solid #e0e0e0;
+  border: 2px solid var(--border);
   border-radius: 6px;
   font-size: 1rem;
   font-family: inherit;
@@ -291,8 +339,8 @@
 .form-group textarea:focus,
 .form-group select:focus {
   outline: none;
-  border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  border-color: var(--secondary);
+  box-shadow: 0 0 0 3px rgba(234, 179, 8, 0.12);
 }
 
 .form-row {
@@ -303,7 +351,7 @@
 
 /* Journal Lines */
 .journal-lines {
-  background: #f8f9fa;
+  background: var(--accent-light);
   border-radius: 8px;
   padding: 1.5rem;
   margin-bottom: 1rem;
@@ -311,7 +359,7 @@
 
 .journal-lines h3 {
   margin-bottom: 1rem;
-  color: #333;
+  color: var(--primary);
 }
 
 .journal-line {
@@ -329,8 +377,8 @@
 
 .btn-remove {
   padding: 0.5rem 0.75rem;
-  background: #c62828;
-  color: white;
+  background: var(--accent-dark);
+  color: var(--bg);
   border: none;
   border-radius: 4px;
   cursor: pointer;
@@ -339,7 +387,7 @@
 }
 
 .btn-remove:hover {
-  background: #b71c1c;
+  background: var(--primary-dark);
 }
 
 /* Tables */
@@ -354,8 +402,8 @@
 .entries-table th,
 .accounts-table th,
 .trial-balance-table th {
-  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
-  color: white;
+  background: var(--primary-light);
+  color: var(--secondary);
   padding: 1rem;
   text-align: left;
   font-weight: 600;
@@ -379,7 +427,7 @@
 .trial-balance-table .amount {
   text-align: right;
   font-weight: 600;
-  color: #2563eb;
+  color: var(--secondary);
 }
 
 .accounts-table .code {
@@ -390,7 +438,7 @@
 .accounts-table .type {
   text-transform: uppercase;
   font-size: 0.85rem;
-  color: #999;
+  color: var(--muted);
   letter-spacing: 0.5px;
 }
 
@@ -418,7 +466,7 @@
 
 .report-view h3 {
   margin-bottom: 1.5rem;
-  color: #333;
+  color: var(--primary);
   text-transform: uppercase;
   letter-spacing: 1px;
 }
@@ -495,7 +543,7 @@
 /* Empty Message */
 .empty-message {
   text-align: center;
-  color: #999;
+  color: var(--muted);
   padding: 2rem;
   font-style: italic;
 }
@@ -512,14 +560,14 @@
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
-  color: white;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+  background: var(--secondary);
+  color: var(--primary-dark);
+  box-shadow: 0 4px 12px rgba(234, 179, 8, 0.18);
 }
 
 .btn-primary:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+  box-shadow: 0 6px 20px rgba(234, 179, 8, 0.28);
 }
 
 .btn-primary:disabled {
@@ -527,13 +575,10 @@
   cursor: not-allowed;
 }
 
-.btn-secondary {
-  background: #e0e0e0;
-  color: #333;
-}
 
-.btn-secondary:hover {
-  background: #d0d0d0;
+.btn-secondary {
+  background: var(--border);
+  color: var(--primary);
 }
 
 /* Responsive Design */

@@ -25,17 +25,18 @@ async function demonstrateAccounting() {
       date: new Date(),
       description: 'Sample: Pledge received for School Library Campaign',
       reference: 'PLEDGE-001',
+      userId: 1, // Use admin user or a valid user ID
       lines: [
         {
           accountId: cashAccount.id,
-          type: 'debit',
-          amount: 5000000,
+          debit: 5000000,
+          credit: 0,
           description: 'Cash received from donor'
         },
         {
           accountId: pledgeIncome.id,
-          type: 'credit',
-          amount: 5000000,
+          debit: 0,
+          credit: 5000000,
           description: 'Pledge income recorded'
         }
       ]
@@ -46,17 +47,17 @@ async function demonstrateAccounting() {
 
       // Get account balances
       console.log('\n💰 Account Balances After Entry:');
-      const cashBalance = await Account.getBalance(cashAccount.id);
-      const incomeBalance = await Account.getBalance(pledgeIncome.id);
+      const cashBalance = await Account.getWithBalance(cashAccount.id);
+      const incomeBalance = await Account.getWithBalance(pledgeIncome.id);
 
       console.log(`Cash (1000):`);
-      console.log(`  Debits: ${cashBalance.debit.toLocaleString('en-UG')}`);
-      console.log(`  Credits: ${cashBalance.credit.toLocaleString('en-UG')}`);
+      console.log(`  Debits: ${cashBalance.total_debit.toLocaleString('en-UG')}`);
+      console.log(`  Credits: ${cashBalance.total_credit.toLocaleString('en-UG')}`);
       console.log(`  Balance: ${cashBalance.balance.toLocaleString('en-UG')}`);
 
       console.log(`\nPledge Income (4000):`);
-      console.log(`  Debits: ${incomeBalance.debit.toLocaleString('en-UG')}`);
-      console.log(`  Credits: ${incomeBalance.credit.toLocaleString('en-UG')}`);
+      console.log(`  Debits: ${incomeBalance.total_debit.toLocaleString('en-UG')}`);
+      console.log(`  Credits: ${incomeBalance.total_credit.toLocaleString('en-UG')}`);
       console.log(`  Balance: ${incomeBalance.balance.toLocaleString('en-UG')}`);
 
       console.log('\n✨ Accounting system is working correctly!');

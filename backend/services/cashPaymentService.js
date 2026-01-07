@@ -324,7 +324,7 @@ class CashPaymentService {
           u.phone as collector_phone,
           p.donor_name,
           p.amount as pledge_amount,
-          c.name as creator_name,
+          c.title as creator_name,
           DATEDIFF(NOW(), cd.collection_date) as days_pending
         FROM cash_deposits cd
         JOIN users u ON cd.collected_by = u.id
@@ -415,7 +415,7 @@ class CashPaymentService {
           u_verified.name as verified_by_name,
           p.donor_name as pledge_donor_name,
           p.amount as pledge_amount,
-          c.name as creator_name
+          c.title as creator_name
         FROM cash_deposits cd
         LEFT JOIN users u_collector ON cd.collected_by = u_collector.id
         LEFT JOIN users u_verified ON cd.verified_by = u_verified.id

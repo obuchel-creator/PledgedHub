@@ -25,6 +25,7 @@ export default function AboutScreen() {
         <section
           className="section card"
           aria-labelledby="about-mission"
+          style={{ background: '#fff', color: '#1f2937' }}
         >
           <h2
             id="about-mission"
@@ -74,6 +75,7 @@ export default function AboutScreen() {
         <section
           className="section card"
           aria-labelledby="about-values"
+          style={{ background: '#fff', color: '#1f2937' }}
         >
           <h2
             id="about-values"
@@ -114,6 +116,7 @@ export default function AboutScreen() {
         <section
           className="section card"
           aria-labelledby="about-impact"
+          style={{ background: '#fff', color: '#1f2937' }}
         >
           <h2
             id="about-impact"

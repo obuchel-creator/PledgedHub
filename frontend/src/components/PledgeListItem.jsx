@@ -20,7 +20,7 @@ function PledgeListItem({ pledge }) {
   console.log('🔍 [PledgeListItem] Rendering pledge:', { id, hasId: !!id, pledge });
   const details = parsePledgeMessage(pledge?.message);
   const purposeDisplay = details.purpose || pledge?.title || pledge?.name || pledge?.purpose || 'Pledge';
-  const donorName = pledge?.donorName || pledge?.donor_name || pledge?.fullName || 'Anonymous';
+  const donorName = pledge?.donor_name || pledge?.fullName || 'Anonymous';
   const pledgeDateDisplay = formatDateShort(details.pledgeDate || pledge?.date || pledge?.created_at);
   const collectionDateDisplay = formatDateShort(details.collectionDate || pledge?.collection_date);
   const amountDisplay = formatCurrency(pledge?.amount ?? pledge?.goal) || 'Amount unavailable';

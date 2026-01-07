@@ -173,7 +173,7 @@ async function getCampaignPerformance(userId, dateRange = {}) {
     const query = `
       SELECT 
         c.id,
-        c.name as title,
+        c.title as title,
         c.target_amount as goal_amount,
         COALESCE(SUM(p.amount), 0) as current_amount,
         c.status,
@@ -186,7 +186,7 @@ async function getCampaignPerformance(userId, dateRange = {}) {
       FROM campaigns c
       LEFT JOIN pledges p ON c.id = p.campaign_id
       WHERE c.created_at BETWEEN ? AND ?
-      GROUP BY c.id, c.name, c.target_amount, c.status, c.created_at
+      GROUP BY c.id, c.title, c.target_amount, c.status, c.created_at
       ORDER BY COALESCE(SUM(p.amount), 0) DESC
     `;
 
@@ -448,7 +448,7 @@ async function getTopCampaigns(userId, limit = 10, metric = 'revenue') {
     const query = `
       SELECT 
         c.id,
-        c.name as title,
+        c.title as title,
         c.target_amount as goal_amount,
         COALESCE(SUM(p.amount), 0) as current_amount,
         (COALESCE(SUM(p.amount), 0) / NULLIF(c.target_amount, 0) * 100) as completion_rate,
@@ -459,7 +459,7 @@ async function getTopCampaigns(userId, limit = 10, metric = 'revenue') {
       FROM campaigns c
       LEFT JOIN pledges p ON c.id = p.campaign_id
       WHERE c.user_id = ?
-      GROUP BY c.id, c.name, c.target_amount, c.created_at
+      GROUP BY c.id, c.title, c.target_amount, c.created_at
       ORDER BY ${orderBy[metric] || orderBy.revenue}
       LIMIT ?
     `;

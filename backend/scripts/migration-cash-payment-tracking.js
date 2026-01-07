@@ -213,7 +213,7 @@ async function migrate() {
           u.name as collector_name,
           u.phone as collector_phone,
           p.donor_name,
-          c.name as creator_name,
+          c.title as creator_name,
           cd.verification_status,
           DATEDIFF(NOW(), cd.collection_date) as days_pending
         FROM cash_deposits cd

@@ -82,9 +82,9 @@ async function verifyPledge(token) {
       return { success: false, error: 'Token is required' };
     }
 
-    // Find pledge by token
+    // Find pledge by token (enforce soft delete)
     const [pledges] = await pool.execute(
-      'SELECT * FROM pledges WHERE verification_token = ? AND is_verified = FALSE',
+      'SELECT * FROM pledges WHERE verification_token = ? AND is_verified = FALSE AND deleted = 0',
       [token]
     );
 

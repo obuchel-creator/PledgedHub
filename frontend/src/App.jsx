@@ -4,12 +4,12 @@ import Navbar from './components/Navbar';
 import ProtectedRoute from './components/ProtectedRoute';
 
 // Global error logging
-console.log('🟢 App.jsx: Loading');
+// Removed debug log
 window.addEventListener('error', (event) => {
-  console.error('❌ Global JavaScript Error:', event.error, event);
+  window.alert('A global error occurred. See console for details.');
 });
 window.addEventListener('unhandledrejection', (event) => {
-  console.error('❌ Unhandled Promise Rejection:', event.reason);
+  window.alert('An unhandled promise rejection occurred. See console for details.');
 });
 
 // Design System Imports
@@ -38,17 +38,17 @@ import PaymentInitiationScreen from './screens/PaymentInitiationScreen';
 import GuestPledgeScreen from './screens/GuestPledgeScreen';
 import CashAccountabilityDashboard from './screens/CashAccountabilityDashboard';
 import NotFoundScreen from './screens/NotFoundScreen';
+import ExploreScreen from './screens/ExploreScreen';
 import HelpScreen from './screens/HelpScreen';
 import PrivacyScreen from './screens/PrivacyScreen';
 import TermsScreen from './screens/TermsScreen';
 import VerifyPledgeScreen from './screens/VerifyPledgeScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import SharePledgeScreen from './screens/SharePledgeScreen';
-import DemoDashboardScreen from './screens/DemoDashboardScreen';
 import PricingScreen from './screens/PricingScreen';
 
 function App() {
-  console.log('🟢 App component: Rendering');
+  // Removed debug log
   return (
     <Router>
       <Navbar />
@@ -73,11 +73,11 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="/explore" element={<ExploreScreen />} />
         <Route path="/about" element={<AboutScreen />} />
         <Route path="/fundraising" element={<FundraisingScreen />} />
         <Route path="/campaign/:slug" element={<GuestPledgeScreen />} />
         <Route path="/campaigns/:id" element={<GuestPledgeScreen />} />
-        <Route path="/explore" element={<DemoDashboardScreen />} />
         <Route path="/pledges/:id" element={
           <ProtectedRoute>
             <PledgeDetailScreen />

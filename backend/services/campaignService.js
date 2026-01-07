@@ -56,7 +56,7 @@ async function getAllCampaigns({ status } = {}) {
         let sql = `
             SELECT 
                 c.id,
-                c.name as title,
+                c.title as title,
                 c.description,
                 c.target_amount as goal_amount,
                 c.suggested_amount as suggested_amount,

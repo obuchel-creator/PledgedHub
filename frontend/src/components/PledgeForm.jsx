@@ -6,7 +6,7 @@ const PledgeForm = ({ onSubmit, onCancel, initialData = {}, loading = false, use
   const [formData, setFormData] = useState({
     title: initialData.title || '',
     amount: initialData.amount || '',
-    donorName: initialData.donorName || '',
+    donor_name: initialData.donor_name || '',
     phone: userPhone || initialData.phone || '',
     email: initialData.email || '',
     message: initialData.message || '',
@@ -36,8 +36,8 @@ const PledgeForm = ({ onSubmit, onCancel, initialData = {}, loading = false, use
       newErrors.amount = 'Valid amount is required';
     }
 
-    if (!formData.donorName.trim()) {
-      newErrors.donorName = 'Donor name is required';
+    if (!formData.donor_name.trim()) {
+      newErrors.donor_name = 'Donor name is required';
     }
 
     // Phone is required
@@ -134,20 +134,20 @@ const PledgeForm = ({ onSubmit, onCancel, initialData = {}, loading = false, use
       </div>
 
       <div style={{ marginBottom: '16px' }}>
-        <label style={labelStyle} htmlFor="donorName">
+        <label style={labelStyle} htmlFor="donor_name">
           Donor Name *
         </label>
         <input
-          id="donorName"
-          name="donorName"
+          id="donor_name"
+          name="donor_name"
           type="text"
-          value={formData.donorName}
+          value={formData.donor_name}
           onChange={handleChange}
           style={inputStyle}
           placeholder="Enter donor name"
           disabled={loading}
         />
-        {errors.donorName && <div style={errorStyle}>{errors.donorName}</div>}
+        {errors.donor_name && <div style={errorStyle}>{errors.donor_name}</div>}
       </div>
 
       <div style={{ marginBottom: '16px' }}>

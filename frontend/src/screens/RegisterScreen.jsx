@@ -88,50 +88,42 @@ function RegisterScreen({ disableRequired = false }) {
     setError('');
     setStatus('⏳ Creating account...');
     try {
+      // Auto-generate username: firstName + last 4 digits of phone
+      const phoneDigits = form.phone.replace(/\D/g, '');
+      const base = form.firstName.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+      const suffix = phoneDigits.slice(-4);
+      const username = `${base}${suffix}`;
       const payload = {
         name: (form.firstName + ' ' + form.lastName).trim(),
         email: form.email.trim() ? form.email.trim() : null,
         phone: form.phone.trim(),
         password: form.password,
+        username,
       };
       console.log('📝 RegisterScreen: Submitting registration with payload:', payload);
       setStatus('⏳ Sending to server...');
-      
       // Use context's register function which handles token + user data loading
       const result = await register(payload);
       console.log('✅ RegisterScreen: Registration result:', result);
-      
       if (result && result.token) {
         console.log('✅ RegisterScreen: Token received and user context loaded');
         setStatus('✅ Account created! Redirecting to dashboard...');
-        
         // The context's register() already called refreshUser() and set loading=false
         // Now we can safely navigate
         console.log('✅ RegisterScreen: Navigating to dashboard');
         navigate('/dashboard', { replace: true });
       } else {
-        console.log('❌ RegisterScreen: No token in result:', result);
+        // Show backend error (duplicate phone/email, password strength, etc)
         const errorMsg = result?.error || 'Registration failed. Please try again.';
         setError(errorMsg);
         setStatus('');
       }
     } catch (err) {
-      // If the error has a specific message, use it; otherwise, use 'Server error'
+      // Show network/server error
       console.error('❌ RegisterScreen: Catch error:', err);
-      const msg = err?.response?.data?.message || err?.message || err?.toString();
-      console.error('Error details:', msg);
-      if (msg && (
-        msg.toLowerCase().includes('invalid email address') ||
-        msg.toLowerCase().includes('passwords do not match') ||
-        msg.toLowerCase().includes('phone number must be in format')
-      )) {
-        setError(msg);
-        setStatus('');
-      } else {
-        const fallbackError = msg?.toLowerCase().includes('network') ? 'Network error' : 'Network error';
-        setError(fallbackError);
-        setStatus('');
-      }
+      const msg = err?.response?.data?.error || err?.response?.data?.message || err?.message || err?.toString();
+      setError(msg || 'Server error. Please try again.');
+      setStatus('');
     } finally {
       setLoading(false);
     }

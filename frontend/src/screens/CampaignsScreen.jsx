@@ -86,8 +86,14 @@ const CampaignsScreen = () => {
 
   return (
     <div className="campaigns-container">
+      {/* Hero/Intro Section */}
+      <div className="explore-hero">
+        <h1 className="explore-hero__title">Explore Fundraising Campaigns</h1>
+        <p className="explore-hero__desc">Discover, support, and track impactful campaigns across Africa. Join the movement and make a difference!</p>
+      </div>
+
       <div className="campaigns-header">
-        <h1>🎯 Campaigns</h1>
+        <h2>All Campaigns</h2>
         {isAdmin && (
           <button
             className="btn-primary"
@@ -101,7 +107,7 @@ const CampaignsScreen = () => {
       {error && <div className="error-message">{error}</div>}
 
       {showCreateForm && isAdmin && (
-        <div className="campaign-form-card">
+        <div className="campaign-form-card polished-form">
           <h2>Create New Campaign</h2>
           <form onSubmit={handleSubmit}>
             <div className="form-group">
@@ -170,56 +176,53 @@ const CampaignsScreen = () => {
 
       <div className="campaigns-grid">
         {campaigns.length === 0 ? (
-          <div className="no-campaigns">
+          <div className="no-campaigns polished-empty">
             <p>No campaigns yet.</p>
             {isAdmin && <p>Create your first campaign to get started!</p>}
           </div>
         ) : (
           campaigns.map((campaign) => {
-            // Prefer slug, fallback to event_code or id
             const slug = campaign.slug || campaign.event_code || campaign.id;
+            const goal = parseInt(campaign.targetAmount || campaign.goal) || 0;
+            const raised = parseInt(campaign.currentAmount || campaign.raised) || 0;
+            const progress = goal > 0 ? Math.min(raised / goal, 1) : 0;
             return (
-              <div key={campaign.id} className="campaign-card">
+              <div key={campaign.id} className="campaign-card polished-card">
                 <div className="campaign-header">
                   <h3>{campaign.name}</h3>
                   {campaign.status && (
-                    <span className={`campaign-status ${campaign.status}`}>
-                      {campaign.status}
-                    </span>
+                    <span className={`campaign-status ${campaign.status}`}>{campaign.status}</span>
                   )}
                 </div>
                 {campaign.description && (
                   <p className="campaign-description">{campaign.description}</p>
                 )}
-                {(campaign.targetAmount || campaign.goal) && (
+                {(goal > 0) && (
                   <div className="campaign-stats">
                     <div className="stat">
                       <span className="label">Target:</span>
-                      <span className="value">
-                        UGX {parseInt(campaign.targetAmount || campaign.goal).toLocaleString()}
-                      </span>
+                      <span className="value">UGX {goal.toLocaleString()}</span>
                     </div>
-                    {(campaign.currentAmount || campaign.raised) && (
-                      <div className="stat">
-                        <span className="label">Raised:</span>
-                        <span className="value">
-                          UGX {parseInt(campaign.currentAmount || campaign.raised).toLocaleString()}
-                        </span>
-                      </div>
-                    )}
+                    <div className="stat">
+                      <span className="label">Raised:</span>
+                      <span className="value">UGX {raised.toLocaleString()}</span>
+                    </div>
+                  </div>
+                )}
+                {/* Progress Bar */}
+                {goal > 0 && (
+                  <div className="campaign-progress-bar">
+                    <div className="campaign-progress-bar__fill" style={{ width: `${progress * 100}%` }} />
+                    <span className="campaign-progress-bar__text">{Math.round(progress * 100)}%</span>
                   </div>
                 )}
                 {(campaign.startDate || campaign.endDate || campaign.start_date || campaign.end_date) && (
                   <div className="campaign-dates">
                     {(campaign.startDate || campaign.start_date) && (
-                      <div className="date">
-                        📅 Start: {new Date(campaign.startDate || campaign.start_date).toLocaleDateString()}
-                      </div>
+                      <div className="date">📅 Start: {new Date(campaign.startDate || campaign.start_date).toLocaleDateString()}</div>
                     )}
                     {(campaign.endDate || campaign.end_date) && (
-                      <div className="date">
-                        🏁 End: {new Date(campaign.endDate || campaign.end_date).toLocaleDateString()}
-                      </div>
+                      <div className="date">🏁 End: {new Date(campaign.endDate || campaign.end_date).toLocaleDateString()}</div>
                     )}
                   </div>
                 )}
@@ -247,8 +250,8 @@ const CampaignsScreen = () => {
                       contentType="campaign"
                       contentData={{
                         title: campaign.name,
-                        goalAmount: campaign.targetAmount || campaign.goal,
-                        raisedAmount: campaign.currentAmount || campaign.raised || 0,
+                        goalAmount: goal,
+                        raisedAmount: raised,
                       }}
                       contentId={campaign.id}
                       shareUrl={`${window.location.origin}/campaigns/${campaign.id}`}

@@ -32,7 +32,10 @@ router.post('/setup', authenticateToken, async (req, res) => {
             'UPDATE users SET two_factor_secret = ?, two_factor_enabled = 0 WHERE id = ?',
             [secret.base32, userId]
         );
-        
+        // Audit log
+        const { auditRoleAccess } = require('../middleware/authMiddleware');
+        await auditRoleAccess(userId, '2fa_setup', { secret: 'generated' });
+
         res.json({
             success: true,
             data: {
@@ -86,7 +89,10 @@ router.post('/verify', authenticateToken, async (req, res) => {
             'UPDATE users SET two_factor_enabled = 1 WHERE id = ?',
             [userId]
         );
-        
+        // Audit log
+        const { auditRoleAccess } = require('../middleware/authMiddleware');
+        await auditRoleAccess(userId, '2fa_verify', { verified: true });
+
         res.json({
             success: true,
             message: 'Two-factor authentication enabled successfully'
@@ -129,7 +135,10 @@ router.post('/disable', authenticateToken, async (req, res) => {
             'UPDATE users SET two_factor_enabled = 0, two_factor_secret = NULL WHERE id = ?',
             [userId]
         );
-        
+        // Audit log
+        const { auditRoleAccess } = require('../middleware/authMiddleware');
+        await auditRoleAccess(userId, '2fa_disable', { disabled: true });
+
         res.json({
             success: true,
             message: 'Two-factor authentication disabled'

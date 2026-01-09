@@ -1,16 +1,23 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FaChartBar, FaMoneyBillWave, FaUsers, FaRobot, FaMobileAlt, FaShieldAlt } from 'react-icons/fa';
 import './ExploreScreen.css';
+import {
+  getAnalyticsOverview,
+  getCampaigns,
+  getPayments,
+  getAIStatus,
+  getReminderStatus,
+} from '../services/api';
 
-const dummyStats = [
-  { icon: <FaUsers />, label: 'Active Donors', value: '2,340+' },
-  { icon: <FaMoneyBillWave />, label: 'Total Pledges', value: 'UGX 120M+' },
-  { icon: <FaChartBar />, label: 'Campaigns', value: '58' },
-  { icon: <FaMobileAlt />, label: 'Mobile Payments', value: 'UGX 80M' },
-  { icon: <FaRobot />, label: 'AI Reminders Sent', value: '4,200+' },
-  { icon: <FaShieldAlt />, label: 'Security Events', value: '0 Critical' },
-];
+const statIcons = {
+  donors: <FaUsers />,
+  pledges: <FaMoneyBillWave />,
+  campaigns: <FaChartBar />,
+  payments: <FaMobileAlt />,
+  ai: <FaRobot />,
+  security: <FaShieldAlt />,
+};
 
 const features = [
   {
@@ -44,6 +51,59 @@ const features = [
 ];
 
 export default function ExploreScreen() {
+  const [stats, setStats] = useState({
+    donors: 0,
+    pledges: 0,
+    campaigns: 0,
+    payments: 0,
+    aiReminders: 0,
+    securityEvents: 0,
+  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    async function fetchStats() {
+      setLoading(true);
+      setError('');
+      try {
+        // Fetch analytics overview
+        const overview = await getAnalyticsOverview();
+        // Fetch campaigns count
+        const campaignsRes = await getCampaigns('active');
+        // Fetch payments summary
+        const paymentsRes = await getPayments({});
+        // Fetch AI status (reminders sent)
+        const aiStatus = await getAIStatus();
+        // Fetch security events (critical count)
+        const reminderStatus = await getReminderStatus();
+
+        setStats({
+          donors: overview?.activeDonors || 0,
+          pledges: overview?.totalPledges || 0,
+          campaigns: Array.isArray(campaignsRes?.data?.campaigns) ? campaignsRes.data.campaigns.length : 0,
+          payments: overview?.totalCollected || 0,
+          aiReminders: aiStatus?.data?.remindersSent || 0,
+          securityEvents: reminderStatus?.data?.criticalEvents || 0,
+        });
+      } catch (err) {
+        setError(err?.message || 'Failed to load stats');
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchStats();
+  }, []);
+
+  const statCards = [
+    { icon: statIcons.donors, label: 'Active Donors', value: stats.donors },
+    { icon: statIcons.pledges, label: 'Total Pledges', value: stats.pledges },
+    { icon: statIcons.campaigns, label: 'Campaigns', value: stats.campaigns },
+    { icon: statIcons.payments, label: 'Mobile Payments', value: `UGX ${Number(stats.payments).toLocaleString()}` },
+    { icon: statIcons.ai, label: 'AI Reminders Sent', value: stats.aiReminders },
+    { icon: statIcons.security, label: 'Security Events', value: `${stats.securityEvents} Critical` },
+  ];
+
   return (
     <div className="explore-main">
       <section className="explore-hero">
@@ -53,13 +113,23 @@ export default function ExploreScreen() {
       </section>
 
       <section className="explore-stats">
-        {dummyStats.map((stat, i) => (
-          <div className="explore-stat" key={i}>
-            <div className="explore-stat__icon">{stat.icon}</div>
-            <div className="explore-stat__value">{stat.value}</div>
-            <div className="explore-stat__label">{stat.label}</div>
+        {loading ? (
+          <div className="explore-stat" style={{ gridColumn: 'span 3', textAlign: 'center', color: '#64748b' }}>
+            Loading stats...
           </div>
-        ))}
+        ) : error ? (
+          <div className="explore-stat" style={{ gridColumn: 'span 3', textAlign: 'center', color: '#ef4444' }}>
+            {error}
+          </div>
+        ) : (
+          statCards.map((stat, i) => (
+            <div className="explore-stat" key={i}>
+              <div className="explore-stat__icon">{stat.icon}</div>
+              <div className="explore-stat__value">{stat.value}</div>
+              <div className="explore-stat__label">{stat.label}</div>
+            </div>
+          ))
+        )}
       </section>
 
       <section className="explore-features">
@@ -73,6 +143,7 @@ export default function ExploreScreen() {
         ))}
       </section>
 
+      {/* Optionally, replace demo cards with real campaign/pledge/payment highlights in future */}
       <section className="explore-demo-cards">
         <div className="explore-demo-card">
           <h4>Sample Campaign</h4>
@@ -90,6 +161,10 @@ export default function ExploreScreen() {
           <Link to="/payment" className="explore-demo-card__cta">View Payment</Link>
         </div>
       </section>
+
+      <div style={{textAlign:'center',margin:'2rem 0'}}>
+        <Link to="/explore-details" className="explore-hero__cta" style={{fontSize:'1.1rem',padding:'0.75rem 2rem'}}>View Detailed Tables & Charts</Link>
+      </div>
     </div>
   );
 }

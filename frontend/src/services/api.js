@@ -1,3 +1,79 @@
+// =============================
+// ADMIN PASSWORD RESET & 2FA API
+// =============================
+
+/**
+ * Superadmin: Reset another admin's password
+ * @param {number} adminId - Admin user ID
+ * @param {string} newPassword - New password
+ * @returns {Promise<Object>}
+ */
+export async function superadminResetAdminPassword(adminId, newPassword) {
+  if (!adminId || !newPassword) {
+    return Promise.reject(new Error('superadminResetAdminPassword: adminId and newPassword are required'));
+  }
+  const client = await getClient();
+  return handleRequest(client.post(`users/${adminId}/reset-password`, { newPassword }));
+}
+
+// 2FA Management API
+
+/**
+ * Get 2FA status for a user (self or admin)
+ * @param {number} [userId] - Optional user ID (admin only)
+ * @returns {Promise<Object>}
+ */
+export async function getTwoFactorStatus(userId) {
+  const client = await getClient();
+  const path = userId ? `twofactor/status/${userId}` : 'twofactor/status';
+  return handleRequest(client.get(path));
+}
+
+/**
+ * Initiate/setup 2FA for a user (self or admin)
+ * @param {number} [userId] - Optional user ID (admin only)
+ * @returns {Promise<Object>} (returns QR code, secret, etc)
+ */
+export async function setupTwoFactor(userId) {
+  const client = await getClient();
+  const path = userId ? `twofactor/setup/${userId}` : 'twofactor/setup';
+  return handleRequest(client.post(path));
+}
+
+/**
+ * Enable 2FA for a user (self or admin)
+ * @param {string} code - Verification code
+ * @param {number} [userId] - Optional user ID (admin only)
+ * @returns {Promise<Object>}
+ */
+export async function enableTwoFactor(code, userId) {
+  const client = await getClient();
+  const path = userId ? `twofactor/enable/${userId}` : 'twofactor/enable';
+  return handleRequest(client.post(path, { code }));
+}
+
+/**
+ * Disable 2FA for a user (self or admin)
+ * @param {number} [userId] - Optional user ID (admin only)
+ * @returns {Promise<Object>}
+ */
+export async function disableTwoFactor(userId) {
+  const client = await getClient();
+  const path = userId ? `twofactor/disable/${userId}` : 'twofactor/disable';
+  return handleRequest(client.post(path));
+}
+
+/**
+ * Verify 2FA code (self or admin)
+ * @param {string} code - Verification code
+ * @param {number} [userId] - Optional user ID (admin only)
+ * @returns {Promise<Object>}
+ */
+export async function verifyTwoFactor(code, userId) {
+  const client = await getClient();
+  const path = userId ? `twofactor/verify/${userId}` : 'twofactor/verify';
+  return handleRequest(client.post(path, { code }));
+}
 
 console.log('[API] api.js loaded - version 2025-12-16');
 import { getViteEnv } from '../utils/getViteEnv';
@@ -344,9 +420,9 @@ export async function getPayments(query = {}) {
 
 export async function loginUser(credentials) {
   const client = await getClient();
-  // Use email for login (backend expects { email, password })
+  // Always send identifier for login (backend expects { identifier, password })
   const payload = {
-    email: credentials.email || credentials.identifier || '',
+    identifier: credentials.identifier || credentials.email || credentials.phone || '',
     password: credentials.password,
   };
   return handleRequest(client.post('auth/login', payload));

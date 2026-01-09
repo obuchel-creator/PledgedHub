@@ -1,67 +1,56 @@
-
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { forgotPassword } from '../services/api';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { resetPassword } from '../services/api';
 
-export default function ForgotPassword() {
-  const [email, setEmail] = useState('');
+export default function ResetPassword() {
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const handleChange = (e) => {
-    setEmail(e.target.value);
-    setError(null);
-    setSuccess(null);
-  };
+  // Get token from query string
+  const params = new URLSearchParams(location.search);
+  const token = params.get('token');
+
+  const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
     setSuccess(null);
+    if (!password || !confirmPassword) {
+      setError('Both password fields are required.');
+      return;
+    }
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+    if (!strongPasswordRegex.test(password)) {
+      setError('Password must be at least 8 characters and include uppercase, lowercase, number, and special character.');
+      return;
+    }
+    if (!token) {
+      setError('Reset token is missing.');
+      return;
+    }
     setLoading(true);
     try {
-      const res = await forgotPassword(email);
+      const res = await resetPassword(token, password);
       if (res && res.success) {
-        setSuccess(res.message || 'If this email is registered, a password reset link has been sent.');
+        setSuccess(res.message || 'Password reset successfully. You can now login.');
+        setTimeout(() => navigate('/login'), 2500);
       } else {
-        setError(res?.message || 'Failed to send reset email. Please try again.');
+        setError(res?.message || 'Failed to reset password.');
       }
     } catch (err) {
-      setError(err?.message || 'Failed to send reset email. Please try again.');
+      setError(err?.message || 'Failed to reset password.');
     } finally {
       setLoading(false);
     }
-  };
-
-  const inputStyle = {
-    width: '100%',
-    padding: '12px',
-    border: '1px solid #d1d5db',
-    borderRadius: 6,
-    fontSize: 16,
-    marginBottom: '8px',
-  };
-
-  const labelStyle = {
-    display: 'block',
-    fontSize: 14,
-    fontWeight: 500,
-    marginBottom: '4px',
-    color: '#374151',
-  };
-
-  const buttonStyle = {
-    width: '100%',
-    padding: '12px',
-    background: '#0070f3',
-    color: 'white',
-    border: 'none',
-    borderRadius: 6,
-    fontSize: 16,
-    cursor: loading ? 'not-allowed' : 'pointer',
-    opacity: loading ? 0.7 : 1,
   };
 
   return (
@@ -77,12 +66,12 @@ export default function ForgotPassword() {
       }}
     >
       <div style={{ textAlign: 'center', marginBottom: 32 }}>
-        <h1 style={{ margin: 0, color: '#111' }}>Forgot Password</h1>
+        <h1 style={{ margin: 0, color: '#111' }}>Reset Password</h1>
         <p style={{ color: '#666', marginTop: 8 }}>
-          Enter your email to receive a password reset link
+          Enter your new password below
         </p>
       </div>
-      <form onSubmit={handleSubmit} aria-label="Forgot Password form" role="form" tabIndex={0} autoComplete="on">
+      <form onSubmit={handleSubmit} aria-label="Reset Password form" role="form" tabIndex={0} autoComplete="on">
         <div aria-live="polite" aria-atomic="true">
           {error && (
             <div
@@ -121,25 +110,39 @@ export default function ForgotPassword() {
             </div>
           )}
         </div>
-        <div style={{ marginBottom: 24 }}>
-          <label style={labelStyle} htmlFor="email">
-            Email
-          </label>
+        <div style={{ marginBottom: 20 }}>
+          <label htmlFor="password" style={{ display: 'block', fontSize: 14, fontWeight: 500, marginBottom: 4, color: '#374151' }}>New Password</label>
           <input
-            id="email"
-            name="email"
-            type="email"
-            value={email}
-            onChange={handleChange}
-            style={inputStyle}
-            placeholder="Enter your email"
+            id="password"
+            name="password"
+            type="password"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            style={{ width: '100%', padding: '12px', border: '1px solid #d1d5db', borderRadius: 6, fontSize: 16, marginBottom: '8px' }}
+            placeholder="Enter new password"
             required
             disabled={loading}
+            autoComplete="new-password"
+          />
+        </div>
+        <div style={{ marginBottom: 24 }}>
+          <label htmlFor="confirmPassword" style={{ display: 'block', fontSize: 14, fontWeight: 500, marginBottom: 4, color: '#374151' }}>Confirm Password</label>
+          <input
+            id="confirmPassword"
+            name="confirmPassword"
+            type="password"
+            value={confirmPassword}
+            onChange={e => setConfirmPassword(e.target.value)}
+            style={{ width: '100%', padding: '12px', border: '1px solid #d1d5db', borderRadius: 6, fontSize: 16, marginBottom: '8px' }}
+            placeholder="Confirm new password"
+            required
+            disabled={loading}
+            autoComplete="new-password"
           />
         </div>
         <button
           type="submit"
-          aria-label="Send Reset Link"
+          aria-label="Reset Password"
           style={{
             marginTop: 8,
             padding: '12px 0',
@@ -162,7 +165,7 @@ export default function ForgotPassword() {
           tabIndex={0}
         >
           {loading && <span className="spinner" aria-hidden="true" style={{ width: 18, height: 18, border: '2px solid #fff', borderTop: '2px solid #0050a8', borderRadius: '50%', display: 'inline-block', animation: 'spin 1s linear infinite' }}></span>}
-          {loading ? 'Sending...' : 'Send Reset Link'}
+          {loading ? 'Resetting...' : 'Reset Password'}
         </button>
         <style>{`
           @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -175,11 +178,9 @@ export default function ForgotPassword() {
       </div>
       <div style={{ textAlign: 'center', marginTop: 16 }}>
         <Link to="/" style={{ color: '#666', textDecoration: 'none', fontSize: 14 }}>
-           Back to Home
+          ← Back to Home
         </Link>
       </div>
     </main>
   );
 }
-
-

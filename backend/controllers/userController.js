@@ -320,6 +320,10 @@ async function updateUserRole(req, res) {
             return res.status(500).json({ error: 'Failed to update user role' });
         }
 
+        // Audit log
+        const { auditRoleAccess } = require('../middleware/authMiddleware');
+        await auditRoleAccess(req.user.id, 'update_user_role', { targetUserId, oldRole: targetUser.role, newRole: role });
+
         // Remove sensitive data
         const safeUser = { ...updatedUser };
         delete safeUser.password_hash;
@@ -410,6 +414,36 @@ async function promoteToAdmin(req, res) {
   }
 }
 
+const adminService = require('../services/adminService');
+
+/**
+ * Superadmin: Reset another admin's password (forces reset on next login)
+ * POST /api/users/:id/reset-password (superadmin only)
+ */
+async function superadminResetAdminPassword(req, res) {
+    try {
+        const superadminId = req.user.id;
+        const targetUserId = parseInt(req.params.id, 10);
+        const { newPassword } = req.body;
+        if (!newPassword) {
+            return res.status(400).json({ success: false, error: 'New password required.' });
+        }
+        // Only superadmins can use this endpoint (enforced by route)
+        const result = await adminService.superadminResetAdminPassword(superadminId, targetUserId, newPassword);
+        // Audit log
+        const { auditRoleAccess } = require('../middleware/authMiddleware');
+        await auditRoleAccess(superadminId, 'superadmin_reset_admin_password', { targetUserId, success: result.success, error: result.error });
+        if (result.success) {
+            return res.status(200).json({ success: true, message: 'Password reset. Admin must change password on next login.' });
+        } else {
+            return res.status(400).json({ success: false, error: result.error });
+        }
+    } catch (err) {
+        console.error('[superadminResetAdminPassword] Controller error:', err);
+        return res.status(500).json({ success: false, error: 'Server error.' });
+    }
+}
+
 module.exports = { 
     createUser, 
     getUser, 
@@ -420,5 +454,6 @@ module.exports = {
     listAllUsers,
     updateUserRole,
     login,
-    promoteToAdmin 
+    promoteToAdmin,
+    superadminResetAdminPassword
 };

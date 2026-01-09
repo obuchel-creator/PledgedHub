@@ -30,6 +30,8 @@
         "helmet": "^8.1.0",
         "hpp": "^0.2.3",
         "jsonwebtoken": "^9.0.2",
+        "jspdf": "^4.0.0",
+        "jspdf-autotable": "^5.0.7",
         "morgan": "^1.10.1",
         "mysql2": "^3.15.3",
         "node-cron": "^4.2.1",
@@ -38,6 +40,7 @@
         "passport-facebook": "^3.0.0",
         "passport-google-oauth20": "^2.0.0",
         "qrcode": "^1.5.4",
+        "react-csv": "^2.2.2",
         "speakeasy": "^2.0.0",
         "twilio": "^5.10.4",
         "xss-clean": "^0.1.4"

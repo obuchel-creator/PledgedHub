@@ -776,7 +776,118 @@ export const translations = {
       partialPayment: 'Malipo ya Sehemu',
       fullPayment: 'Malipo Kamili'
     }
-  }
+  },
+  rny: {
+    nav: {
+      home: 'Ahansi',
+      campaigns: 'Omurimo',
+      myPledges: 'Ebirayiro Byange',
+      analytics: 'Obubalo',
+      settings: 'Enkora',
+      help: 'Obuyambi',
+      logout: 'Genda',
+      login: 'Injira',
+      register: 'Iyandikishe'
+    },
+    common: {
+      welcome: 'Tukushemererwe',
+      loading: 'Kutekateka...',
+      save: 'Tereka',
+      cancel: 'Saza',
+      delete: 'Sangura',
+      edit: 'Hindura',
+      submit: 'Tuma',
+      close: 'Gara',
+      confirm: 'Kakasa',
+      back: 'Garuka',
+      next: 'Komeza',
+      search: 'Shakisha',
+      filter: 'Sengeja',
+      export: 'Fulumya',
+      import: 'Leeta',
+      download: 'Wanura',
+      upload: 'Teeka',
+      success: 'Kyakora',
+      error: 'Kireme',
+      warning: 'Okurabura',
+      info: 'Amakuru'
+    },
+    // ...add more keys as needed
+  },
+  ateso: {
+    nav: {
+      home: 'Ekai',
+      campaigns: 'Emikoro',
+      myPledges: 'Ebirayiro Ikai',
+      analytics: 'Obubalo',
+      settings: 'Ekikaro',
+      help: 'Obuyambi',
+      logout: 'Genda',
+      login: 'Ingo',
+      register: 'Ikwang'
+    },
+    common: {
+      welcome: 'Ejai',
+      loading: 'Ekitere...',
+      save: 'Tereka',
+      cancel: 'Saza',
+      delete: 'Sangura',
+      edit: 'Hindura',
+      submit: 'Tuma',
+      close: 'Gara',
+      confirm: 'Kakasa',
+      back: 'Garuka',
+      next: 'Komeza',
+      search: 'Shakisha',
+      filter: 'Sengeja',
+      export: 'Fulumya',
+      import: 'Leeta',
+      download: 'Wanura',
+      upload: 'Teeka',
+      success: 'Kyakora',
+      error: 'Kireme',
+      warning: 'Okurabura',
+      info: 'Amakuru'
+    },
+    // ...add more keys as needed
+  },
+  fr: {
+    nav: {
+      home: 'Accueil',
+      campaigns: 'Campagnes',
+      myPledges: 'Mes Engagements',
+      analytics: 'Analytique',
+      settings: 'Paramètres',
+      help: 'Aide',
+      logout: 'Déconnexion',
+      login: 'Connexion',
+      register: 'Inscription'
+    },
+    common: {
+      welcome: 'Bienvenue',
+      loading: 'Chargement...',
+      save: 'Enregistrer',
+      cancel: 'Annuler',
+      delete: 'Supprimer',
+      edit: 'Modifier',
+      submit: 'Soumettre',
+      close: 'Fermer',
+      confirm: 'Confirmer',
+      back: 'Retour',
+      next: 'Suivant',
+      search: 'Rechercher',
+      filter: 'Filtrer',
+      export: 'Exporter',
+      import: 'Importer',
+      download: 'Télécharger',
+      upload: 'Téléverser',
+      success: 'Succès',
+      error: 'Erreur',
+      warning: 'Avertissement',
+      info: 'Information'
+    },
+    // ...add more keys as needed
+  },
 };
 
 // Helper function to get translation

@@ -259,4 +259,14 @@ router.post(
     })
 );
 
+// POST /:id/reset-password (superadmin only)
+router.post(
+    '/:id/reset-password',
+    protect,
+    requireRole('superadmin'),
+    asyncHandler(async (req, res, next) => {
+        await userController.superadminResetAdminPassword(req, res, next);
+    })
+);
+
 module.exports = router;

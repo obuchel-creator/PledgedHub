@@ -52,6 +52,22 @@ function PledgeFormSection({
 
   return (
     <section className="pledge-form-section card card--glass">
+      <div style={{
+        background: '#fef9c3',
+        color: '#92400e',
+        border: '1.5px solid #fde68a',
+        borderRadius: '8px',
+        padding: '0.75rem 1.2rem',
+        marginBottom: '1.2rem',
+        fontWeight: 600,
+        fontSize: '1.05rem',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.5rem',
+      }}>
+        <span role="img" aria-label="info">ℹ️</span>
+        This form is for <strong>individual pledges only</strong>. To support a fundraising campaign, use the "Make a Donation Pledge" screen.
+      </div>
       <div className="pledge-form-section__header">
         <div>
           <h2 className="pledge-form-section__title">Make a Pledge</h2>

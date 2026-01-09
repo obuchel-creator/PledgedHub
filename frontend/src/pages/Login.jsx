@@ -27,7 +27,7 @@ export default function Login() {
     setLoading(true);
     try {
       const payload = {
-        email: form.identifier.trim(), // always send as 'email' for backend compatibility
+        identifier: form.identifier.trim(), // always send as 'identifier' for backend compatibility
         password: form.password,
       };
       const response = await loginUser(payload);

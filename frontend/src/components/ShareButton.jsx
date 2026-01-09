@@ -4,6 +4,7 @@
  */
 
 import React, { useState } from 'react';
+import { toast } from 'react-toastify';
 import {
   shareViaWhatsApp,
   shareViaSMS,
@@ -18,6 +19,7 @@ import {
   trackShare,
   isMobileDevice,
 } from '../utils/shareHelpers';
+import { shareViaTelegram, shareViaReddit } from '../utils/shareHelpersExtra';
 
 const ShareButton = ({ 
   contentType = 'campaign',
@@ -48,51 +50,81 @@ const ShareButton = ({
     await trackShare(contentType, contentId, channel);
 
     let shouldClose = true;
-    switch (channel) {
-      case 'whatsapp':
-        shareViaWhatsApp(shareContent.text, url);
-        break;
-      case 'sms':
-        shareViaSMS(shareContent.text, url);
-        break;
-      case 'facebook':
-        shareViaFacebook(url);
-        break;
-      case 'twitter':
-        shareViaTwitter(shareContent.text, url, shareContent.hashtags);
-        break;
-      case 'linkedin':
-        shareViaLinkedIn(url);
-        break;
-      case 'email':
-        shareViaEmail(shareContent.title, shareContent.text, url);
-        break;
-      case 'copy': {
-        const result = await copyToClipboard(url);
-        if (result.success) {
-          setCopySuccess(true);
-          setTimeout(() => setCopySuccess(false), 2000);
-        } else {
-          shouldClose = false;
+    let fallbackError = null;
+    try {
+      switch (channel) {
+                case 'telegram':
+                  shareViaTelegram(shareContent.text, url);
+                  break;
+                case 'reddit':
+                  shareViaReddit(shareContent.title, url);
+                  break;
+        case 'whatsapp':
+          shareViaWhatsApp(shareContent.text, url);
+          break;
+        case 'sms':
+          if (!isMobileDevice()) {
+            toast.info('SMS sharing is only available on mobile devices.');
+            shouldClose = false;
+            break;
+          }
+          shareViaSMS(shareContent.text, url);
+          break;
+        case 'facebook':
+          shareViaFacebook(url);
+          break;
+        case 'twitter':
+          shareViaTwitter(shareContent.text, url, shareContent.hashtags);
+          break;
+        case 'linkedin':
+          shareViaLinkedIn(url);
+          break;
+        case 'email':
+          shareViaEmail(shareContent.title, shareContent.text, url);
+          break;
+        case 'copy': {
+          const result = await copyToClipboard(url);
+          if (result.success) {
+            setCopySuccess(true);
+            toast.success('Link copied to clipboard!');
+            setTimeout(() => setCopySuccess(false), 2000);
+          } else {
+            toast.error('Failed to copy link.');
+            shouldClose = false;
+          }
+          // Delay closing dropdown for copy feedback
+          setTimeout(() => setShowDropdown(false), 400);
+          return;
         }
-        // Delay closing dropdown for copy feedback
-        setTimeout(() => setShowDropdown(false), 400);
-        return;
-      }
-      case 'native': {
-        const nativeResult = await shareViaNative(shareContent.title, shareContent.text, url);
-        if (nativeResult.success) {
-          setShareSuccess(true);
-          setTimeout(() => setShareSuccess(false), 2000);
-        } else {
-          shouldClose = false;
+        case 'native': {
+          if (!navigator.share) {
+            toast.info('Native sharing is not supported on this device/browser.');
+            shouldClose = false;
+            break;
+          }
+          const nativeResult = await shareViaNative(shareContent.title, shareContent.text, url);
+          if (nativeResult.success) {
+            setShareSuccess(true);
+            toast.success('Shared successfully!');
+            setTimeout(() => setShareSuccess(false), 2000);
+          } else {
+            toast.error(nativeResult.message || 'Failed to share.');
+            shouldClose = false;
+          }
+          // Delay closing dropdown for native share feedback
+          setTimeout(() => setShowDropdown(false), 400);
+          return;
         }
-        // Delay closing dropdown for native share feedback
-        setTimeout(() => setShowDropdown(false), 400);
-        return;
+        default:
+          fallbackError = 'This share option is not supported.';
+          break;
       }
-      default:
-        break;
+    } catch (err) {
+      fallbackError = err?.message || 'An error occurred while sharing.';
+    }
+    if (fallbackError) {
+      toast.error(fallbackError);
+      shouldClose = false;
     }
     if (shouldClose) setShowDropdown(false);
   };
@@ -232,12 +264,29 @@ const ShareButton = ({
                 onClick={(e) => handleShare('twitter', e)}
               />
 
+
               {/* LinkedIn */}
               <ShareOption
                 icon="💼"
                 label="LinkedIn"
                 color="#0A66C2"
                 onClick={(e) => handleShare('linkedin', e)}
+              />
+
+              {/* Telegram */}
+              <ShareOption
+                icon="✈️"
+                label="Telegram"
+                color="#229ED9"
+                onClick={(e) => handleShare('telegram', e)}
+              />
+
+              {/* Reddit */}
+              <ShareOption
+                icon="👽"
+                label="Reddit"
+                color="#FF4500"
+                onClick={(e) => handleShare('reddit', e)}
               />
 
               {/* Email */}
@@ -297,6 +346,7 @@ const ShareButton = ({
           onClick={() => handleShare('facebook')}
         />
 
+
         {/* Twitter */}
         <InlineButton
           icon="🐦"
@@ -304,6 +354,24 @@ const ShareButton = ({
           color="#1DA1F2"
           size={size}
           onClick={() => handleShare('twitter')}
+        />
+
+        {/* Telegram */}
+        <InlineButton
+          icon="✈️"
+          label="Telegram"
+          color="#229ED9"
+          size={size}
+          onClick={() => handleShare('telegram')}
+        />
+
+        {/* Reddit */}
+        <InlineButton
+          icon="👽"
+          label="Reddit"
+          color="#FF4500"
+          size={size}
+          onClick={() => handleShare('reddit')}
         />
 
         {/* Copy */}

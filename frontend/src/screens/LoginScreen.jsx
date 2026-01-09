@@ -3,8 +3,10 @@ import React, { useState, useEffect } from 'react';
 import '../authOutlook.css';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+
 import Logo from '../components/Logo';
 import { socialLogos } from '../assets/social-logos';
+import OAuthButtons from '../components/OAuthButtons';
 
 export default function LoginScreen() {
   const { login, user } = useAuth();
@@ -109,10 +111,13 @@ export default function LoginScreen() {
           </div>
 
           <h2>Sign in to PledgeHub</h2>
-          
+
+          {/* OAuth login options */}
+          <OAuthButtons className="mb-4" />
+
           {error && <div className="error-message">{error}</div>}
           {success && <div className="success-message">{success}</div>}
-          
+
           <form onSubmit={handleSubmit} noValidate style={{ width: '100%' }}>
             {/* Email/Username/Phone field */}
             <div>

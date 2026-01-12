@@ -12,6 +12,7 @@ export default function CreateCampaignScreen() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
   const [error, setError] = useState(null);
+  const [newCampaignId, setNewCampaignId] = useState(null);
 
   const resetForm = () => {
     setTitle('');
@@ -40,6 +41,7 @@ export default function CreateCampaignScreen() {
       }
     }
 
+      setNewCampaignId(result?.data?.id);
     setError(null);
     return true;
   };
@@ -122,6 +124,25 @@ export default function CreateCampaignScreen() {
             background: 'var(--surface)',
             borderRadius: '12px',
             padding: '2rem',
+              {newCampaignId && (
+                <div style={{marginTop: '1rem'}}>
+                  <button
+                    className="btn btn-primary"
+                    type="button"
+                    onClick={() => navigate(`/pledges/new?campaignId=${newCampaignId}`)}
+                    style={{marginRight: '1rem'}}
+                  >
+                    Add a Pledge to this Campaign
+                  </button>
+                  <button
+                    className="btn btn-secondary"
+                    type="button"
+                    onClick={() => navigate(`/campaigns/${newCampaignId}`)}
+                  >
+                    View Campaign
+                  </button>
+                </div>
+              )}
             boxShadow: '0 4px 12px -4px rgba(15, 23, 42, 0.1), 0 2px 6px rgba(15, 23, 42, 0.05)',
           }}
           aria-labelledby="create-campaign-form"

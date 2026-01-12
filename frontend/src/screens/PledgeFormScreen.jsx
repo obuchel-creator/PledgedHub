@@ -1,17 +1,33 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { fetchWithAuth, postWithAuth, putWithAuth } from '../utils/api';
+import { getCampaignDetails } from '../services/api';
 import Logo from '../components/Logo';
 
 export default function PledgeFormScreen() {
   const { id } = useParams();
+  const location = useLocation();
   const navigate = useNavigate();
   const isEdit = Boolean(id);
   const [form, setForm] = useState({ title: '', amount: '', purpose: '', donor_name: '', collection_date: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [campaignId, setCampaignId] = useState(null);
+  const [campaignTitle, setCampaignTitle] = useState('');
 
   useEffect(() => {
+    // Check for campaignId in query params
+    const params = new URLSearchParams(location.search);
+    const cid = params.get('campaignId');
+    if (cid) {
+      setCampaignId(cid);
+      // Fetch campaign details for display
+      getCampaignDetails(cid).then(res => {
+        if (res && res.data && res.data.title) {
+          setCampaignTitle(res.data.title);
+        }
+      });
+    }
     if (isEdit) {
       async function loadPledge() {
         setLoading(true);
@@ -35,7 +51,7 @@ export default function PledgeFormScreen() {
       }
       loadPledge();
     }
-  }, [id, isEdit]);
+  }, [id, isEdit, location.search]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -56,7 +72,8 @@ export default function PledgeFormScreen() {
         donor_name: form.donor_name,
         amount: form.amount,
         purpose: form.purpose,
-        collection_date: form.collection_date
+        collection_date: form.collection_date,
+        ...(campaignId ? { campaign_id: campaignId } : {}),
       };
       let res;
       if (isEdit) {
@@ -80,6 +97,12 @@ export default function PledgeFormScreen() {
       <Logo size="large" showText={false} />
       <h2>{isEdit ? 'Edit Pledge' : 'Add New Pledge'}</h2>
       <form onSubmit={handleSubmit} className="pledge-form">
+        {campaignId && (
+          <div>
+            <label>Campaign</label>
+            <input value={campaignTitle || campaignId} disabled style={{ background: '#f3f4f6', color: '#374151', fontWeight: 500 }} />
+          </div>
+        )}
         <div>
           <label>Title</label>
           <input name="title" value={form.title} onChange={handleChange} required />

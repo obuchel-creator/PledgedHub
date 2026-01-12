@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import ShareAnalyticsDashboard from '../components/ShareAnalyticsDashboard';
 import { useAuth } from '../context/AuthContext';
 import {
   LineChart, Line, BarChart, Bar, PieChart, Pie, AreaChart, Area,

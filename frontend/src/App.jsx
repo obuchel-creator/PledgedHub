@@ -1,4 +1,7 @@
 import React from 'react';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { TablePreferencesProvider } from './context/TablePreferencesContext';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -39,6 +42,7 @@ import GuestPledgeScreen from './screens/GuestPledgeScreen';
 import CashAccountabilityDashboard from './screens/CashAccountabilityDashboard';
 import NotFoundScreen from './screens/NotFoundScreen';
 import ExploreScreen from './screens/ExploreScreen';
+import ExploreDetails from './screens/ExploreDetails';
 import HelpScreen from './screens/HelpScreen';
 import PrivacyScreen from './screens/PrivacyScreen';
 import TermsScreen from './screens/TermsScreen';
@@ -50,13 +54,14 @@ import PricingScreen from './screens/PricingScreen';
 function App() {
   // Removed debug log
   return (
-    <Router>
-      <Navbar />
-      <div style={{ minHeight: 'calc(100vh - 60px - 48px)', display: 'flex', flexDirection: 'column' }}>
-        <div style={{ flex: 1 }}>
-          <Routes>
-        <Route path="/" element={<HomeScreen />} />
-        <Route path="/login" element={<LoginScreen />} />
+    <TablePreferencesProvider>
+      <Router>
+        <Navbar />
+        <div style={{ minHeight: 'calc(100vh - 60px - 48px)', display: 'flex', flexDirection: 'column' }}>
+          <div style={{ flex: 1 }}>
+            <Routes>
+              <Route path="/" element={<HomeScreen />} />
+              <Route path="/login" element={<LoginScreen />} />
         <Route path="/register" element={<RegisterScreen />} />
         <Route path="/forgot-password" element={<ForgotPasswordScreen />} />
         <Route path="/reset-password" element={<ResetPasswordScreen />} />
@@ -74,6 +79,7 @@ function App() {
           }
         />
         <Route path="/explore" element={<ExploreScreen />} />
+        <Route path="/explore-details" element={<ExploreDetails />} />
         <Route path="/about" element={<AboutScreen />} />
         <Route path="/fundraising" element={<FundraisingScreen />} />
         <Route path="/campaign/:slug" element={<GuestPledgeScreen />} />
@@ -179,8 +185,10 @@ function App() {
         <footer style={{ background: '#f8fafc', color: '#1e293b', textAlign: 'center', padding: '1.2rem 0', fontSize: '1.08rem', borderTop: '2px solid #e5e7eb', fontWeight: 'bold', letterSpacing: '0.02em', textShadow: '0 1px 6px #fff, 0 1px 1px #e5e7eb' }}>
           &copy; {new Date().getFullYear()} PledgeHub. All rights reserved.
         </footer>
+        <ToastContainer position="top-center" autoClose={2500} hideProgressBar newestOnTop closeOnClick pauseOnFocusLoss draggable pauseOnHover />
       </div>
     </Router>
+    </TablePreferencesProvider>
   );
 }
 

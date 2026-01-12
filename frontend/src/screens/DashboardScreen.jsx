@@ -1,4 +1,6 @@
 import React, { useEffect } from 'react';
+import OnboardingModal from '../components/OnboardingModal';
+import useOnboardingModal from '../hooks/useOnboardingModal';
 import { useAuth } from '../context/AuthContext';
 import { formatCurrency } from '../utils/formatters';
 import useDashboardData from '../hooks/useDashboardData';
@@ -17,6 +19,7 @@ import ShareButton from '../components/ShareButton';
  */
 function Dashboard() {
   const { user } = useAuth();
+  const [showOnboarding, closeOnboarding] = useOnboardingModal(user);
   const {
     loading,
     pledges,
@@ -96,18 +99,23 @@ function Dashboard() {
     }
   }, [user?.phone, pledgeForm.phone, handlePledgeFieldChange]);
 
+
   if (loading) {
     return (
-      <main className="page page--wide" aria-busy="true" aria-label="Loading dashboard">
-        <div className="loading-state" role="status" aria-live="polite">
-          ⏳ Loading pledges and recent payments...
-        </div>
-      </main>
+      <>
+        <OnboardingModal isOpen={false} onClose={closeOnboarding} />
+        <main className="page page--wide" aria-busy="true" aria-label="Loading dashboard">
+          <div className="loading-state" role="status" aria-live="polite">
+            ⏳ Loading pledges and recent payments...
+          </div>
+        </main>
+      </>
     );
   }
 
   return (
     <>
+      <OnboardingModal isOpen={showOnboarding} onClose={closeOnboarding} />
       <style dangerouslySetInnerHTML={{__html: `
         .achievement-stats {
           display: flex !important;

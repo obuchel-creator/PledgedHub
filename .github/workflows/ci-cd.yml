@@ -1,0 +1,77 @@
+name: PledgeHub CI/CD
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build-test-deploy:
+    runs-on: ubuntu-latest
+    env:
+      NODE_ENV: test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20.x'
+      - name: Install backend dependencies
+        run: |
+          cd backend
+          npm ci
+      - name: Install frontend dependencies
+        run: |
+          cd frontend
+          npm ci
+      - name: Lint backend
+        run: |
+          cd backend
+          npm run lint || true
+      - name: Lint frontend
+        run: |
+          cd frontend
+          npm run lint || true
+      - name: Run backend tests
+        run: |
+          cd backend
+          npm test
+      - name: Run frontend tests
+        run: |
+          cd frontend
+          npm test
+      - name: Build frontend
+        run: |
+          cd frontend
+          npm run build
+      - name: Upload frontend build artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: frontend-build
+          path: frontend/dist
+      - name: Upload backend coverage
+        uses: actions/upload-artifact@v3
+        with:
+          name: backend-coverage
+          path: backend/coverage
+      - name: Security audit backend
+        run: |
+          cd backend
+          npm audit --audit-level=moderate || true
+      - name: Security audit frontend
+        run: |
+          cd frontend
+          npm audit --audit-level=moderate || true
+      - name: Performance audit (Lighthouse)
+        run: |
+          npm install -g lighthouse
+          lighthouse http://localhost:5173 --output html --output-path ./lh-report.html || true
+        continue-on-error: true
+      - name: Upload Lighthouse report
+        uses: actions/upload-artifact@v3
+        with:
+          name: lighthouse-report
+          path: lh-report.html
+      - name: Deploy (placeholder)
+        run: echo "Add deployment steps here"

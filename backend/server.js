@@ -359,6 +359,10 @@ if (require.main === module) {
     } catch (cronError) {
       logger.error('❌ Failed to initialize cron jobs:', cronError.message);
     }
+      // Initialize WebSocket server for realtime updates
+      const { setupRealtime } = require('./services/realtimeService');
+      const wss = setupRealtime(server);
+      app.set('wss', wss);
   });
 
   // Graceful shutdown
@@ -369,6 +373,10 @@ if (require.main === module) {
       process.exit(0);
     });
   });
+    // Initialize WebSocket server for realtime updates
+    const { setupRealtime } = require('./services/realtimeService');
+    const wss = setupRealtime(server);
+    app.set('wss', wss);
 
   process.on('SIGINT', () => {
     logger.info('📛 SIGINT received, shutting down gracefully...');

@@ -58,7 +58,13 @@ const PERMISSIONS = {
  */
 async function auditRoleAccess(userId, action, details = {}) {
   try {
-    // In production, log to role_audit_log table
+    // Log to role_audit_log table
+    const { pool } = require('../config/db');
+    const detailStr = details ? JSON.stringify(details) : '';
+    await pool.execute(
+      'INSERT INTO role_audit_log (user_id, action, details, timestamp) VALUES (?, ?, ?, ?)',
+      [userId, action, detailStr, new Date()]
+    );
     console.log(`🔐 [AUDIT] User ${userId} - ${action}`, details);
   } catch (err) {
     console.error('⚠️ [AUDIT] Failed to log role access:', err.message);

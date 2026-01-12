@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Link, useNavigate } from 'react-router-dom';
 import '../authOutlook.css';
+
 import Logo from '../components/Logo';
 import { useAuth } from '../context/AuthContext';
+import OAuthButtons from '../components/OAuthButtons';
 
 // More flexible phone pattern - accepts various formats
 // +256, 0256, 256, or just numbers starting with common prefixes
@@ -151,8 +153,12 @@ function RegisterScreen({ disableRequired = false }) {
             <Logo size="large" showText={false} />
           </div>
 
+
           <h2>Create your PledgeHub account</h2>
           <p className="subtitle">Sign up</p>
+
+          {/* OAuth sign up options */}
+          <OAuthButtons className="mb-4" />
 
           {error && <div className="error-message" style={{ marginBottom: '16px', padding: '12px', background: '#fee2e2', color: '#991b1b', borderRadius: '4px', fontSize: '14px' }}>{error}</div>}
           {status && <div style={{ marginBottom: '16px', padding: '12px', background: '#e0f2fe', color: '#0c4a6e', borderRadius: '4px', fontSize: '14px', fontWeight: '500' }}>{status}</div>}

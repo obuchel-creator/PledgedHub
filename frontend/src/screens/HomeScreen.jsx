@@ -1,4 +1,6 @@
 import React, { useEffect, useMemo, useState, useContext } from 'react';
+import OnboardingModal from '../components/OnboardingModal';
+import useOnboardingModal from '../hooks/useOnboardingModal';
 
 import { FaSortAmountUp, FaSortAmountDown, FaFire, FaDownload, FaUserShield, FaHistory, FaMoon, FaSun, FaWhatsapp, FaEnvelope } from 'react-icons/fa';
 import { Bar, Pie } from 'react-chartjs-2';
@@ -19,6 +21,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 function HomeScreen() {
   const { user, loading: authLoading } = useContext(AuthContext);
+  const [showOnboarding, closeOnboarding] = useOnboardingModal(user);
 
   // State hooks FIRST
   const [campaigns, setCampaigns] = useState([]);
@@ -165,36 +168,44 @@ function HomeScreen() {
     return filtered;
   }, [campaigns, search, sort]);
 
-  // Fancy HomeScreen additions
+
+  // Real HomeScreen stats from API data
+  const activeDonors = useMemo(() => {
+    // Count unique donor names from pledges if available
+    if (!user?.pledges) return 0;
+    const donors = new Set(user.pledges.map(p => p.donorName || p.donor_name || p.donor || ''));
+    donors.delete('');
+    return donors.size;
+  }, [user]);
+
+  const totalPledges = useMemo(() => {
+    if (!user?.pledges) return 0;
+    return user.pledges.reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
+  }, [user]);
+
+  const totalCampaigns = campaignStats.count;
+  const mobilePayments = useMemo(() => {
+    // Sum payments from user.recentPayments if available
+    if (!user?.recentPayments) return 0;
+    return user.recentPayments.reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
+  }, [user]);
+
+  // Placeholder for AI reminders and security events (replace with real API if available)
+  const aiReminders = user?.aiRemindersSent || 0;
+  const securityEvents = user?.securityEvents || '0';
+
   const homeStats = [
-    { icon: <FaUsers />, label: 'Active Donors', value: '2,340+' },
-    { icon: <FaMoneyBillWave />, label: 'Total Pledges', value: 'UGX 120M+' },
-    { icon: <FaChartBar />, label: 'Campaigns', value: '58' },
-    { icon: <FaMobileAlt />, label: 'Mobile Payments', value: 'UGX 80M' },
-    { icon: <FaRobot />, label: 'AI Reminders', value: '4,200+' },
-    { icon: <FaShieldAlt />, label: 'Security Events', value: '0 Critical' },
-  ];
-  const homeFeatures = [
-    {
-      icon: <FaRobot style={{ color: '#16a34a', fontSize: '2rem' }} />, title: 'AI Reminders',
-      desc: 'Automated SMS, WhatsApp, and email reminders boost your collection rates.'
-    },
-    {
-      icon: <FaMobileAlt style={{ color: '#22d3ee', fontSize: '2rem' }} />, title: 'Mobile Money',
-      desc: 'Collect payments via MTN, Airtel, and PayPal with instant reconciliation.'
-    },
-    {
-      icon: <FaChartBar style={{ color: '#f59e42', fontSize: '2rem' }} />, title: 'Analytics',
-      desc: 'Track pledges, payments, and campaign performance with real-time dashboards.'
-    },
-    {
-      icon: <FaShieldAlt style={{ color: '#6366f1', fontSize: '2rem' }} />, title: 'Security',
-      desc: 'Multi-layered security, audit logs, and role-based access for peace of mind.'
-    },
+    { icon: <FaUsers />, label: 'Active Donors', value: activeDonors },
+    { icon: <FaMoneyBillWave />, label: 'Total Pledges', value: `UGX ${totalPledges.toLocaleString()}` },
+    { icon: <FaChartBar />, label: 'Campaigns', value: totalCampaigns },
+    { icon: <FaMobileAlt />, label: 'Mobile Payments', value: `UGX ${mobilePayments.toLocaleString()}` },
+    { icon: <FaRobot />, label: 'AI Reminders', value: aiReminders },
+    { icon: <FaShieldAlt />, label: 'Security Events', value: securityEvents },
   ];
 
   return (
     <>
+      <OnboardingModal isOpen={showOnboarding} onClose={closeOnboarding} />
       <ToastContainer />
       <main
         style={{ padding: '0', background: highContrast ? '#111' : '#f8fafc', minHeight: '100vh', fontFamily: 'inherit', color: highContrast ? '#fff' : undefined }}
@@ -223,16 +234,8 @@ function HomeScreen() {
           ))}
         </section>
 
-        {/* Feature Highlights Section */}
-        <section style={{ display: 'flex', flexWrap: 'wrap', gap: '2rem', justifyContent: 'center', margin: '0 0 2.5rem 0' }}>
-          {homeFeatures.map((f, i) => (
-            <div key={i} style={{ background: '#fff', borderRadius: 14, boxShadow: '0 2px 12px #16a34a11', padding: '2rem 1.5rem 1.5rem 1.5rem', minWidth: 220, maxWidth: 320, textAlign: 'center', flex: '1 1 240px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              {f.icon}
-              <h3 style={{ fontWeight: 700, fontSize: '1.18rem', margin: '0.7rem 0 0.3rem 0' }}>{f.title}</h3>
-              <p style={{ color: '#64748b', fontSize: '1.01rem', margin: 0 }}>{f.desc}</p>
-            </div>
-          ))}
-        </section>
+
+        {/* Feature Highlights Section (removed demo, add real highlights if available) */}
 
         {/* ...existing header, controls, and analytics sections... */}
         <section style={{ marginBottom: '2.5rem' }}>

@@ -1,4 +1,16 @@
 import React, { useState, useRef, useEffect } from 'react';
+// Dark mode persistence
+function useDarkMode() {
+  const [dark, setDark] = useState(() => {
+    const stored = localStorage.getItem('darkMode');
+    return stored ? stored === 'true' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  });
+  useEffect(() => {
+    document.body.classList.toggle('dark-mode', dark);
+    localStorage.setItem('darkMode', dark);
+  }, [dark]);
+  return [dark, setDark];
+}
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from './src/context/AuthContext';
 import './NavBar.css';
@@ -17,6 +29,7 @@ export default function NavBar() {
   const location = useLocation();
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef(null);
+  const [darkMode, setDarkMode] = useDarkMode();
 
   const handleLogout = () => {
     logout();
@@ -51,6 +64,17 @@ export default function NavBar() {
           );
         })}
       </ul>
+      <div style={{marginLeft:'auto',marginRight:16,display:'flex',alignItems:'center',gap:16}}>
+        <button
+          aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+          onClick={() => setDarkMode(d => !d)}
+          style={{
+            background: 'none', border: 'none', cursor: 'pointer', fontSize: 22, color: darkMode ? '#fbbf24' : '#2563eb', marginRight: 8
+          }}
+        >
+          {darkMode ? '🌙' : '☀️'}
+        </button>
+      </div>
       <div className="qb-navbar__user" ref={dropdownRef}>
         {user ? (
           <div style={{ position: 'relative' }}>

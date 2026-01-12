@@ -1,7 +1,102 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { getUsers, deleteUser, restoreUser, registerUser } from '../services/api';
+import { getUsers, deleteUser, restoreUser, registerUser, superadminResetAdminPassword, getTwoFactorStatus, enableTwoFactor, disableTwoFactor } from '../services/api';
+  // Admin Password Reset Modal State
+  const [showResetPasswordModal, setShowResetPasswordModal] = useState(false);
+  const [resettingUser, setResettingUser] = useState(null);
+  const [newAdminPassword, setNewAdminPassword] = useState('');
+  const [resettingPassword, setResettingPassword] = useState(false);
+  const [resetPasswordError, setResetPasswordError] = useState('');
+  const [resetPasswordSuccess, setResetPasswordSuccess] = useState('');
+
+  // 2FA Management State
+  const [twoFactorStatus, setTwoFactorStatus] = useState({}); // { [userId]: { enabled: bool, loading: bool } }
+  const [twoFactorError, setTwoFactorError] = useState({});
+  const [twoFactorSuccess, setTwoFactorSuccess] = useState({});
+  // Fetch 2FA status for all users (admin only)
+  useEffect(() => {
+    if ((user?.role === 'admin' || user?.role === 'superadmin') && users.length > 0) {
+      users.forEach(async (u) => {
+        if (u.role === 'admin' || u.role === 'superadmin') {
+          setTwoFactorStatus((prev) => ({ ...prev, [u.id]: { loading: true } }));
+          try {
+            const res = await getTwoFactorStatus(u.id);
+            setTwoFactorStatus((prev) => ({ ...prev, [u.id]: { enabled: !!res.enabled, loading: false } }));
+          } catch {
+            setTwoFactorStatus((prev) => ({ ...prev, [u.id]: { enabled: false, loading: false } }));
+          }
+        }
+      });
+    }
+  }, [users, user]);
+  // Open Reset Password Modal
+  const openResetPasswordModal = (adminUser) => {
+    setResettingUser(adminUser);
+    setShowResetPasswordModal(true);
+    setNewAdminPassword('');
+    setResetPasswordError('');
+    setResetPasswordSuccess('');
+  };
+
+  const closeResetPasswordModal = () => {
+    setShowResetPasswordModal(false);
+    setResettingUser(null);
+    setNewAdminPassword('');
+    setResetPasswordError('');
+    setResetPasswordSuccess('');
+  };
+
+  // Handle admin password reset
+  const handleResetAdminPassword = async (e) => {
+    e.preventDefault();
+    setResetPasswordError('');
+    setResetPasswordSuccess('');
+    if (!resettingUser || !newAdminPassword || newAdminPassword.length < 8) {
+      setResetPasswordError('Password must be at least 8 characters');
+      return;
+    }
+    setResettingPassword(true);
+    try {
+      await superadminResetAdminPassword(resettingUser.id, newAdminPassword);
+      setResetPasswordSuccess('Password reset successfully');
+      setNewAdminPassword('');
+      await loadUsers();
+    } catch (err) {
+      setResetPasswordError(err.message || 'Failed to reset password');
+    } finally {
+      setResettingPassword(false);
+    }
+  };
+
+  // 2FA enable/disable handlers
+  const handleEnable2FA = async (adminUser) => {
+    setTwoFactorError((prev) => ({ ...prev, [adminUser.id]: '' }));
+    setTwoFactorSuccess((prev) => ({ ...prev, [adminUser.id]: '' }));
+    setTwoFactorStatus((prev) => ({ ...prev, [adminUser.id]: { ...prev[adminUser.id], loading: true } }));
+    try {
+      // For demo: auto-enable (in real, would require code verification)
+      await enableTwoFactor('000000', adminUser.id); // Placeholder code
+      setTwoFactorSuccess((prev) => ({ ...prev, [adminUser.id]: '2FA enabled' }));
+      setTwoFactorStatus((prev) => ({ ...prev, [adminUser.id]: { enabled: true, loading: false } }));
+    } catch (err) {
+      setTwoFactorError((prev) => ({ ...prev, [adminUser.id]: err.message || 'Failed to enable 2FA' }));
+      setTwoFactorStatus((prev) => ({ ...prev, [adminUser.id]: { enabled: false, loading: false } }));
+    }
+  };
+  const handleDisable2FA = async (adminUser) => {
+    setTwoFactorError((prev) => ({ ...prev, [adminUser.id]: '' }));
+    setTwoFactorSuccess((prev) => ({ ...prev, [adminUser.id]: '' }));
+    setTwoFactorStatus((prev) => ({ ...prev, [adminUser.id]: { ...prev[adminUser.id], loading: true } }));
+    try {
+      await disableTwoFactor(adminUser.id);
+      setTwoFactorSuccess((prev) => ({ ...prev, [adminUser.id]: '2FA disabled' }));
+      setTwoFactorStatus((prev) => ({ ...prev, [adminUser.id]: { enabled: false, loading: false } }));
+    } catch (err) {
+      setTwoFactorError((prev) => ({ ...prev, [adminUser.id]: err.message || 'Failed to disable 2FA' }));
+      setTwoFactorStatus((prev) => ({ ...prev, [adminUser.id]: { enabled: true, loading: false } }));
+    }
+  };
 
 console.log('[DEBUG] UserManagementScreen mounted');
 // The following useEffect should be inside the component, not at the top level
@@ -826,43 +921,158 @@ export default function UserManagementScreen() {
                   <span style={{ fontSize: '2rem' }}>⚠️</span>
                 </div>
                 <h3 style={{ margin: '0 0 0.75rem', fontSize: '1.75rem', fontWeight: '700' }}>
-                  Delete User
-                </h3>
-                <p style={{ margin: 0, color: '#94a3b8', fontSize: '1.05rem', lineHeight: '1.6' }}>
-                  Are you sure you want to delete <strong>{selectedUser.email}</strong>?
-                </p>
-              </div>
-
               <div
-                style={{
-                  marginBottom: '2rem',
-                  padding: '1.5rem',
-                  background: 'rgba(255,255,255,0.05)',
-                  borderRadius: '12px',
-                }}
-              >
-                <div style={{ marginBottom: '1.5rem' }}>
-                  <label
-                    style={{
-                      fontSize: '1rem',
-                      fontWeight: '600',
-                      marginBottom: '1rem',
-                      display: 'block',
                     }}
-                  >
-                    Deletion Type:
-                  </label>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                    <label
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.75rem',
                         cursor: 'pointer',
-                        padding: '1rem',
-                        background:
-                          deleteType === 'soft' ? 'rgba(59, 130, 246, 0.2)' : 'transparent',
-                        border: `2px solid ${deleteType === 'soft' ? '#3b82f6' : 'rgba(255,255,255,0.1)'}`,
+                        {u.deleted_at ? (
+                          <button
+                            onClick={() => handleRestore(u.id)}
+                            className="btn btn-ghost btn--small"
+                            style={{ color: '#10b981' }}
+                          >
+                            🔄 Restore
+                          </button>
+                        ) : (
+                          <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', alignItems: 'center' }}>
+                            {/* Only superadmin can change roles */}
+                            {user.role === 'superadmin' && u.id !== user.id && (
+                              <button
+                                onClick={() => handleEditRole(u)}
+                                className="btn btn-ghost btn--small"
+                                style={{ color: '#2563eb' }}
+                                title="Change user role"
+                              >
+                                ⚡ Edit Role
+                              </button>
+                            )}
+                            {/* Superadmin: Reset admin password */}
+                            {user.role === 'superadmin' && (u.role === 'admin' || u.role === 'superadmin') && u.id !== user.id && (
+                              <button
+                                onClick={() => openResetPasswordModal(u)}
+                                className="btn btn-ghost btn--small"
+                                style={{ color: '#f59e42' }}
+                                title="Reset admin password"
+                              >
+                                🔑 Reset Password
+                              </button>
+                            )}
+                            {/* 2FA Management (admin/superadmin only) */}
+                            {(u.role === 'admin' || u.role === 'superadmin') && (
+                              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+                                {twoFactorStatus[u.id]?.loading ? (
+                                  <span style={{ color: '#2563eb', fontSize: '0.9em' }}>Checking 2FA...</span>
+                                ) : twoFactorStatus[u.id]?.enabled ? (
+                                  <>
+                                    <span style={{ color: '#10b981', fontWeight: 600 }}>2FA On</span>
+                                    <button
+                                      onClick={() => handleDisable2FA(u)}
+                                      className="btn btn-ghost btn--small"
+                                      style={{ color: '#ef4444' }}
+                                      title="Disable 2FA"
+                                      disabled={twoFactorStatus[u.id]?.loading}
+                                    >
+                                      ❌ Disable 2FA
+                                    </button>
+                                  </>
+                                ) : (
+                                  <>
+                                    <span style={{ color: '#ef4444', fontWeight: 600 }}>2FA Off</span>
+                                    <button
+                                      onClick={() => handleEnable2FA(u)}
+                                      className="btn btn-ghost btn--small"
+                                      style={{ color: '#2563eb' }}
+                                      title="Enable 2FA"
+                                      disabled={twoFactorStatus[u.id]?.loading}
+                                    >
+                                      ✅ Enable 2FA
+                                    </button>
+                                  </>
+                                )}
+                                {twoFactorError[u.id] && <span style={{ color: '#ef4444', fontSize: '0.85em' }}>{twoFactorError[u.id]}</span>}
+                                {twoFactorSuccess[u.id] && <span style={{ color: '#10b981', fontSize: '0.85em' }}>{twoFactorSuccess[u.id]}</span>}
+                              </div>
+                            )}
+                            {u.id !== user.id && (
+                              <button
+                                onClick={() => openDeleteModal(u)}
+                                className="btn btn-ghost btn--small"
+                                style={{ color: '#ef4444' }}
+                              >
+                                🗑️ Delete
+                              </button>
+                            )}
+                          </div>
+                        )}
+                              {/* Reset Admin Password Modal (Superadmin Only) */}
+                              {showResetPasswordModal && resettingUser && (
+                                <div
+                                  style={{
+                                    position: 'fixed',
+                                    top: 0,
+                                    left: 0,
+                                    right: 0,
+                                    bottom: 0,
+                                    background: 'rgba(0, 0, 0, 0.7)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    zIndex: 1000,
+                                    padding: '1rem',
+                                  }}
+                                  onClick={closeResetPasswordModal}
+                                >
+                                  <div
+                                    style={{
+                                      background: 'white',
+                                      borderRadius: '24px',
+                                      maxWidth: '400px',
+                                      width: '100%',
+                                      padding: '2rem',
+                                      boxShadow: '0 25px 70px rgba(0,0,0,0.3)',
+                                      animation: 'slideUp 0.3s ease-out',
+                                    }}
+                                    onClick={(e) => e.stopPropagation()}
+                                  >
+                                    <h3 style={{ marginBottom: '1rem', color: '#1f2937', fontWeight: 700 }}>
+                                      🔑 Reset Admin Password
+                                    </h3>
+                                    <p style={{ color: '#4b5563', marginBottom: '1rem' }}>
+                                      Set a new password for <strong>{resettingUser.email || resettingUser.phone}</strong>
+                                    </p>
+                                    <form onSubmit={handleResetAdminPassword}>
+                                      <input
+                                        type="password"
+                                        value={newAdminPassword}
+                                        onChange={(e) => setNewAdminPassword(e.target.value)}
+                                        placeholder="New password (min 8 chars)"
+                                        minLength={8}
+                                        required
+                                        style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #e5e7eb', marginBottom: '1rem' }}
+                                        disabled={resettingPassword}
+                                      />
+                                      {resetPasswordError && <div style={{ color: '#ef4444', marginBottom: '0.5rem' }}>{resetPasswordError}</div>}
+                                      {resetPasswordSuccess && <div style={{ color: '#10b981', marginBottom: '0.5rem' }}>{resetPasswordSuccess}</div>}
+                                      <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+                                        <button
+                                          type="button"
+                                          onClick={closeResetPasswordModal}
+                                          disabled={resettingPassword}
+                                          style={{ padding: '0.75rem 1.5rem', background: '#f3f4f6', border: 'none', borderRadius: '8px', fontWeight: 600, color: '#1f2937', cursor: 'pointer' }}
+                                        >
+                                          Cancel
+                                        </button>
+                                        <button
+                                          type="submit"
+                                          disabled={resettingPassword || newAdminPassword.length < 8}
+                                          style={{ padding: '0.75rem 1.5rem', background: '#2563eb', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: 'pointer' }}
+                                        >
+                                          {resettingPassword ? 'Resetting...' : 'Reset Password'}
+                                        </button>
+                                      </div>
+                                    </form>
+                                  </div>
+                                </div>
+                              )}
                         borderRadius: '10px',
                       }}
                     >

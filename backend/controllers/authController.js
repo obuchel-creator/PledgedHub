@@ -280,6 +280,18 @@ async function login(req, res) {
 
         // Security: Clear failed login attempts on successful login
         clearLoginAttempts(loginId);
+            // Enforce 2FA for admin/superadmin
+            const isAdmin = user.role === 'admin' || user.role === 'superadmin';
+            if (isAdmin) {
+                if (!user.two_factor_enabled) {
+                    return res.status(403).json({
+                        success: false,
+                        require2FA: true,
+                        message: 'Two-factor authentication required for admin/superadmin accounts. Please set up 2FA.'
+                    });
+                }
+                // Optionally: check if 2FA was verified in session/token (for future enhancement)
+            }
 
         // Generate token with session tracking
         const { token, jti } = signToken({ id: user.id || user._id });

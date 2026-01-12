@@ -29,8 +29,18 @@ export default function Register() {
     if (name === 'password' && value.length > 0 && value.length < 6) {
       setError('Password must be at least 6 characters.');
     }
-    if (name === 'phone' && value && !/^\+256\d{9}$/.test(value)) {
-      setError('Phone number must be in format +256XXXXXXXXX');
+    if (name === 'phone' && value) {
+      // Only allow digits, must start with 256, exactly 12 digits
+      if (!/^256\d{9}$/.test(value)) {
+        setError('Phone number must be in format 256XXXXXXXXX (no plus, 12 digits)');
+      }
+    }
+    if (name === 'password' && value) {
+      // Password must match backend: 8+ chars, upper, lower, number, special
+      const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/;
+      if (!strongPasswordRegex.test(value)) {
+        setError('Password must be at least 8 characters and include uppercase, lowercase, number, and special character.');
+      }
     }
     if (name === 'email' && value && !/^\S+@\S+\.\S+$/.test(value)) {
       setError('Invalid email address');
@@ -54,8 +64,8 @@ export default function Register() {
       setError('Phone number is required.');
       return false;
     }
-    if (!/^\+256\d{9}$/.test(formData.phone)) {
-      setError('Phone number must be in format +256XXXXXXXXX');
+    if (!/^256\d{9}$/.test(formData.phone)) {
+      setError('Phone number must be in format 256XXXXXXXXX (no plus, 12 digits)');
       return false;
     }
     if (!formData.email.trim()) {
@@ -70,8 +80,10 @@ export default function Register() {
       setError('Password is required.');
       return false;
     }
-    if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters.');
+    // Password must match backend: 8+ chars, upper, lower, number, special
+    const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/;
+    if (!strongPasswordRegex.test(formData.password)) {
+      setError('Password must be at least 8 characters and include uppercase, lowercase, number, and special character.');
       return false;
     }
     if (formData.password !== formData.confirmPassword) {
@@ -251,10 +263,11 @@ export default function Register() {
             value={formData.phone}
             onChange={handleChange}
             autoComplete="tel"
-            placeholder="e.g. +256771234567"
+            placeholder="e.g. 256771234567"
             required
             disabled={loading}
             data-cy="register-phone"
+            maxLength={12}
           />
         </div>
         <div style={{ marginBottom: 20, position: 'relative', zIndex: 12 }}>
@@ -289,7 +302,7 @@ export default function Register() {
             aria-describedby="registerPasswordHelp"
           />
           <div id="registerPasswordHelp" style={{ fontSize: 12, color: '#888', marginTop: -8, marginBottom: 8 }}>
-            Password must be at least 6 characters.
+            Password must be at least 8 characters and include uppercase, lowercase, number, and special character.
           </div>
         </div>
         <div style={{ marginBottom: 24, position: 'relative', zIndex: 12 }}>

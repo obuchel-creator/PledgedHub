@@ -7,7 +7,7 @@ async function batchCreatePledges(req, res) {
             return res.status(400).json({ error: 'No pledges provided' });
         }
         // Validate and prepare values
-        const validPledges = pledges.filter(p => p && p.title && p.amount && !isNaN(Number(p.amount)));
+        const validPledges = pledges.filter(p => p && p.amount && !isNaN(Number(p.amount)));
         if (!validPledges.length) {
             return res.status(400).json({ error: 'No valid pledges in batch' });
         }

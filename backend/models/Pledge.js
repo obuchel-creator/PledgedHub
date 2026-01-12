@@ -2,7 +2,6 @@ const { pool } = require('../config/db');
 
 const TABLE = 'pledges';
 const ALLOWED_UPDATE = [
-    'title', 
     'description', 
     'goal', 
     'amount', 

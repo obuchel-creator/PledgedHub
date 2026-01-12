@@ -24,7 +24,7 @@ const TEST_USER = {
 
 let authToken = null;
 
-const BASE_URL = 'http://localhost:5000/api';
+const BASE_URL = 'http://localhost:5002/api';
 const colors = {
     reset: '\x1b[0m',
     green: '\x1b[32m',
@@ -114,14 +114,13 @@ async function runTests() {
     // Only the 11 fields used in backend SQL insert, in order
     const pledgePayload = {
         campaign_id: 1,
-        title: 'Community Pledge',
-        name: 'Community Pledge',
         donor_name: 'John Doe',
         donor_email: 'john@example.com',
         donor_phone: '+256700000000',
         purpose: 'Support local agriculture',
         message: '',
         collection_date: '2025-11-19',
+        date: '2025-11-18', // Required pledge date
         amount: 100000,
         status: 'active'
     };

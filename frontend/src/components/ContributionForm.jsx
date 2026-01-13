@@ -1,18 +1,39 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 
+// Error boundary for debugging
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+  componentDidCatch(error, info) {
+    // eslint-disable-next-line no-console
+    console.error('ContributionForm error boundary:', error, info);
+  }
+  render() {
+    if (this.state.hasError) {
+      return <div style={{ color: 'red', fontWeight: 700 }}>ContributionForm error: {this.state.error?.toString()}</div>;
+    }
+    return this.props.children;
+  }
+}
+
 const quickAmounts = [50000, 100000];
 
-export default function ContributionForm({ campaign, onSuccess }) {
+function ContributionFormInner({ campaign, onSuccess }) {
   const [amount, setAmount] = useState('');
-    const [amountTouched, setAmountTouched] = useState(false);
-    const [phoneTouched, setPhoneTouched] = useState(false);
-    const amountInputRef = useRef(null);
-    useEffect(() => {
-      if (amountInputRef.current) {
-        amountInputRef.current.focus();
-      }
-    }, []);
+  const [amountTouched, setAmountTouched] = useState(false);
+  const [phoneTouched, setPhoneTouched] = useState(false);
+  const amountInputRef = useRef(null);
+  useEffect(() => {
+    if (amountInputRef.current) {
+      amountInputRef.current.focus();
+    }
+  }, []);
   const [donorName, setDonorName] = useState('');
   const [donorPhone, setDonorPhone] = useState('+256');
   const [donorEmail, setDonorEmail] = useState('');
@@ -41,166 +62,145 @@ export default function ContributionForm({ campaign, onSuccess }) {
     setSuccessMsg(null);
     setAmountTouched(true);
     setPhoneTouched(true);
+
+    // Validate all fields
+    if (!donorName || donorName.trim().length < 2) {
+      setSubmitError('Please enter your name.');
+      return;
+    }
+    if (!donorPhone || !donorPhone.match(/^256\d{9}$/)) {
+      setSubmitError('Invalid phone number. Must be 256XXXXXXXXX');
+      return;
+    }
+    if (!donorEmail || !donorEmail.match(/^[^@]+@[^@]+\.[^@]+$/)) {
+      setSubmitError('Please enter a valid email address.');
+      return;
+    }
     if (!amount || parseFloat(amount) <= 0) {
       setSubmitError('Please enter a valid amount');
       return;
     }
-    const normalizedPhone = normalizePhone(donorPhone);
-    if (!normalizedPhone.match(/^256\d{9}$/)) {
-      setSubmitError('Invalid phone number. Must be 256XXXXXXXXX');
+    if (!campaign?.id) {
+      setSubmitError('No campaign selected.');
       return;
     }
-    // Submission logic here (API call, etc.)
+
+    setIsSubmitting(true);
+    try {
+      const res = await fetch('/api/payments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount: parseFloat(amount),
+          donorName,
+          donorPhone,
+          donorEmail,
+          campaignId: campaign.id,
+        }),
+      });
+      const data = await res.json();
+      if (!data.success) {
+        setSubmitError(data.error || 'Payment failed. Please try again.');
+      } else {
+        setSuccessMsg('Thank you! Please check your phone for a payment prompt.');
+        setAmount('');
+        setDonorName('');
+        setDonorPhone('+256');
+        setDonorEmail('');
+        if (onSuccess) onSuccess(data);
+      }
+    } catch (err) {
+      setSubmitError('Network error. Please try again.');
+    }
+    setIsSubmitting(false);
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      style={{
-        background: '#fff',
-        borderRadius: 20,
-        boxShadow: '0 12px 40px 0 rgba(37,99,235,0.13)',
-        maxWidth: 440,
-        margin: '0 auto',
-        padding: '2.7rem 2.5rem 2.2rem 2.5rem',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 22,
-        fontFamily: 'Inter, Segoe UI, Arial, sans-serif',
-      }}
-      autoComplete="off"
-    >
-      <div style={{ display: 'flex', alignItems: 'center', marginBottom: 14 }}>
-        <h2 style={{ margin: 0, fontSize: 26, fontWeight: 800, color: '#1e293b', letterSpacing: 0.2 }}>Make Your Contribution</h2>
+    <form onSubmit={handleSubmit} className="card" style={{ maxWidth: 440, margin: '0 auto', padding: '2.7rem 2.5rem 2.2rem 2.5rem' }} autoComplete="off">
+      <div className="form-group" style={{ marginBottom: 0 }}>
+        <h2 className="card-title" style={{ margin: 0 }}>Make Your Contribution</h2>
+        <div className="form-help" style={{ marginBottom: 12 }}>Support this campaign with a secure mobile money payment.</div>
       </div>
-      <div style={{ color: '#64748b', fontSize: 16, marginBottom: 12, lineHeight: 1.6 }}>
-        Support this campaign with a secure mobile money payment.
+      <div className="form-group">
+        <label className="form-label" htmlFor="contribution-amount">Contribution Amount</label>
+        <div style={{ display: 'flex', gap: 8, marginBottom: 10, flexWrap: 'nowrap', justifyContent: 'flex-start' }}>
+          {quickAmounts.map((amt) => (
+            <button
+              type="button"
+              key={amt}
+              onClick={() => handleQuickAmount(amt)}
+              className={`btn btn-outline${amount === amt.toString() ? ' btn-primary' : ''}`}
+              style={{ minWidth: 90 }}
+            >
+              {amt.toLocaleString()} UGX
+            </button>
+          ))}
+        </div>
+        <input
+          ref={amountInputRef}
+          id="contribution-amount"
+          type="number"
+          min="1000"
+          step="100"
+          placeholder="Enter amount (UGX)"
+          value={amount}
+          onChange={e => setAmount(e.target.value)}
+          onBlur={() => setAmountTouched(true)}
+          className={`form-input${amountTouched && (!amount || parseFloat(amount) <= 0) ? ' error' : ''}`}
+          required
+        />
       </div>
-      <div style={{ fontWeight: 700, color: '#2563eb', fontSize: 15, marginBottom: 6 }}>Contribution Amount</div>
-      <div style={{ display: 'flex', gap: 8, marginBottom: 10, flexWrap: 'nowrap', justifyContent: 'flex-start' }}>
-        {quickAmounts.map((amt) => (
-          <button
-            type="button"
-            key={amt}
-            onClick={() => handleQuickAmount(amt)}
-            style={{
-              background: amount === amt.toString() ? '#2563eb' : '#f3f4f6',
-              color: amount === amt.toString() ? '#fff' : '#2563eb',
-              border: '1px solid #e5e7eb',
-              borderRadius: 9,
-              padding: '0.45rem 0.9rem',
-              fontWeight: 600,
-              fontSize: 14,
-              cursor: 'pointer',
-              transition: 'background 0.18s, color 0.18s',
-              boxShadow: amount === amt.toString() ? '0 1px 4px rgba(37,99,235,0.10)' : 'none',
-              outline: amount === amt.toString() ? '2px solid #2563eb33' : 'none',
-              minWidth: 90,
-            }}
-          >
-            {amt.toLocaleString()} UGX
-          </button>
-        ))}
+      <div className="form-group">
+        <label className="form-label" htmlFor="contribution-name">Name</label>
+        <input
+          id="contribution-name"
+          type="text"
+          placeholder="Your name"
+          value={donorName}
+          onChange={e => setDonorName(e.target.value)}
+          className="form-input"
+        />
       </div>
-      <input
-        ref={amountInputRef}
-        type="number"
-        min="1000"
-        step="100"
-        placeholder="Enter amount (UGX)"
-        value={amount}
-        onChange={e => setAmount(e.target.value)}
-        onBlur={() => setAmountTouched(true)}
-        style={{
-          border: amountTouched && (!amount || parseFloat(amount) <= 0) ? '2px solid #ef4444' : '1.2px solid #cbd5e1',
-          borderRadius: 10,
-          padding: '0.7rem 1rem',
-          fontSize: 15,
-          marginBottom: 8,
-          outline: 'none',
-          fontFamily: 'inherit',
-          boxShadow: 'none',
-          transition: 'border 0.18s',
-        }}
-        required
-      />
-      <div style={{ fontWeight: 700, color: '#2563eb', fontSize: 16, marginBottom: 8 }}>Name</div>
-      <input
-        type="text"
-        placeholder="Your name"
-        value={donorName}
-        onChange={e => setDonorName(e.target.value)}
-        style={{
-          border: '1.5px solid #cbd5e1',
-          borderRadius: 14,
-          padding: '1.1rem 1.2rem',
-          fontSize: 18,
-          marginBottom: 10,
-          outline: 'none',
-          fontFamily: 'inherit',
-          boxShadow: 'none',
-          transition: 'border 0.18s',
-        }}
-      />
-      <div style={{ fontWeight: 700, color: '#2563eb', fontSize: 16, marginBottom: 8 }}>Phone Number <span style={{ color: '#64748b', fontWeight: 400, fontSize: 13 }}>(Uganda: 256XXXXXXXXX)</span></div>
-      <input
-        type="tel"
-        placeholder="e.g. 256771234567"
-        value={donorPhone}
-        onChange={e => setDonorPhone(e.target.value)}
-        onBlur={() => setPhoneTouched(true)}
-        style={{
-          border: phoneTouched && !donorPhone.match(/^\+?256\d{9}$/) ? '2px solid #ef4444' : '1.5px solid #cbd5e1',
-          borderRadius: 14,
-          padding: '1.1rem 1.2rem',
-          fontSize: 18,
-          marginBottom: 10,
-          outline: 'none',
-          fontFamily: 'inherit',
-          boxShadow: 'none',
-          transition: 'border 0.18s',
-        }}
-        required
-      />
-      <div style={{ fontWeight: 700, color: '#2563eb', fontSize: 16, marginBottom: 8 }}>Email <span style={{ color: '#64748b', fontWeight: 400, fontSize: 13 }}>(optional)</span></div>
-      <input
-        type="email"
-        placeholder="Your email (optional)"
-        value={donorEmail}
-        onChange={e => setDonorEmail(e.target.value)}
-        style={{
-          border: '1.5px solid #cbd5e1',
-          borderRadius: 14,
-          padding: '1.1rem 1.2rem',
-          fontSize: 18,
-          marginBottom: 10,
-          outline: 'none',
-          fontFamily: 'inherit',
-          boxShadow: 'none',
-          transition: 'border 0.18s',
-        }}
-      />
-      {submitError && <div style={{ color: '#ef4444', fontWeight: 600, marginBottom: 10 }}>{submitError}</div>}
-      {successMsg && <div style={{ color: '#10b981', fontWeight: 600, marginBottom: 10 }}>{successMsg}</div>}
-      <button
-        type="submit"
-        disabled={isSubmitting}
-        style={{
-          background: isSubmitting ? '#a5b4fc' : '#2563eb',
-          color: '#fff',
-          border: 'none',
-          borderRadius: 14,
-          padding: '1.2rem 0',
-          fontWeight: 800,
-          fontSize: 19,
-          marginTop: 10,
-          cursor: isSubmitting ? 'not-allowed' : 'pointer',
-          boxShadow: '0 2px 8px rgba(37,99,235,0.10)',
-          transition: 'background 0.18s',
-        }}
-      >
+      <div className="form-group">
+        <label className="form-label" htmlFor="contribution-phone">Phone Number <span className="form-help">(Uganda: 256XXXXXXXXX)</span></label>
+        <input
+          id="contribution-phone"
+          type="tel"
+          placeholder="e.g. 256771234567"
+          value={donorPhone}
+          onChange={e => setDonorPhone(e.target.value)}
+          onBlur={() => setPhoneTouched(true)}
+          className={`form-input${phoneTouched && !donorPhone.match(/^\+?256\d{9}$/) ? ' error' : ''}`}
+          required
+        />
+      </div>
+      <div className="form-group">
+        <label className="form-label" htmlFor="contribution-email">Email <span className="form-help">(optional)</span></label>
+        <input
+          id="contribution-email"
+          type="email"
+          placeholder="Your email (optional)"
+          value={donorEmail}
+          onChange={e => setDonorEmail(e.target.value)}
+          className="form-input"
+        />
+      </div>
+      {/* Show error/success messages above the button, always visible */}
+      <div style={{ minHeight: 32, marginBottom: 8 }}>
+        {submitError && <div className="form-error">{submitError}</div>}
+        {successMsg && <div className="alert alert-success">{successMsg}</div>}
+      </div>
+      <button type="submit" className="btn btn-primary btn-block" disabled={isSubmitting} style={{ marginTop: 10 }}>
         {isSubmitting ? 'Processing...' : 'Contribute Now'}
       </button>
     </form>
+  );
+}
+
+export default function ContributionForm(props) {
+  return (
+    <ErrorBoundary>
+      <ContributionFormInner {...props} />
+    </ErrorBoundary>
   );
 }

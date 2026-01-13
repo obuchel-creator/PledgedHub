@@ -85,7 +85,7 @@ describe('RegisterScreen', () => {
     fireEvent.change(screen.getByLabelText(/^password$/i), { target: { value: 'password123' } });
     fireEvent.change(screen.getByLabelText(/confirm password/i), { target: { value: 'password123' } });
     fireEvent.click(screen.getByRole('button', { name: /register/i }));
-    expect(await screen.findByText(/network error/i)).toBeInTheDocument();
+    expect(await screen.findByText(/server error/i)).toBeInTheDocument();
     jest.restoreAllMocks();
   });
 });

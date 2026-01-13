@@ -9,7 +9,7 @@ describe('HomeScreen', () => {
         <HomeScreen />
       </MemoryRouter>
     );
-    expect(screen.getByText(/quick snapshot/i)).toBeInTheDocument();
+    expect(screen.getByText(/welcome to pledgehub/i)).toBeInTheDocument();
     // There are multiple elements with 'active campaigns' text, so use getAllByText
     const activeCampaigns = screen.getAllByText(/active campaigns/i);
     expect(activeCampaigns.length).toBeGreaterThan(0);

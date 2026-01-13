@@ -1,7 +1,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 
-const quickAmounts = [50000, 100000, 250000, 500000];
+const quickAmounts = [50000, 100000];
 
 export default function ContributionForm({ campaign, onSuccess }) {
   const [amount, setAmount] = useState('');
@@ -76,24 +76,26 @@ export default function ContributionForm({ campaign, onSuccess }) {
       <div style={{ color: '#64748b', fontSize: 16, marginBottom: 12, lineHeight: 1.6 }}>
         Support this campaign with a secure mobile money payment.
       </div>
-      <div style={{ fontWeight: 700, color: '#2563eb', fontSize: 16, marginBottom: 8 }}>Contribution Amount</div>
-      <div style={{ display: 'flex', gap: 12, marginBottom: 12, flexWrap: 'wrap' }}>
+      <div style={{ fontWeight: 700, color: '#2563eb', fontSize: 15, marginBottom: 6 }}>Contribution Amount</div>
+      <div style={{ display: 'flex', gap: 8, marginBottom: 10, flexWrap: 'nowrap', justifyContent: 'flex-start' }}>
         {quickAmounts.map((amt) => (
           <button
             type="button"
             key={amt}
             onClick={() => handleQuickAmount(amt)}
             style={{
-              background: amount === amt.toString() ? '#2563eb' : '#f1f5f9',
+              background: amount === amt.toString() ? '#2563eb' : '#f3f4f6',
               color: amount === amt.toString() ? '#fff' : '#2563eb',
-              border: 'none',
-              borderRadius: 12,
-              padding: '0.7rem 1.3rem',
-              fontWeight: 700,
-              fontSize: 16,
+              border: '1px solid #e5e7eb',
+              borderRadius: 9,
+              padding: '0.45rem 0.9rem',
+              fontWeight: 600,
+              fontSize: 14,
               cursor: 'pointer',
-              transition: 'background 0.18s',
-              boxShadow: amount === amt.toString() ? '0 2px 8px rgba(37,99,235,0.10)' : 'none',
+              transition: 'background 0.18s, color 0.18s',
+              boxShadow: amount === amt.toString() ? '0 1px 4px rgba(37,99,235,0.10)' : 'none',
+              outline: amount === amt.toString() ? '2px solid #2563eb33' : 'none',
+              minWidth: 90,
             }}
           >
             {amt.toLocaleString()} UGX
@@ -110,11 +112,11 @@ export default function ContributionForm({ campaign, onSuccess }) {
         onChange={e => setAmount(e.target.value)}
         onBlur={() => setAmountTouched(true)}
         style={{
-          border: amountTouched && (!amount || parseFloat(amount) <= 0) ? '2px solid #ef4444' : '1.5px solid #cbd5e1',
-          borderRadius: 14,
-          padding: '1.1rem 1.2rem',
-          fontSize: 18,
-          marginBottom: 10,
+          border: amountTouched && (!amount || parseFloat(amount) <= 0) ? '2px solid #ef4444' : '1.2px solid #cbd5e1',
+          borderRadius: 10,
+          padding: '0.7rem 1rem',
+          fontSize: 15,
+          marginBottom: 8,
           outline: 'none',
           fontFamily: 'inherit',
           boxShadow: 'none',

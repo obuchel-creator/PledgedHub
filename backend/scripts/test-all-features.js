@@ -19,12 +19,12 @@ const TEST_USER = {
     username: 'testuser',
     phone: '+256771234567',
     email: 'testuser@example.com',
-    password: 'testpass123'
+    password: 'TestPass123!@#'
 };
 
 let authToken = null;
 
-const BASE_URL = 'http://localhost:5002/api';
+const BASE_URL = 'http://localhost:5001/api';
 const colors = {
     reset: '\x1b[0m',
     green: '\x1b[32m',
@@ -61,6 +61,17 @@ async function runTests() {
         passed: 0,
         failed: 0
     };
+
+    // --- CLEANUP: Delete test user if exists ---
+    log('yellow', '\n🧹 Cleaning up any existing test user...');
+    try {
+        const connection = await mysql.createConnection(dbConfig);
+        await connection.execute('DELETE FROM users WHERE email = ? OR phone = ?', [TEST_USER.email, TEST_USER.phone]);
+        await connection.end();
+        log('green', 'Old test user deleted (if existed).');
+    } catch (err) {
+        log('red', 'Failed to delete old test user: ' + err.message);
+    }
 
     // --- AUTHENTICATION: Register or login test user ---
     log('yellow', '\n🔑 Authenticating test user...');

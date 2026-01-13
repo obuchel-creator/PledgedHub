@@ -1,3 +1,4 @@
+import CampaignDetailScreen from './screens/CampaignDetailScreen';
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
@@ -77,7 +78,11 @@ function App() {
         <Route path="/about" element={<AboutScreen />} />
         <Route path="/fundraising" element={<FundraisingScreen />} />
         <Route path="/campaign/:slug" element={<GuestPledgeScreen />} />
-        <Route path="/campaigns/:id" element={<GuestPledgeScreen />} />
+        <Route path="/campaigns/:id" element={
+          <ProtectedRoute>
+            <CampaignDetailScreen />
+          </ProtectedRoute>
+        } />
         <Route path="/pledges/:id" element={
           <ProtectedRoute>
             <PledgeDetailScreen />

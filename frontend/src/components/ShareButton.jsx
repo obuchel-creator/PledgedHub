@@ -321,6 +321,38 @@ const ShareButton = ({
   return null;
 };
 
+
+// SVG Icon components for each platform
+const icons = {
+  whatsapp: (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="12" fill="#25D366"/><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.472-.148-.67.15-.198.297-.767.967-.94 1.164-.173.198-.347.223-.644.075-.297-.149-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.372-.025-.521-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.007-.372-.009-.571-.009-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.099 3.205 5.077 4.366.71.306 1.263.489 1.695.625.712.227 1.36.195 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.288.173-1.413-.074-.124-.272-.198-.57-.347z" fill="#fff"/></svg>
+  ),
+  facebook: (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="12" fill="#1877F2"/><path d="M15.117 8.667h-1.2c-.15 0-.317.2-.317.45v.9h1.517l-.2 1.517h-1.317v4.05h-1.7v-4.05h-1.05v-1.517h1.05v-.95c0-.85.517-1.7 1.7-1.7h1.317v1.35z" fill="#fff"/></svg>
+  ),
+  twitter: (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="12" fill="#1DA1F2"/><path d="M19.633 7.997c-.508.226-1.054.379-1.626.448a2.825 2.825 0 001.24-1.555 5.657 5.657 0 01-1.793.685 2.822 2.822 0 00-4.807 2.572A8.012 8.012 0 015.67 7.149a2.822 2.822 0 00.873 3.77c-.45-.014-.874-.138-1.244-.344v.035a2.825 2.825 0 002.263 2.768c-.21.057-.432.088-.66.088-.162 0-.318-.016-.47-.045a2.825 2.825 0 002.637 1.96A5.66 5.66 0 015 17.027a7.978 7.978 0 004.29 1.257c5.148 0 7.967-4.267 7.967-7.967 0-.121-.003-.242-.009-.362a5.69 5.69 0 001.395-1.457z" fill="#fff"/></svg>
+  ),
+  linkedin: (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="12" fill="#0A66C2"/><path d="M8.5 17h-2v-6h2v6zm-1-7.1c-.69 0-1.25-.56-1.25-1.25S6.81 7.4 7.5 7.4s1.25.56 1.25 1.25S8.19 9.9 7.5 9.9zm9.5 7.1h-2v-3c0-.72-.28-1.2-.97-1.2-.53 0-.84.36-.98.71-.05.13-.06.31-.06.49v3h-2s.03-4.87 0-6h2v.85c.27-.42.76-1.02 1.85-1.02 1.35 0 2.36.88 2.36 2.77v3.4z" fill="#fff"/></svg>
+  ),
+  email: (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="12" fill="#EA4335"/><path d="M6 8h12v8H6V8zm6 5l6-4H6l6 4z" fill="#fff"/></svg>
+  ),
+  copy: (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="4" fill="#6B7280"/><rect x="8" y="8" width="8" height="8" rx="2" fill="#fff"/></svg>
+  ),
+  sms: (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="12" fill="#4CAF50"/><path d="M6 8h12v8H6V8zm6 5l6-4H6l6 4z" fill="#fff"/></svg>
+  ),
+  native: (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="12" fill="#6366F1"/><path d="M12 7v10m5-5H7" stroke="#fff" strokeWidth="2" strokeLinecap="round"/></svg>
+  ),
+  check: (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="12" fill="#10B981"/><path d="M7 13l3 3 7-7" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+  ),
+};
+
 // Share Option Component (for dropdown)
 const ShareOption = ({ icon, label, color, onClick }) => (
   <button
@@ -329,14 +361,18 @@ const ShareOption = ({ icon, label, color, onClick }) => (
       width: '100%',
       display: 'flex',
       alignItems: 'center',
-      gap: '12px',
-      padding: '10px 12px',
+      gap: '14px',
+      padding: '12px 14px',
       border: 'none',
       backgroundColor: 'transparent',
-      borderRadius: '8px',
+      borderRadius: '10px',
       cursor: 'pointer',
       transition: 'background-color 0.2s',
       textAlign: 'left',
+      fontWeight: 600,
+      fontSize: '1.08rem',
+      color: color || '#374151',
+      outline: 'none',
     }}
     onMouseEnter={(e) => {
       e.currentTarget.style.backgroundColor = '#f3f4f6';
@@ -345,8 +381,8 @@ const ShareOption = ({ icon, label, color, onClick }) => (
       e.currentTarget.style.backgroundColor = 'transparent';
     }}
   >
-    <span style={{ fontSize: '20px' }}>{icon}</span>
-    <span style={{ color: color || '#374151', fontWeight: '500' }}>{label}</span>
+    <span style={{ display: 'flex', alignItems: 'center', fontSize: '22px' }}>{icons[icon] || icon}</span>
+    <span>{label}</span>
   </button>
 );
 
@@ -357,7 +393,6 @@ const InlineButton = ({ icon, label, color, size, onClick }) => {
     medium: 'px-4 py-2 text-sm',
     large: 'px-5 py-2.5 text-base',
   };
-
   return (
     <button
       onClick={onClick}
@@ -367,9 +402,10 @@ const InlineButton = ({ icon, label, color, size, onClick }) => {
         color: 'white',
         border: 'none',
         cursor: 'pointer',
+        outline: 'none',
       }}
     >
-      <span>{icon}</span>
+      <span style={{ display: 'flex', alignItems: 'center', fontSize: '20px' }}>{icons[icon] || icon}</span>
       <span>{label}</span>
     </button>
   );

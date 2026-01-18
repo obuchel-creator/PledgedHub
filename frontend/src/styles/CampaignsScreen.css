@@ -1,3 +1,63 @@
+@media (max-width: 480px) {
+  .explore-hero {
+    padding: 1.2rem 0.5rem 1rem 0.5rem;
+    font-size: 1rem;
+    border-radius: 10px;
+  }
+  .explore-hero__title {
+    font-size: 1.25rem;
+    margin-bottom: 0.3rem;
+  }
+  .explore-hero__desc {
+    font-size: 0.95rem;
+  }
+  .campaigns-container {
+    padding: 0.5rem;
+  }
+  .campaigns-header {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+  }
+  .campaigns-header h1, .campaigns-header h2 {
+    font-size: 1.1rem;
+  }
+  .btn-primary {
+    padding: 0.5rem 1rem;
+    font-size: 0.95rem;
+    border-radius: 6px;
+  }
+  .campaign-form-card, .campaign-card, .polished-card {
+    padding: 0.7rem;
+    border-radius: 8px;
+    font-size: 0.98rem;
+  }
+  .form-group input, .form-group textarea {
+    padding: 0.5rem;
+    font-size: 0.98rem;
+  }
+  .campaigns-grid {
+    gap: 0.7rem;
+  }
+  .campaign-stats {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .campaign-header h3 {
+    font-size: 1rem;
+  }
+  .campaign-description {
+    font-size: 0.98rem;
+  }
+  .campaign-progress-bar__text {
+    font-size: 0.8rem;
+  }
+  .loading, .no-campaigns {
+    padding: 1.2rem;
+    font-size: 1rem;
+  }
+}
 /* Explore Hero Section */
 .explore-hero {
   background: linear-gradient(120deg, var(--secondary) 0%, var(--accent) 100%);

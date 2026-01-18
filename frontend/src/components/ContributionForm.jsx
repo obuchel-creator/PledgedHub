@@ -18,124 +18,36 @@ class ErrorBoundary extends React.Component {
     if (this.state.hasError) {
       return <div style={{ color: 'red', fontWeight: 700 }}>ContributionForm error: {this.state.error?.toString()}</div>;
     }
+
     return this.props.children;
   }
 }
 
-const quickAmounts = [50000, 100000];
-
-function ContributionFormInner({ campaign, onSuccess }) {
+// Main form component
+function ContributionFormInner(props) {
   const [amount, setAmount] = useState('');
   const [amountTouched, setAmountTouched] = useState(false);
-  const [phoneTouched, setPhoneTouched] = useState(false);
-  const amountInputRef = useRef(null);
-  useEffect(() => {
-    if (amountInputRef.current) {
-      amountInputRef.current.focus();
-    }
-  }, []);
   const [donorName, setDonorName] = useState('');
-  const [donorPhone, setDonorPhone] = useState('+256');
+  const [donorPhone, setDonorPhone] = useState('');
+  const [phoneTouched, setPhoneTouched] = useState(false);
   const [donorEmail, setDonorEmail] = useState('');
+  const [submitError, setSubmitError] = useState('');
+  const [successMsg, setSuccessMsg] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState(null);
-  const [successMsg, setSuccessMsg] = useState(null);
+  const amountInputRef = useRef(null);
 
-  const normalizePhone = (phone) => {
-    let normalized = phone.replace(/\D/g, '');
-    if (normalized.startsWith('0')) {
-      normalized = '256' + normalized.substring(1);
-    } else if (!normalized.startsWith('256')) {
-      normalized = '256' + normalized;
-    }
-    return normalized;
-  };
-
-  const handleQuickAmount = (amt) => {
-    setAmount(amt.toString());
-    setAmountTouched(true);
-  };
-
+  // Example submit handler (replace with real logic)
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitError(null);
-    setSuccessMsg(null);
-    setAmountTouched(true);
-    setPhoneTouched(true);
-
-    // Validate all fields
-    if (!donorName || donorName.trim().length < 2) {
-      setSubmitError('Please enter your name.');
-      return;
-    }
-    if (!donorPhone || !donorPhone.match(/^256\d{9}$/)) {
-      setSubmitError('Invalid phone number. Must be 256XXXXXXXXX');
-      return;
-    }
-    if (!donorEmail || !donorEmail.match(/^[^@]+@[^@]+\.[^@]+$/)) {
-      setSubmitError('Please enter a valid email address.');
-      return;
-    }
-    if (!amount || parseFloat(amount) <= 0) {
-      setSubmitError('Please enter a valid amount');
-      return;
-    }
-    if (!campaign?.id) {
-      setSubmitError('No campaign selected.');
-      return;
-    }
-
-    setIsSubmitting(true);
-    try {
-      const res = await fetch('/api/payments', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          amount: parseFloat(amount),
-          donorName,
-          donorPhone,
-          donorEmail,
-          campaignId: campaign.id,
-        }),
-      });
-      const data = await res.json();
-      if (!data.success) {
-        setSubmitError(data.error || 'Payment failed. Please try again.');
-      } else {
-        setSuccessMsg('Thank you! Please check your phone for a payment prompt.');
-        setAmount('');
-        setDonorName('');
-        setDonorPhone('+256');
-        setDonorEmail('');
-        if (onSuccess) onSuccess(data);
-      }
-    } catch (err) {
-      setSubmitError('Network error. Please try again.');
-    }
-    setIsSubmitting(false);
+    setSubmitError('');
+    setSuccessMsg('');
+    // TODO: Add real submission logic here
   };
 
   return (
-    <form onSubmit={handleSubmit} className="card" style={{ maxWidth: 440, margin: '0 auto', padding: '2.7rem 2.5rem 2.2rem 2.5rem' }} autoComplete="off">
-      <div className="form-group" style={{ marginBottom: 0 }}>
-        <h2 className="card-title" style={{ margin: 0 }}>Make Your Contribution</h2>
-        <div className="form-help" style={{ marginBottom: 12 }}>Support this campaign with a secure mobile money payment.</div>
-      </div>
+    <form className="contribution-form" onSubmit={handleSubmit} style={{ maxWidth: 420, margin: '0 auto', padding: 16, background: '#fff', borderRadius: 12, boxShadow: '0 2px 8px #0001' }}>
       <div className="form-group">
-        <label className="form-label" htmlFor="contribution-amount">Contribution Amount</label>
-        <div style={{ display: 'flex', gap: 8, marginBottom: 10, flexWrap: 'nowrap', justifyContent: 'flex-start' }}>
-          {quickAmounts.map((amt) => (
-            <button
-              type="button"
-              key={amt}
-              onClick={() => handleQuickAmount(amt)}
-              className={`btn btn-outline${amount === amt.toString() ? ' btn-primary' : ''}`}
-              style={{ minWidth: 90 }}
-            >
-              {amt.toLocaleString()} UGX
-            </button>
-          ))}
-        </div>
+        <label className="form-label" htmlFor="contribution-amount">Amount (UGX)</label>
         <input
           ref={amountInputRef}
           id="contribution-amount"
@@ -170,7 +82,7 @@ function ContributionFormInner({ campaign, onSuccess }) {
           value={donorPhone}
           onChange={e => setDonorPhone(e.target.value)}
           onBlur={() => setPhoneTouched(true)}
-          className={`form-input${phoneTouched && !donorPhone.match(/^\+?256\d{9}$/) ? ' error' : ''}`}
+          className={`form-input${phoneTouched && !donorPhone.match(/^?256\d{9}$/) ? ' error' : ''}`}
           required
         />
       </div>
@@ -187,10 +99,10 @@ function ContributionFormInner({ campaign, onSuccess }) {
       </div>
       {/* Show error/success messages above the button, always visible */}
       <div style={{ minHeight: 32, marginBottom: 8 }}>
-        {submitError && <div className="form-error">{submitError}</div>}
-        {successMsg && <div className="alert alert-success">{successMsg}</div>}
+        {submitError && <div className="form-error" style={{ color: '#dc2626', fontWeight: 600 }}>{submitError}</div>}
+        {successMsg && <div className="alert alert-success" style={{ color: '#059669', fontWeight: 600 }}>{successMsg}</div>}
       </div>
-      <button type="submit" className="btn btn-primary btn-block" disabled={isSubmitting} style={{ marginTop: 10 }}>
+      <button type="submit" className="btn btn-primary btn-block" disabled={isSubmitting} style={{ marginTop: 10, borderRadius: 8, fontWeight: 700, fontSize: '1.08rem' }}>
         {isSubmitting ? 'Processing...' : 'Contribute Now'}
       </button>
     </form>

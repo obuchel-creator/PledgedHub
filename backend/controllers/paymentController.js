@@ -15,15 +15,17 @@ const isPositiveNumber = (v) => {
 async function createPayment(req, res) {
     const { userId, pledgeId, amount, paymentMethod } = req.body || {};
 
-    console.log('createPayment called with body:', req.body);
+    // Enhanced debug logging
+    console.log('[PaymentController] createPayment called with:', { userId, pledgeId, amount, paymentMethod, body: req.body });
 
     if (!userId || !pledgeId || !paymentMethod || !isPositiveNumber(amount)) {
+        console.error('[PaymentController] Missing or invalid fields:', { userId, pledgeId, amount, paymentMethod });
         return res.status(400).json({ error: 'Missing or invalid fields (userId, pledgeId, amount, paymentMethod)' });
     }
 
     try {
         // Use the new payment tracking service to handle partial payments
-        console.log('Using payment tracking service for pledge:', pledgeId);
+        console.log('[PaymentController] Using paymentTrackingService for pledge:', pledgeId);
         const result = await paymentTrackingService.recordPayment(
             pledgeId,
             amount,
@@ -32,7 +34,8 @@ async function createPayment(req, res) {
         );
 
         if (!result.success) {
-            return res.status(500).json({ error: 'Failed to record payment' });
+            console.error('[PaymentController] Failed to record payment:', result.error);
+            return res.status(500).json({ error: 'Failed to record payment', details: result.error });
         }
 
         // Also update the raised field for compatibility
@@ -41,11 +44,11 @@ async function createPayment(req, res) {
                 await db.execute('UPDATE pledges SET raised = raised + ? WHERE id = ?', [amount, pledgeId]);
             }
         } catch (e) {
-            console.error('Failed to update raised total:', e);
+            console.error('[PaymentController] Failed to update raised total:', e);
         }
 
         // Payment tracking service handles email/SMS notifications automatically
-        console.log('✓ Payment recorded successfully:', result.payment);
+        console.log('[PaymentController] Payment recorded successfully:', result.payment);
 
         return res.status(201).json({
             success: true,
@@ -61,7 +64,7 @@ async function createPayment(req, res) {
         });
 
     } catch (error) {
-        console.error('Error creating payment:', error);
+        console.error('[PaymentController] Error creating payment:', error);
         return res.status(500).json({ 
             error: 'Failed to create payment', 
             details: error.message 
@@ -100,9 +103,11 @@ async function listPayments(req, res) {
     const limit = Math.min(1000, Math.max(1, parseInt(req.query.limit, 10) || 100));
     const offset = Math.max(0, parseInt(req.query.offset, 10) || 0);
 
+    // Enhanced debug logging
+    console.log('[PaymentController] listPayments called with:', { userId, pledgeId, limit, offset, query: req.query });
+
     try {
         const { pool } = require('../config/db');
-        
         let sql = `SELECT 
             id, 
             pledge_id,
@@ -122,26 +127,24 @@ async function listPayments(req, res) {
             created_at AS createdAt,
             created_at AS dateCreated
          FROM payments WHERE deleted = 0`;
-        
         const params = [];
-        
         if (pledgeId) {
             sql += ` AND pledge_id = ?`;
             params.push(pledgeId);
         }
-        
         if (userId) {
             sql += ` AND recorded_by = ?`;
             params.push(userId);
         }
-        
         sql += ` ORDER BY payment_date DESC, created_at DESC LIMIT ? OFFSET ?`;
         params.push(limit, offset);
-        
+        // Add debug log for SQL and params
+        console.log('[PaymentController] listPayments SQL:', sql, 'Params:', params);
         const [payments] = await pool.execute(sql, params);
+        console.log('[PaymentController] listPayments DB rows:', payments && payments.length);
         return res.status(200).json({ success: true, payments: payments || [], data: payments || [] });
     } catch (err) {
-        console.error('listPayments error:', err);
+        console.error('[PaymentController] listPayments error:', err);
         return res.status(500).json({ success: false, error: 'Internal Server Error', details: err.message });
     }
 }

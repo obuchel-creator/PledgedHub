@@ -16,8 +16,9 @@ router.post('/change', authenticateToken, async (req, res) => {
     try {
         const { currentPassword, newPassword } = req.body;
         const userId = req.user && req.user.id;
+        const passwordService = require('../services/passwordService');
 
-        // Debug logging for troubleshooting
+        // Debug logging
         const authHeader = req.headers['authorization'] || req.headers['Authorization'];
         console.log('[PasswordChange] Debug:', {
           userId,
@@ -26,49 +27,30 @@ router.post('/change', authenticateToken, async (req, res) => {
           body: req.body
         });
 
-        // Validation
         if (!currentPassword || !newPassword) {
-            return res.status(400).json({ 
-                success: false, 
-                error: 'Current password and new password are required' 
+            return res.status(400).json({
+                success: false,
+                error: 'Current password and new password are required'
             });
         }
-
         if (newPassword.length < 8) {
-            return res.status(400).json({ 
-                success: false, 
-                error: 'New password must be at least 8 characters long' 
+            return res.status(400).json({
+                success: false,
+                error: 'New password must be at least 8 characters long'
             });
         }
 
-        // Hash new password
-        const newPasswordHash = await bcrypt.hash(newPassword, 10);
-
-        // Update both password_hash and password fields for compatibility
-        await pool.execute(
-            'UPDATE users SET password = ?, password_hash = ? WHERE id = ?',
-            [newPasswordHash, newPasswordHash, userId]
-        );
-
-        // Debug: Confirm update and log new hash
-        const [checkRows] = await pool.execute('SELECT password_hash, password FROM users WHERE id = ?', [userId]);
-        console.log('[PasswordChange] Password updated:', {
-          userId,
-          newHash: newPasswordHash,
-          dbHash: checkRows && checkRows[0] && checkRows[0].password_hash,
-          dbPassword: checkRows && checkRows[0] && checkRows[0].password
-        });
-
-        res.json({ 
-            success: true, 
-            message: 'Password changed successfully' 
-        });
-
+        const result = await passwordService.changePassword(userId, currentPassword, newPassword);
+        if (!result.success) {
+            const status = result.error === 'Current password is incorrect' ? 401 : 400;
+            return res.status(status).json({ success: false, error: result.error });
+        }
+        res.json({ success: true, message: 'Password changed successfully' });
     } catch (error) {
-        console.error('Change password error:', error);
-        res.status(500).json({ 
-            success: false, 
-            error: 'Failed to change password. Please try again.' 
+        console.error('[PasswordChange] Change password error:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to change password. Please try again.'
         });
     }
 });

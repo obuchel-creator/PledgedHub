@@ -49,18 +49,27 @@ export default function PasswordChangeScreen() {
     setLoading(true);
 
     try {
-      await changePassword({
+      const result = await changePassword({
         currentPassword,
         newPassword,
       });
 
-      setMessage({
-        type: 'success',
-        text: 'Password changed successfully! You can now use your new password to log in.',
-      });
-      setCurrentPassword('');
-      setNewPassword('');
-      setConfirmPassword('');
+      if (result && result.success === false) {
+        setMessage({
+          type: 'error',
+          text:
+            result.error ||
+            'Failed to change password. Please verify your current password is correct.',
+        });
+      } else {
+        setMessage({
+          type: 'success',
+          text: 'Password changed successfully! You can now use your new password to log in.',
+        });
+        setCurrentPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
+      }
     } catch (error) {
       setMessage({
         type: 'error',

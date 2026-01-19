@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { createPledge, getCampaigns } from '../services/api';
 import './FormScreens.css';
 
-export default function CreatePledgeScreen() {
+export default function FundraisePledgeScreen() {
   const [campaigns, setCampaigns] = useState([]);
   const [campaignId, setCampaignId] = useState('');
   const [donor_name, setDonorName] = useState('');

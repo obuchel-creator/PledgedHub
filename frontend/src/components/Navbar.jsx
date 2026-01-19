@@ -14,7 +14,7 @@ export default function Navbar() {
     ...(user ? [{ to: '/dashboard', label: 'Dashboard' }] : [{ to: '/explore', label: 'Explore' }]),
     { to: '/campaigns', label: 'Campaigns' },
     { to: '/analytics', label: 'Analytics' },
-    { to: '/create', label: 'Create' },
+    { to: '/fundraise', label: 'Fundraise' },
     ...(user?.role === 'admin' || user?.role === 'superadmin'
       ? [
           { to: '/admin/users', label: '👥 Users' },

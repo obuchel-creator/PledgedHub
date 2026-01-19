@@ -1,9 +1,11 @@
 
 import React, { useState } from 'react';
+import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import { getViteEnv } from '../utils/getViteEnv';
 
 export default function PaymentModal({ pledge, onClose, onSuccess }) {
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
     amount: pledge?.amount || '',
     paymentDate: new Date().toISOString().split('T')[0],
@@ -28,13 +30,21 @@ export default function PaymentModal({ pledge, onClose, onSuccess }) {
     setLoading(true);
 
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('pledgehub_token');
       const API_URL = getViteEnv().API_URL || 'http://localhost:5001';
+
+      // Support all possible user id fields
+      const userId = Number(user?.id || user?._id || user?.userId);
+      const pledgeId = Number(pledge.id);
+      const amount = Number(formData.amount);
+
       await axios.post(
         `${API_URL}/payments`,
         {
-          pledgeId: pledge.id,
-          ...formData,
+          pledgeId,
+          userId,
+          amount,
+          paymentMethod: formData.paymentMethod,
         },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -44,7 +54,16 @@ export default function PaymentModal({ pledge, onClose, onSuccess }) {
       onSuccess?.();
       onClose();
     } catch (err) {
-      setError(err.response?.data?.error || 'Failed to record payment');
+      // Try to extract error message from axios, fetch, or plain error
+      let backendError = 'Failed to record payment';
+      if (err.response && err.response.data && err.response.data.error) {
+        backendError = err.response.data.error;
+      } else if (err.message) {
+        backendError = err.message;
+      } else if (typeof err === 'string') {
+        backendError = err;
+      }
+      setError(backendError);
     } finally {
       setLoading(false);
     }
@@ -185,7 +204,7 @@ export default function PaymentModal({ pledge, onClose, onSuccess }) {
             />
           </div>
 
-          <div style={{ marginBottom: '1rem' }}>
+          <div style={{ marginBottom: '1rem', position: 'relative' }}>
             <label
               style={{
                 display: 'block',
@@ -202,20 +221,42 @@ export default function PaymentModal({ pledge, onClose, onSuccess }) {
               value={formData.paymentMethod}
               onChange={(e) => setFormData({ ...formData, paymentMethod: e.target.value })}
               required
-              style={{ width: '100%' }}
+              style={{ width: '100%', appearance: 'none', paddingRight: '2.5rem', background: '#fff', border: '1px solid #cbd5e1', borderRadius: '6px', minHeight: '2.5rem', fontSize: '1rem', color: '#334155', cursor: 'pointer' }}
             >
+              {/* No hidden/disabled option; default is always valid */}
               {paymentMethods.map((method) => (
                 <option key={method.value} value={method.value}>
                   {method.label}
                 </option>
               ))}
             </select>
+            {/* Down arrow icon for select */}
+            <span style={{
+              position: 'absolute',
+              right: '1rem',
+              top: '2.3rem',
+              pointerEvents: 'none',
+              color: '#64748b',
+              fontSize: '1.2rem',
+            }}>
+              ▼
+            </span>
+            <span style={{
+              fontSize: '0.75rem',
+              color: '#64748b',
+              marginTop: '0.25rem',
+              display: 'block',
+            }}>
+              Choose your payment method: Mobile Money, Cash, Bank Transfer, Cheque, or Other.
+            </span>
           </div>
 
           <div style={{ marginBottom: '1rem' }}>
             <label
               style={{
-                display: 'block',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
                 marginBottom: '0.5rem',
                 fontWeight: 500,
                 fontSize: '0.875rem',
@@ -223,6 +264,52 @@ export default function PaymentModal({ pledge, onClose, onSuccess }) {
               }}
             >
               Reference/Receipt Number
+              <span
+                className="reference-tooltip-parent"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  cursor: 'pointer',
+                  position: 'relative',
+                }}
+                tabIndex={0}
+                title="Enter the transaction ID, receipt number, or bank reference provided by your payment provider."
+              >
+                <svg width="16" height="16" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="10" cy="10" r="9" stroke="#64748b" strokeWidth="2" fill="#f1f5f9" />
+                  <text x="10" y="15" textAnchor="middle" fontSize="12" fill="#64748b" fontFamily="Arial" fontWeight="bold">i</text>
+                </svg>
+                <span
+                  style={{
+                    visibility: 'hidden',
+                    opacity: 0,
+                    width: '220px',
+                    background: '#f1f5f9',
+                    color: '#334155',
+                    textAlign: 'left',
+                    borderRadius: '6px',
+                    padding: '0.5rem',
+                    position: 'absolute',
+                    zIndex: 10,
+                    left: '110%',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                    fontSize: '0.85rem',
+                    transition: 'opacity 0.2s',
+                  }}
+                  className="reference-tooltip"
+                >
+                  Enter the transaction ID, receipt number, or bank reference provided by your payment provider. This helps us verify your payment.
+                </span>
+                <style>{`
+                  .reference-tooltip-parent:hover .reference-tooltip,
+                  .reference-tooltip-parent:focus .reference-tooltip {
+                    visibility: visible !important;
+                    opacity: 1 !important;
+                  }
+                `}</style>
+              </span>
             </label>
             <input
               type="text"
@@ -240,7 +327,7 @@ export default function PaymentModal({ pledge, onClose, onSuccess }) {
                 display: 'block',
               }}
             >
-              Optional transaction or receipt reference
+              Enter the transaction ID, receipt number, or bank reference provided by your payment provider. This helps us verify your payment.
             </span>
           </div>
 

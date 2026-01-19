@@ -16,21 +16,42 @@ function PledgeFormSection({
   isSubmitting = false, 
   message = null 
 }) {
+  // Predefined item costs
+  const ITEM_COSTS = {
+    'Wedding Gift': 500000,
+    'Cash': 0,
+    'Transport': 2000000, // Example: Truck full of matooke
+    'Venue': 1500000,
+    'Choir': 300000,
+    'Sound System': 800000,
+    'Decor': 1200000,
+    'Photography': 600000,
+  };
+
+  // Auto-fill amount when purpose changes
+  const handlePurposeChange = (e) => {
+    const value = e.target.value;
+    if (value === 'Other') {
+      setCustomPurposeDraft(pledgeForm.customPurpose || "");
+      setShowOtherModal(true);
+    }
+    // If predefined, auto-fill amount
+    if (ITEM_COSTS.hasOwnProperty(value)) {
+      onFieldChange({
+        target: {
+          name: 'amount',
+          value: ITEM_COSTS[value]
+        }
+      });
+    }
+    onFieldChange(e);
+  };
   const [showOtherModal, setShowOtherModal] = useState(false);
   const [customPurposeDraft, setCustomPurposeDraft] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     await onSubmit(e);
-  };
-
-  // When user selects 'Other', open modal and clear draft
-  const handlePurposeChange = (e) => {
-    if (e.target.value === 'Other') {
-      setCustomPurposeDraft(pledgeForm.customPurpose || "");
-      setShowOtherModal(true);
-    }
-    onFieldChange(e);
   };
 
   const handleOtherModalOk = () => {
@@ -136,7 +157,7 @@ function PledgeFormSection({
 
           <div className="form-field">
             <label htmlFor="pledge-email" className="form-label">
-              Email <span className="form-help">(optional)</span>
+              Email
             </label>
             <input
               id="pledge-email"
@@ -145,7 +166,7 @@ function PledgeFormSection({
               style={darkInputStyle}
               value={pledgeForm.email}
               onChange={onFieldChange}
-              placeholder="Your email (optional)"
+              placeholder="Your email"
               disabled={isSubmitting}
             />
           </div>
@@ -165,7 +186,7 @@ function PledgeFormSection({
               value={pledgeForm.amount}
               onChange={onFieldChange}
               placeholder="Enter amount (UGX)"
-              disabled={isSubmitting}
+              disabled={isSubmitting || (ITEM_COSTS.hasOwnProperty(pledgeForm.purpose) && pledgeForm.purpose !== 'Other')}
               required
             />
           </div>

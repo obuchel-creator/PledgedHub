@@ -16,7 +16,7 @@ export default function AIChatbot() {
       '/': "👋 Welcome to PledgeHub! I'm your AI assistant. I can help you:\n\n• Learn about pledge management\n• Understand how to create pledges\n• Get started with the platform\n• Answer questions about features\n\nHow can I assist you today?",
       '/dashboard':
         "📊 Hi! I'm your AI dashboard assistant. I can help you:\n\n• Analyze your pledge performance\n• Generate personalized reminder messages\n• Suggest collection strategies\n• Provide insights on trends\n\nWhat would you like to know about your pledges?",
-      '/create':
+      '/fundraise':
         '✨ Creating a new pledge? I can help with:\n\n• Best practices for pledge amounts\n• Optimal collection dates\n• Effective pledge descriptions\n• Tips for donor engagement\n\nWhat aspect would you like guidance on?',
     };
 
@@ -173,7 +173,7 @@ export default function AIChatbot() {
         },
         { label: '📈 Trends', prompt: 'Show me collection trends', icon: '📈' },
       ],
-      '/create': [
+      '/fundraise': [
         { label: '💰 Amount', prompt: "What's a good pledge amount to suggest?", icon: '💰' },
         { label: '📅 Dates', prompt: 'When should I set collection dates?', icon: '📅' },
         {

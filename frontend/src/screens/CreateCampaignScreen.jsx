@@ -70,33 +70,34 @@ export default function CreateCampaignScreen() {
         } else {
           navigate('/dashboard');
         }
-      }, 1500);
-    } catch (err) {
-      setError(err?.message || 'Failed to create campaign.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div
-      style={{
-        background: 'var(--bg-base)',
-        backgroundImage: 'var(--gradient-1), var(--gradient-2), var(--gradient-3)',
-        backgroundAttachment: 'fixed',
-        minHeight: '100vh',
-        paddingTop: '2rem',
-        paddingBottom: '3rem',
-      }}
-    >
-      <main className="page page--narrow" aria-labelledby="create-campaign-title">
-        <header
-          className="page-header"
+        <section
+          className="card"
           style={{
             background: 'var(--surface)',
             borderRadius: '12px',
             padding: '2rem',
-            marginBottom: '2rem',
+            boxShadow: '0 4px 12px -4px rgba(15, 23, 42, 0.1), 0 2px 6px rgba(15, 23, 42, 0.05)',
+          }}
+          aria-labelledby="create-campaign-form"
+        >
+          {/* Show buttons to add pledge or view campaign if a new campaign was just created */}
+          {newCampaignId && (
+            <div style={{marginTop: '1rem'}}>
+              <button
+                className="btn btn-primary"
+                type="button"
+                onClick={() => navigate(`/pledges/new?campaignId=${newCampaignId}`)}
+                style={{marginRight: '1rem'}}>
+                Add a Pledge to this Campaign
+              </button>
+              <button
+                className="btn btn-secondary"
+                type="button"
+                onClick={() => navigate(`/campaigns/${newCampaignId}`)}>
+                View Campaign
+              </button>
+            </div>
+          )}
             boxShadow: '0 4px 12px -4px rgba(15, 23, 42, 0.1), 0 2px 6px rgba(15, 23, 42, 0.05)',
           }}
         >

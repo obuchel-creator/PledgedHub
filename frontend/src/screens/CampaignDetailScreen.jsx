@@ -121,7 +121,7 @@ export default function CampaignDetailScreen({ campaign: initialCampaign, loadCa
             <div className="ph-campaign-pledges" style={{ background: '#fff', borderRadius: 18, boxShadow: '0 8px 32px 0 rgba(37,99,235,0.09)', padding: '2.7rem 2.2rem 2.2rem 2.2rem', border: '1px solid #e5e7eb', marginTop: 40 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 22, flexWrap: 'wrap', gap: 14 }}>
                 <div style={{ fontSize: 24, fontWeight: 700, color: '#1e293b' }}>Campaign Pledges</div>
-                <button onClick={() => navigate('/create')} style={{ padding: '0.8rem 1.7rem', background: '#2563eb', color: '#fff', border: 'none', borderRadius: 12, fontWeight: 600, fontSize: 17, cursor: 'pointer', transition: 'background 0.2s', boxShadow: '0 2px 8px rgba(37,99,235,0.08)' }} onMouseOver={e => e.currentTarget.style.background='#1e40af'} onMouseOut={e => e.currentTarget.style.background='#2563eb'}>+ Add Pledge</button>
+                <button onClick={() => navigate('/fundraise')} style={{ padding: '0.8rem 1.7rem', background: '#2563eb', color: '#fff', border: 'none', borderRadius: 12, fontWeight: 600, fontSize: 17, cursor: 'pointer', transition: 'background 0.2s', boxShadow: '0 2px 8px rgba(37,99,235,0.08)' }} onMouseOver={e => e.currentTarget.style.background='#1e40af'} onMouseOut={e => e.currentTarget.style.background='#2563eb'}>+ Fundraise</button>
               </div>
               {campaign.pledges && campaign.pledges.length > 0 ? (
                 <div style={{ overflowX: 'auto' }}>
@@ -152,7 +152,7 @@ export default function CampaignDetailScreen({ campaign: initialCampaign, loadCa
                 <div style={{ textAlign: 'center', padding: '2.7rem 0', color: '#374151', fontSize: 17 }}>
                   <div style={{ marginBottom: 12, fontSize: 19, fontWeight: 600, color: '#1e293b' }}>No pledges yet for this campaign</div>
                   <div style={{ marginBottom: 18, color: '#374151', fontSize: 16 }}>Be the first to support this cause and inspire others!</div>
-                  <button className="ph-empty-pledges-cta" onClick={() => navigate('/create')} style={{ padding: '0.9rem 2.3rem', background: '#fff', color: '#1e293b', border: '2px solid #2563eb', borderRadius: 14, fontWeight: 700, fontSize: 18, cursor: 'pointer', transition: 'all 0.18s', boxShadow: '0 2px 8px rgba(37,99,235,0.08)' }} aria-label="Create first pledge for this campaign">Create First Pledge</button>
+                  <button className="ph-empty-pledges-cta" onClick={() => navigate('/fundraise')} style={{ padding: '0.9rem 2.3rem', background: '#fff', color: '#1e293b', border: '2px solid #2563eb', borderRadius: 14, fontWeight: 700, fontSize: 18, cursor: 'pointer', transition: 'all 0.18s', boxShadow: '0 2px 8px rgba(37,99,235,0.08)' }} aria-label="Fundraise for this campaign">Fundraise for this Campaign</button>
                 </div>
               )}
             </div>

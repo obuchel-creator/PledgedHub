@@ -357,8 +357,8 @@ export default function Dashboard() {
       <header style={styles.header}>
         <h1 style={styles.title}>Dashboard</h1>
         <div style={styles.quickActions}>
-          <Link to="/create" style={styles.quickActionBtn}>
-            Create Pledge
+          <Link to="/fundraise" style={styles.quickActionBtn}>
+            Fundraise
           </Link>
           <Link to="/" style={{ ...styles.quickActionBtn, background: '#6b7280' }}>
             View Home
@@ -513,8 +513,8 @@ export default function Dashboard() {
               {pledges.length === 0 ? (
                 <p style={{ color: '#6b7280', textAlign: 'center', margin: '40px 0' }}>
                   No pledges available.{' '}
-                  <Link to="/create" style={{ color: '#0070f3' }}>
-                    Create your first pledge
+                  <Link to="/fundraise" style={{ color: '#0070f3' }}>
+                    Start Fundraising
                   </Link>
                   .
                 </p>

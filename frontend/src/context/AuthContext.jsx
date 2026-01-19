@@ -36,10 +36,22 @@ export function AuthProvider({ children }) {
       console.log('🔐 AuthContext: Fetching user data...');
       const data = await getCurrentUser();
       console.log('🔐 AuthContext: User fetched successfully:', data?.user?.username || data?.username);
-      setUser(data && data.user ? data.user : data);
+      // Normalize user object for frontend
+      let userObj = data && data.user ? data.user : data;
+      if (userObj) {
+        // Ensure phone field is set
+        if (!userObj.phone && userObj.phone_number) {
+          userObj.phone = userObj.phone_number;
+        }
+        // Ensure role is set (default to 'user' if missing)
+        if (!userObj.role) {
+          userObj.role = 'user';
+        }
+      }
+      setUser(userObj);
       setLoading(false);
       setInitialized(true);
-      return data;
+      return userObj;
     } catch (err) {
       console.error('🔐 AuthContext: Error refreshing user:', err.message);
       // token likely invalid

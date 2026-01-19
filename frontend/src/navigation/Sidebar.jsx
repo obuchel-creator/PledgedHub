@@ -23,7 +23,7 @@ export default function Sidebar({ collapsed: collapsedProp = false }) {
 
   const links = [
     { name: 'Dashboard', href: '/' },
-    { name: 'Create', href: '/create' },
+    { name: 'Fundraise', href: '/fundraise' },
     { name: 'About', href: '/about' },
     { name: 'Recent', href: '/recent' },
   ];
@@ -162,7 +162,7 @@ export default function Sidebar({ collapsed: collapsedProp = false }) {
           title={collapsed ? 'Expand' : 'Collapse'}
           style={toggleBtnStyle}
         >
-          {collapsed ? '»' : '«'}
+          {collapsed ? 'ï¿½' : 'ï¿½'}
         </button>
       </div>
 

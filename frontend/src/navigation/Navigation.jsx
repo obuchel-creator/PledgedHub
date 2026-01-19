@@ -110,8 +110,8 @@ export default function Navigation() {
         </li>
 
         <li role="none" style={{ margin: isMobile ? '0.25rem 1rem' : 0 }}>
-          <a role="menuitem" href="/create" style={{ textDecoration: 'none', color: '#0366d6' }}>
-            Create
+          <a role="menuitem" href="/fundraise" style={{ textDecoration: 'none', color: '#0366d6' }}>
+            Fundraise
           </a>
         </li>
 

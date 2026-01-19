@@ -79,7 +79,7 @@ export default function Footer() {
               </li>
               <li style={{ marginBottom: '0.65rem' }}>
                 <Link
-                  to="/create"
+                  to="/fundraise"
                   style={{
                     color: '#0f172a',
                     fontSize: '1rem',

@@ -114,7 +114,14 @@ function RegisterScreen({ disableRequired = false }) {
         navigate('/dashboard', { replace: true });
       } else {
         // Show backend error (duplicate phone/email, password strength, etc)
-        const errorMsg = result?.error || 'Registration failed. Please try again.';
+        let errorMsg = result?.error || 'Registration failed. Please try again.';
+        if (typeof errorMsg === 'string') {
+          if (errorMsg.toLowerCase().includes('phone number already registered')) {
+            errorMsg = 'This phone number is already in use. Please use a different phone or log in.';
+          } else if (errorMsg.toLowerCase().includes('email already registered')) {
+            errorMsg = 'This email is already in use. Please use a different email or log in.';
+          }
+        }
         setError(errorMsg);
         setStatus('');
       }

@@ -216,6 +216,7 @@ async function list(filter = {}) {
 async function update(id, changes) {
     try {
         if (!changes || Object.keys(changes).length === 0) {
+            console.error('[User.update] No changes provided for user update', { id, changes });
             return { affectedRows: 0 };
         }
 
@@ -231,24 +232,29 @@ async function update(id, changes) {
                 if (key === 'passwordResetToken') dbKey = 'password_reset_token';
                 if (key === 'passwordResetExpires') dbKey = 'password_reset_expires';
                 if (key === 'phone') dbKey = 'phone_number';
-                
                 setParts.push(`${dbKey} = ?`);
                 params.push(changes[key]);
             }
         }
 
         if (setParts.length === 0) {
+            console.error('[User.update] No allowed fields to update', { id, changes });
             return { affectedRows: 0 };
         }
 
         params.push(id);
         const sql = `UPDATE users SET ${setParts.join(', ')} WHERE id = ?`;
-        const [result] = await pool.execute(sql, params);
-
-        if (result && result.affectedRows > 0) {
-            return await getById(id);
+        try {
+            const [result] = await pool.execute(sql, params);
+            if (result && result.affectedRows > 0) {
+                return await getById(id);
+            }
+            console.error('[User.update] No rows affected', { sql, params, result });
+            return { affectedRows: result.affectedRows || 0 };
+        } catch (sqlErr) {
+            console.error('[User.update] SQL execution error', { sql, params, sqlErr });
+            throw sqlErr;
         }
-        return { affectedRows: result.affectedRows || 0 };
     } catch (err) {
         console.error('DB error in update, falling back to in-memory:', err);
     }

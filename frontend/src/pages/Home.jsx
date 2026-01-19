@@ -53,8 +53,8 @@ export default function Home() {
           >
             View Dashboard
           </Link>
-          <Link to="/create" style={{ textDecoration: 'none', color: '#0070f3' }}>
-            Create a Pledge
+            <Link to="/fundraise" style={{ textDecoration: 'none', color: '#0070f3' }}>
+              Start Fundraising
           </Link>
         </div>
       </header>
@@ -62,11 +62,11 @@ export default function Home() {
       <section>
         <h2>Recent pledges</h2>
 
-        {loading && <p>Loading pledges…</p>}
+        {loading && <p>Loading pledgesï¿½</p>}
         {error && <p style={{ color: 'crimson' }}>Error: {error}</p>}
 
         {!loading && !error && pledges.length === 0 && (
-          <p>No pledges yet — be the first to create one.</p>
+          <p>No pledges yet ï¿½ be the first to create one.</p>
         )}
 
         {!loading && !error && pledges.length > 0 && (

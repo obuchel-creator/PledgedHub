@@ -64,7 +64,7 @@ export default function AdminDashboardScreen() {
   };
 
   const handleCreatePledge = () => {
-    navigate('/create');
+    navigate('/fundraise');
   };
 
   if (loading) {

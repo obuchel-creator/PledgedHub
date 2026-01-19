@@ -14,7 +14,7 @@ export default function AIChatbot() {
       return "👋 Welcome to PledgeHub! I'm your AI assistant. I can help you:\n\n• Learn about pledge management\n• Understand how to create pledges\n• Get started with the platform\n• Answer questions about features\n\nHow can I assist you today?";
     } else if (path === '/dashboard') {
       return "� Hi! I'm your AI dashboard assistant. I can help you:\n\n• Analyze your pledge performance\n• Generate personalized reminder messages\n• Suggest collection strategies\n• Provide insights on trends\n\nWhat would you like to know about your pledges?";
-    } else if (path === '/create') {
+    } else if (path === '/fundraise') {
       return '✨ Creating a new pledge? I can help with:\n\n• Best practices for pledge amounts\n• Optimal collection dates\n• Effective pledge descriptions\n• Tips for donor engagement\n\nWhat aspect would you like guidance on?';
     } else {
       return "👋 Hi! I'm your AI pledge assistant. I can help you with:\n\n• Generate personalized reminder messages\n• Analyze pledge data and trends\n• Suggest follow-up strategies\n• Provide insights on collections\n\nWhat would you like to know?";
@@ -132,7 +132,7 @@ export default function AIChatbot() {
         { label: '💡 Get suggestions', prompt: 'Give me suggestions to improve collections' },
         { label: '📈 Show trends', prompt: 'Show me collection trends' },
       ];
-    } else if (path === '/create') {
+    } else if (path === '/fundraise') {
       return [
         { label: '💰 Amount guidance', prompt: "What's a good pledge amount to suggest?" },
         { label: '📅 Best dates', prompt: 'When should I set collection dates?' },

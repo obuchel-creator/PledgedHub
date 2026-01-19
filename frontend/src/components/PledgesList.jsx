@@ -28,7 +28,7 @@ function PledgesList({ pledges, isLoading = false }) {
           </p>
         </div>
         <Link to="/pledges" className="btn btn--primary btn--small">
-          View All
+          View All Active Pledges
         </Link>
       </div>
 
@@ -42,8 +42,8 @@ function PledgesList({ pledges, isLoading = false }) {
             <p className="empty-state__message">
               No pledges found. Start one to rally your supporters.
             </p>
-            <Link to="/create" className="btn btn--primary">
-              Create a Pledge
+            <Link to="/fundraise" className="btn btn--primary">
+              + Fundraise
             </Link>
           </div>
         </div>

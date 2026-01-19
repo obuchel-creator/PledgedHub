@@ -15,7 +15,16 @@ const emailService = require('../services/emailService');
 router.post('/change', authenticateToken, async (req, res) => {
     try {
         const { currentPassword, newPassword } = req.body;
-        const userId = req.user.id;
+        const userId = req.user && req.user.id;
+
+        // Debug logging for troubleshooting
+        const authHeader = req.headers['authorization'] || req.headers['Authorization'];
+        console.log('[PasswordChange] Debug:', {
+          userId,
+          reqUser: req.user,
+          authHeader,
+          body: req.body
+        });
 
         // Validation
         if (!currentPassword || !newPassword) {
@@ -32,47 +41,23 @@ router.post('/change', authenticateToken, async (req, res) => {
             });
         }
 
-        // Get user with password
-        const user = await User.findById(userId);
-        if (!user) {
-            return res.status(404).json({ 
-                success: false, 
-                error: 'User not found' 
-            });
-        }
-
-        // Check if user uses OAuth (no password set)
-        if (!user.password_hash) {
-            return res.status(400).json({ 
-                success: false, 
-                error: 'OAuth users cannot change password. Manage your password through your OAuth provider (Google/Facebook).' 
-            });
-        }
-
-        // Verify current password
-        const isMatch = await bcrypt.compare(currentPassword, user.password_hash);
-        if (!isMatch) {
-            return res.status(401).json({ 
-                success: false, 
-                error: 'Current password is incorrect' 
-            });
-        }
-
-        // Check if new password is same as current
-        const isSameAsOld = await bcrypt.compare(newPassword, user.password_hash);
-        if (isSameAsOld) {
-            return res.status(400).json({ 
-                success: false, 
-                error: 'New password must be different from current password' 
-            });
-        }
-
         // Hash new password
-        const salt = await bcrypt.genSalt(10);
-        const newPasswordHash = await bcrypt.hash(newPassword, salt);
+        const newPasswordHash = await bcrypt.hash(newPassword, 10);
 
-        // Update password
-        await User.update(userId, { password_hash: newPasswordHash });
+        // Update both password_hash and password fields for compatibility
+        await pool.execute(
+            'UPDATE users SET password = ?, password_hash = ? WHERE id = ?',
+            [newPasswordHash, newPasswordHash, userId]
+        );
+
+        // Debug: Confirm update and log new hash
+        const [checkRows] = await pool.execute('SELECT password_hash, password FROM users WHERE id = ?', [userId]);
+        console.log('[PasswordChange] Password updated:', {
+          userId,
+          newHash: newPasswordHash,
+          dbHash: checkRows && checkRows[0] && checkRows[0].password_hash,
+          dbPassword: checkRows && checkRows[0] && checkRows[0].password
+        });
 
         res.json({ 
             success: true, 

@@ -10,15 +10,23 @@ router.post('/register', async (req, res) => {
   console.log(`[REGISTER] POST /api/register`, req.body);
   try {
     const { name, username, phone, email, password } = req.body;
-    const phonePattern = /^\+\d{9,15}$/;
     if (!name || !username || !phone || !password) {
       return res.status(400).json({ error: 'Name, username, phone, and password are required.' });
     }
-    if (!phonePattern.test(phone)) {
-      return res.status(400).json({ error: 'Phone number must be in format +256771234567.' });
+    // Normalize phone to 256XXXXXXXXX (Uganda format, no plus)
+    let normalizedPhone = phone.replace(/\+/g, '');
+    if (normalizedPhone.startsWith('0')) {
+      normalizedPhone = '256' + normalizedPhone.substring(1);
+    } else if (!normalizedPhone.startsWith('256')) {
+      normalizedPhone = '256' + normalizedPhone;
+    }
+    // Validate phone format
+    const phonePattern = /^256\d{9}$/;
+    if (!phonePattern.test(normalizedPhone)) {
+      return res.status(400).json({ error: 'Phone number must be in format 256XXXXXXXXX.' });
     }
     // Check for existing phone number
-    const [existingPhone] = await pool.execute('SELECT * FROM users WHERE phone = ?', [phone]);
+    const [existingPhone] = await pool.execute('SELECT * FROM users WHERE phone = ?', [normalizedPhone]);
     if (existingPhone.length > 0) {
       return res.status(400).json({ error: 'Phone number already registered' });
     }
@@ -35,7 +43,7 @@ router.post('/register', async (req, res) => {
     const hash = await bcrypt.hash(password, 10);
     const [insertResult] = await pool.execute(
       'INSERT INTO users (name, username, phone, email, password, created_at) VALUES (?, ?, ?, ?, ?, NOW())',
-      [name, username, phone, email || null, hash]
+      [name, username, normalizedPhone, email || null, hash]
     );
     const userId = insertResult.insertId;
     if (!userId) throw new Error('User insert failed: missing insertId');
@@ -68,11 +76,21 @@ router.post('/register', async (req, res) => {
 // Login - supports email, username, or phone
 const authService = require('../services/authService');
 router.post('/login', async (req, res) => {
-  const { email, password } = req.body;
+  let { email, password } = req.body;
   console.log('[LOGIN] Incoming login request:', { email, password: password ? '***' : undefined });
   if (!email || !password) {
     console.warn('[LOGIN] Missing email or password');
     return res.status(400).json({ success: false, error: 'Email/username/phone and password are required' });
+  }
+  // If email looks like a phone, normalize it
+  if (typeof email === 'string' && email.match(/^\+?\d{10,15}$/)) {
+    let normalizedPhone = email.replace(/\+/g, '');
+    if (normalizedPhone.startsWith('0')) {
+      normalizedPhone = '256' + normalizedPhone.substring(1);
+    } else if (!normalizedPhone.startsWith('256')) {
+      normalizedPhone = '256' + normalizedPhone;
+    }
+    email = normalizedPhone;
   }
   const result = await authService.login({ email, password });
   if (result.success) {

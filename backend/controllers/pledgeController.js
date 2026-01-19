@@ -143,8 +143,8 @@ async function createPledge(req, res) {
             }
         });
         const result = await Pledge.create(payload);
-        // Send verification email if donor has email
-        if (payload.donor_email && typeof payload.donor_email === 'string' && payload.donor_email.trim()) {
+        // Send verification email only if donor_email is present and non-empty after trim
+        if (payload.donor_email && typeof payload.donor_email === 'string' && payload.donor_email.trim().length > 0) {
             const verificationResult = await pledgeVerificationService.sendVerificationEmail(
                 result.id,
                 payload.donor_email.trim(),

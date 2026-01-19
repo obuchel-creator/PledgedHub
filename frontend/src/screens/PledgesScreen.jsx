@@ -124,16 +124,7 @@ export default function PledgesScreen() {
     loadPledges();
   };
 
-  if (loading) {
-    return (
-      <div className="pledges-container">
-        <div className="pledges-loading">
-          <div className="loading-spinner"></div>
-          <p>Loading pledges...</p>
-        </div>
-      </div>
-    );
-  }
+
 
   return (
     <div className="pledges-container">
@@ -261,14 +252,8 @@ export default function PledgesScreen() {
             <div className="pledges-empty-text">
               {searchTerm || statusFilter !== 'all' 
                 ? 'Try adjusting your search or filter criteria'
-                : 'No pledges have been created yet. Create one to get started!'}
+                : 'No pledges have been created yet.'}
             </div>
-            <button 
-              className="pledges-empty-btn"
-              onClick={() => window.location.href = '/create'}
-            >
-              + Create Pledge
-            </button>
           </div>
         ) : viewMode === 'table' ? (
           <div className="pledges-table-wrapper">

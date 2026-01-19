@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { changePassword } from '../services/api';
+import ValidationItem from '../components/ValidationItem';
 
 export default function PasswordChangeScreen() {
   const { user } = useAuth();
@@ -23,7 +24,6 @@ export default function PasswordChangeScreen() {
     passwordsMatch: false,
   });
 
-  // Real-time password validation
   useEffect(() => {
     setValidations({
       minLength: newPassword.length >= 8,
@@ -74,73 +74,36 @@ export default function PasswordChangeScreen() {
     }
   };
 
-  const ValidationItem = ({ label, isValid }) => (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '0.75rem',
-        padding: '0.75rem',
-        borderRadius: '8px',
-        background: isValid ? 'rgba(16, 185, 129, 0.05)' : 'rgba(148, 163, 184, 0.05)',
-        border: `1px solid ${isValid ? 'rgba(16, 185, 129, 0.2)' : 'rgba(148, 163, 184, 0.2)'}`,
-        transition: 'all 0.3s ease',
-      }}
-    >
-      <div
-        style={{
-          width: '24px',
-          height: '24px',
-          borderRadius: '50%',
-          background: isValid ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)' : '#e2e8f0',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: '0.75rem',
-          fontWeight: '700',
-          color: 'white',
-          transition: 'all 0.3s ease',
-          boxShadow: isValid ? '0 2px 8px rgba(16, 185, 129, 0.3)' : 'none',
-        }}
-      >
-        {isValid ? '✓' : '○'}
-      </div>
-      <span
-        style={{
-          fontSize: '0.9rem',
-          fontWeight: '600',
-          color: isValid ? '#059669' : '#64748b',
-          transition: 'color 0.3s ease',
-        }}
-      >
-        {label}
-      </span>
-    </div>
-  );
-
   return (
     <div
       style={{
-        background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
         minHeight: '100vh',
-        paddingTop: '2rem',
-        paddingBottom: '3rem',
+        background: 'linear-gradient(120deg, #e0e7ff 0%, #f8fafc 100%)',
+        padding: '0',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
       }}
     >
       <main
         className="page page--narrow"
         aria-labelledby="password-title"
-        style={{ maxWidth: '900px' }}
+        style={{
+          maxWidth: '950px',
+          width: '100%',
+          padding: '2rem 0',
+        }}
       >
         {/* Header */}
         <header
           style={{
-            background: 'white',
-            borderRadius: '16px',
-            padding: '2rem',
-            marginBottom: '2rem',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-            border: '1px solid #e5e7eb',
+            background: 'rgba(255,255,255,0.85)',
+            borderRadius: '20px',
+            padding: '2.5rem 2rem 2rem 2rem',
+            marginBottom: '2.5rem',
+            boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.12)',
+            border: '1px solid rgba(255,255,255,0.18)',
+            backdropFilter: 'blur(8px)',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
@@ -177,15 +140,30 @@ export default function PasswordChangeScreen() {
           </div>
         </header>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 400px', gap: '2rem' }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 380px',
+            gap: '2.5rem',
+            alignItems: 'flex-start',
+            maxWidth: '950px',
+            margin: '0 auto',
+            background: 'rgba(255,255,255,0.7)',
+            borderRadius: '24px',
+            boxShadow: '0 4px 24px 0 rgba(31, 38, 135, 0.10)',
+            padding: '2.5rem 2rem',
+            backdropFilter: 'blur(6px)',
+          }}
+        >
           {/* Main Form */}
           <div
             style={{
-              background: 'white',
-              borderRadius: '16px',
-              padding: '2rem',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-              border: '1px solid #e5e7eb',
+              background: 'rgba(255,255,255,0.95)',
+              borderRadius: '18px',
+              padding: '2.5rem 2rem',
+              boxShadow: '0 2px 12px 0 rgba(31, 38, 135, 0.08)',
+              border: '1px solid rgba(229,231,235,0.5)',
+              minWidth: 0,
             }}
           >
             {message.text && (
@@ -210,7 +188,7 @@ export default function PasswordChangeScreen() {
               </div>
             )}
 
-            <form className="form" onSubmit={handleSubmit}>
+            <form className="form" onSubmit={handleSubmit} autoComplete="off">
               {/* Current Password */}
               <div className="form-field" style={{ marginBottom: '1.5rem' }}>
                 <label
@@ -238,12 +216,16 @@ export default function PasswordChangeScreen() {
                     placeholder="Enter your current password"
                     style={{
                       width: '100%',
-                      padding: '0.75rem 3rem 0.75rem 1rem',
-                      fontSize: '1rem',
+                      padding: '0.85rem 3rem 0.85rem 1rem',
+                      fontSize: '1.08rem',
                       border: '2px solid #e5e7eb',
-                      borderRadius: '10px',
+                      borderRadius: '12px',
+                      background: 'rgba(243,244,246,0.7)',
                       transition: 'border-color 0.2s',
+                      outline: 'none',
                     }}
+                    onFocus={e => e.target.style.borderColor = '#2563eb'}
+                    onBlur={e => e.target.style.borderColor = '#e5e7eb'}
                   />
                   <button
                     type="button"
@@ -256,7 +238,8 @@ export default function PasswordChangeScreen() {
                       background: 'none',
                       border: 'none',
                       cursor: 'pointer',
-                      fontSize: '1.25rem',
+                      fontSize: '1.35rem',
+                      color: '#2563eb',
                       padding: 0,
                     }}
                     aria-label={showCurrentPassword ? 'Hide password' : 'Show password'}
@@ -293,12 +276,16 @@ export default function PasswordChangeScreen() {
                     placeholder="Enter your new password"
                     style={{
                       width: '100%',
-                      padding: '0.75rem 3rem 0.75rem 1rem',
-                      fontSize: '1rem',
+                      padding: '0.85rem 3rem 0.85rem 1rem',
+                      fontSize: '1.08rem',
                       border: `2px solid ${newPassword && !validations.minLength ? '#fca5a5' : '#e5e7eb'}`,
-                      borderRadius: '10px',
+                      borderRadius: '12px',
+                      background: 'rgba(243,244,246,0.7)',
                       transition: 'border-color 0.2s',
+                      outline: 'none',
                     }}
+                    onFocus={e => e.target.style.borderColor = '#2563eb'}
+                    onBlur={e => e.target.style.borderColor = newPassword && !validations.minLength ? '#fca5a5' : '#e5e7eb'}
                   />
                   <button
                     type="button"
@@ -311,7 +298,8 @@ export default function PasswordChangeScreen() {
                       background: 'none',
                       border: 'none',
                       cursor: 'pointer',
-                      fontSize: '1.25rem',
+                      fontSize: '1.35rem',
+                      color: '#2563eb',
                       padding: 0,
                     }}
                     aria-label={showNewPassword ? 'Hide password' : 'Show password'}
@@ -348,12 +336,16 @@ export default function PasswordChangeScreen() {
                     placeholder="Re-enter your new password"
                     style={{
                       width: '100%',
-                      padding: '0.75rem 3rem 0.75rem 1rem',
-                      fontSize: '1rem',
+                      padding: '0.85rem 3rem 0.85rem 1rem',
+                      fontSize: '1.08rem',
                       border: `2px solid ${confirmPassword && !validations.passwordsMatch ? '#fca5a5' : '#e5e7eb'}`,
-                      borderRadius: '10px',
+                      borderRadius: '12px',
+                      background: 'rgba(243,244,246,0.7)',
                       transition: 'border-color 0.2s',
+                      outline: 'none',
                     }}
+                    onFocus={e => e.target.style.borderColor = '#2563eb'}
+                    onBlur={e => e.target.style.borderColor = confirmPassword && !validations.passwordsMatch ? '#fca5a5' : '#e5e7eb'}
                   />
                   <button
                     type="button"
@@ -366,7 +358,8 @@ export default function PasswordChangeScreen() {
                       background: 'none',
                       border: 'none',
                       cursor: 'pointer',
-                      fontSize: '1.25rem',
+                      fontSize: '1.35rem',
+                      color: '#2563eb',
                       padding: 0,
                     }}
                     aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}

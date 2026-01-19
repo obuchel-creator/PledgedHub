@@ -19,8 +19,9 @@ function generateVerificationToken() {
  */
 async function sendVerificationEmail(pledgeId, donorEmail, donorName) {
   try {
-    if (!donorEmail) {
-      return { success: false, error: 'Donor email is required' };
+    if (!donorEmail || (typeof donorEmail === 'string' && donorEmail.trim().length === 0)) {
+      // No email provided, skip verification for dashboard/internal pledges
+      return { success: true, message: 'No email to verify' };
     }
 
     // Generate token

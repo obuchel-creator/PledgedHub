@@ -95,7 +95,6 @@ router.post('/', (req, res, next) => {
   // Validate required fields
   const requiredFields = [
     { value: donor_name, name: 'Donor name' },
-    { value: donor_email, name: 'Donor email' },
     { value: donor_phone, name: 'Donor phone' },
     { value: amount, name: 'Amount' }
   ];
@@ -103,7 +102,7 @@ router.post('/', (req, res, next) => {
     const check = validateRequired(field.value, field.name);
     if (!check.valid) return sendError(res, 400, check.error);
   }
-  if (!validateEmail(donor_email)) return sendError(res, 400, 'Invalid email format');
+  if (donor_email && !validateEmail(donor_email)) return sendError(res, 400, 'Invalid email format');
   if (!validatePhone(donor_phone)) return sendError(res, 400, 'Invalid phone format');
   if (!validateAmount(amount)) return sendError(res, 400, 'Invalid amount');
   next();

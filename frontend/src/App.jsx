@@ -1,3 +1,4 @@
+import PasswordChangeScreen from './screens/PasswordChangeScreen';
 import CampaignDetailScreen from './screens/CampaignDetailScreen';
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
@@ -24,7 +25,7 @@ import CampaignsScreen from './screens/CampaignsScreen';
 import ForgotPasswordScreen from './screens/ForgotPasswordScreen';
 import ResetPasswordScreen from './screens/ResetPasswordScreen';
 import HomeScreen from './screens/HomeScreen';
-import CreatePledgeScreen from './screens/CreatePledgeScreen';
+import FundraisePledgeScreen from './screens/CreatePledgeScreen';
 import AboutScreen from './screens/AboutScreen';
 import PledgeDetailScreen from './screens/PledgeDetailScreen';
 import PledgesScreen from './screens/PledgesScreen';
@@ -61,11 +62,11 @@ function App() {
         <Route path="/register" element={<RegisterScreen />} />
         <Route path="/forgot-password" element={<ForgotPasswordScreen />} />
         <Route path="/reset-password" element={<ResetPasswordScreen />} />
-        <Route path="/create" element={
-          <ProtectedRoute>
-            <CreatePledgeScreen />
-          </ProtectedRoute>
-        } />
+                <Route path="/fundraise" element={
+                  <ProtectedRoute>
+                    <FundraisePledgeScreen />
+                  </ProtectedRoute>
+                } />
         <Route
           path="/campaigns"
           element={
@@ -170,6 +171,11 @@ function App() {
         <Route path="/profile" element={
           <ProtectedRoute>
             <ProfileScreen />
+          </ProtectedRoute>
+        } />
+        <Route path="/change-password" element={
+          <ProtectedRoute>
+            <PasswordChangeScreen />
           </ProtectedRoute>
         } />
         <Route path="/help" element={<HelpScreen />} />

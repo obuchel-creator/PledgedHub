@@ -24,7 +24,7 @@ export default function Navbar() {
     { to: '/fundraise', label: 'Fundraise' },
     ...(isAdmin
       ? [
-          { to: '/admin/users', label: '👥 Users' },
+          { to: '/users', label: '👥 Users' },
           { to: '/accounting/dashboard', label: '📊 Accounting' },
           { to: '/accounting/chart-of-accounts', label: '📋 Accounts' }
         ]

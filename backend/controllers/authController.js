@@ -156,8 +156,8 @@ async function register(req, res) {
             }
 
             // Security: Check if email already exists
-            const existingEmail = await User.findOne({ email: sanitizedEmail });
-            if (existingEmail) {
+            const [existingEmail] = await pool.execute('SELECT id FROM users WHERE email = ?', [sanitizedEmail]);
+            if (existingEmail && existingEmail.length > 0) {
                 const response = { success: false, message: 'Email already in use.' };
                 console.log('❌ [REGISTER] Validation failed: Email already in use', { sanitizedEmail });
                 console.log('🟠 [REGISTER] Responding with:', JSON.stringify(response, null, 2));

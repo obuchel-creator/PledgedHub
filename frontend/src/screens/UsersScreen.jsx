@@ -165,6 +165,40 @@ export default function UsersScreen() {
     }
   };
 
+  const handleRoleChange = async (userId, currentRole, newRole) => {
+    if (currentRole === newRole) return;
+    
+    if (!confirm(`Are you sure you want to change this user's role to ${newRole}?`)) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('pledgehub_token');
+      const response = await fetch(`/api/users/${userId}/role`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ role: newRole })
+      });
+
+      const data = await response.json();
+      
+      if (!response.ok) {
+        const errorMsg = data.error || data.message || 'Failed to update user role';
+        throw new Error(errorMsg);
+      }
+
+      // Update user in state
+      setUsers(users.map(u => u.id === userId ? { ...u, role: newRole } : u));
+      alert(`✅ User role updated to ${newRole} successfully`);
+    } catch (err) {
+      alert('❌ Error: ' + err.message);
+      console.error('Error updating user role:', err);
+    }
+  };
+
   const handleAddUser = async (e) => {
     e.preventDefault();
     
@@ -205,8 +239,8 @@ export default function UsersScreen() {
 
       const data = await response.json();
       
-      // Add new user to list
-      setUsers([...users, data.user || { id: data.id, ...formData }]);
+      // Refetch users list to ensure we have correct data including phone
+      await fetchUsers();
       
       // Reset form
       setFormData({
@@ -511,15 +545,36 @@ export default function UsersScreen() {
                           <FaEnvelope style={{ color: '#64748b', fontSize: '0.85rem' }} />
                           <span>{u.email || 'N/A'}</span>
                         </div>
-                        {u.phone && (
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.95rem' }}>
-                            <FaPhone style={{ color: '#64748b', fontSize: '0.85rem' }} />
-                            <span>{u.phone}</span>
-                          </div>
-                        )}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.95rem' }}>
+                          <FaPhone style={{ color: '#64748b', fontSize: '0.85rem' }} />
+                          <span>{u.phone || u.phone_number || 'N/A'}</span>
+                        </div>
                       </div>
                     </td>
-                    <td>{getRoleBadge(u.role)}</td>
+                    <td>
+                      {(user.role === 'admin' || user.role === 'super_admin') && u.id !== user.id ? (
+                        <select 
+                          value={u.role}
+                          onChange={(e) => handleRoleChange(u.id, u.role, e.target.value)}
+                          style={{
+                            padding: '6px 12px',
+                            borderRadius: '6px',
+                            border: '1px solid #cbd5e1',
+                            fontSize: '0.9rem',
+                            fontWeight: 600,
+                            backgroundColor: '#fff',
+                            cursor: 'pointer',
+                            color: u.role === 'admin' || u.role === 'super_admin' ? '#dc2626' : u.role === 'staff' ? '#2563eb' : '#64748b'
+                          }}
+                        >
+                          <option value="user">User</option>
+                          <option value="staff">Staff</option>
+                          <option value="admin">Admin</option>
+                        </select>
+                      ) : (
+                        getRoleBadge(u.role)
+                      )}
+                    </td>
                     <td>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#64748b' }}>
                         <FaCalendar style={{ fontSize: '0.85rem' }} />

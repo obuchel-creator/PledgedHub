@@ -398,7 +398,9 @@ async function listAll(filter = {}) {
         // Build SQL to exclude deleted users by default
         const includeDeleted = filter.includeDeleted === true; // Only include deleted if explicitly requested
         const whereClause = includeDeleted ? '' : 'WHERE deleted_at IS NULL';
-        const sql = `SELECT * FROM users ${whereClause} ORDER BY id DESC`;
+        const sql = whereClause 
+            ? `SELECT * FROM users ${whereClause} ORDER BY id DESC`
+            : `SELECT * FROM users ORDER BY id DESC`;
         const [rows] = await pool.execute(sql);
         console.log('[DEBUG] User.listAll SQL:', sql);
         console.log('[DEBUG] User.listAll result:', rows.length, 'users');

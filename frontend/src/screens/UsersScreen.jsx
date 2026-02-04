@@ -144,16 +144,24 @@ export default function UsersScreen() {
         }
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || 'Failed to delete user');
+        // Handle specific error messages from backend
+        const errorMsg = data.message || data.error || 'Failed to delete user';
+        throw new Error(errorMsg);
       }
 
+      // Remove user from local state immediately
       setUsers(users.filter(u => u.id !== userId));
+      
+      // Refetch users from server to ensure consistency
+      await fetchUsers();
+      
       alert('User deleted successfully');
     } catch (err) {
-      alert('Error: ' + err.message);
       console.error('Error deleting user:', err);
+      alert('❌ Error: ' + err.message);
     }
   };
 

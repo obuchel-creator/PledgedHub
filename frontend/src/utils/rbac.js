@@ -95,21 +95,27 @@ export function hasRole(userRole, requiredRole) {
   // Normalize roles (handle both 'admin' and 'super_admin')
   const normalizedUserRole = userRole.toLowerCase();
   
+  // Admin roles that have access to all admin features
+  const adminRoles = ['admin', 'super_admin', 'support_staff', 'finance_admin', 'staff'];
+  const isAdminUser = adminRoles.includes(normalizedUserRole);
+  
   if (Array.isArray(requiredRole)) {
     return requiredRole.some(role => {
       const normalizedRequired = role.toLowerCase();
-      // Check exact match or if user is admin (which has super_admin privileges)
-      return normalizedUserRole === normalizedRequired || 
-             (normalizedUserRole === 'admin' && normalizedRequired === 'super_admin') ||
-             (normalizedUserRole === 'super_admin' && normalizedRequired === 'admin');
+      // Exact match
+      if (normalizedUserRole === normalizedRequired) return true;
+      // Admin users can access any admin-protected route
+      if (isAdminUser && adminRoles.includes(normalizedRequired)) return true;
+      return false;
     });
   }
   
   const normalizedRequired = requiredRole.toLowerCase();
-  // Allow admin to access admin/super_admin protected routes
-  return normalizedUserRole === normalizedRequired || 
-         (normalizedUserRole === 'admin' && normalizedRequired === 'super_admin') ||
-         (normalizedUserRole === 'super_admin' && normalizedRequired === 'admin');
+  // Exact match
+  if (normalizedUserRole === normalizedRequired) return true;
+  // Admin users can access any admin-protected route
+  if (isAdminUser && adminRoles.includes(normalizedRequired)) return true;
+  return false;
 }
 
 /**

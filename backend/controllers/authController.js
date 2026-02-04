@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
-const db = require('../config/db');
+const { pool } = require('../config/db');
 
 require('dotenv').config();
 
@@ -166,7 +166,7 @@ async function register(req, res) {
         }
 
         // Security: Check if phone already exists
-        const [existingPhone] = await db.execute('SELECT id FROM users WHERE phone_number = ?', [cleanPhone]);
+        const [existingPhone] = await pool.execute('SELECT id FROM users WHERE phone_number = ?', [cleanPhone]);
         if (existingPhone && existingPhone.length > 0) {
             const response = { success: false, message: 'Phone number already in use.' };
             console.log('❌ [REGISTER] Validation failed: Phone already in use', { cleanPhone });

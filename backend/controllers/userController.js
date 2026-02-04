@@ -183,10 +183,18 @@ async function deleteUser(req, res) {
             });
         }
 
-        // Check if user exists
+        // Check if user exists and is not already deleted
         const targetUser = await User.getById(id);
         if (!targetUser) {
             return res.status(404).json({ error: 'User not found' });
+        }
+
+        // Check if user is already soft-deleted
+        if (targetUser.deleted_at) {
+            return res.status(400).json({ 
+                error: 'This user has already been deleted',
+                message: 'User was deleted on ' + new Date(targetUser.deleted_at).toLocaleString()
+            });
         }
 
         // Get deletion type from query params (soft or hard)
@@ -375,11 +383,11 @@ async function listAllUsers(req, res) {
             });
         }
 
-        // For admin or superadmin, always show all users, including deleted if requested, but default to all
+        // For admin or superadmin, show active users only (exclude soft-deleted)
         const search = req.query.search || '';
-        // If admin or superadmin, ignore limit/offset/includeDeleted for full list (or set a high limit)
+        // Default to showing only active users (deleted_at IS NULL)
         const users = await User.listAll({
-            includeDeleted: true, // always include all for admin/superadmin
+            includeDeleted: false, // only show active users by default
             search,
             limit: 1000, // show up to 1000 users
             offset: 0

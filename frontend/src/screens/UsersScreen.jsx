@@ -10,6 +10,14 @@ export default function UsersScreen() {
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
+  const [showAddUserForm, setShowAddUserForm] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    password: '',
+    role: 'user'
+  });
 
   useEffect(() => {
     fetchUsers();
@@ -95,6 +103,119 @@ export default function UsersScreen() {
     });
   };
 
+  const handleEditUser = async (userId, userData) => {
+    const newName = prompt('Enter new name:', userData.name);
+    if (!newName) return;
+
+    try {
+      const token = localStorage.getItem('pledgehub_token');
+      const response = await fetch(`/api/users/${userId}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ name: newName })
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to update user');
+      }
+
+      setUsers(users.map(u => u.id === userId ? { ...u, name: newName } : u));
+      alert('User updated successfully');
+    } catch (err) {
+      alert('Error: ' + err.message);
+      console.error('Error updating user:', err);
+    }
+  };
+
+  const handleDeleteUser = async (userId) => {
+    if (!confirm('Are you sure you want to delete this user?')) return;
+
+    try {
+      const token = localStorage.getItem('pledgehub_token');
+      const response = await fetch(`/api/users/${userId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to delete user');
+      }
+
+      setUsers(users.filter(u => u.id !== userId));
+      alert('User deleted successfully');
+    } catch (err) {
+      alert('Error: ' + err.message);
+      console.error('Error deleting user:', err);
+    }
+  };
+
+  const handleAddUser = async (e) => {
+    e.preventDefault();
+    
+    // Validation
+    if (!formData.name.trim() || !formData.email.trim() || !formData.password.trim() || !formData.phone.trim()) {
+      alert('Please fill in all required fields (name, email, phone, password)');
+      return;
+    }
+
+    // Validate phone format (basic validation)
+    const phoneRegex = /^[\d\+\-\s\(\)]{9,20}$/;
+    if (!phoneRegex.test(formData.phone)) {
+      alert('Please enter a valid phone number');
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('pledgehub_token');
+      const response = await fetch('/api/users/register', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          password: formData.password,
+          role: formData.role
+        })
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to create user');
+      }
+
+      const data = await response.json();
+      
+      // Add new user to list
+      setUsers([...users, data.user || { id: data.id, ...formData }]);
+      
+      // Reset form
+      setFormData({
+        name: '',
+        email: '',
+        phone: '',
+        password: '',
+        role: 'user'
+      });
+      setShowAddUserForm(false);
+      alert('User created successfully');
+    } catch (err) {
+      alert('Error: ' + err.message);
+      console.error('Error creating user:', err);
+    }
+  };
+
   // Only admins can access this page
   if (!user || (user.role !== 'admin' && user.role !== 'super_admin' && user.role !== 'staff')) {
     return (
@@ -132,7 +253,11 @@ export default function UsersScreen() {
           </div>
         </div>
         {user.role === 'admin' || user.role === 'super_admin' ? (
-          <button className="btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <button 
+            className="btn-primary" 
+            style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+            onClick={() => setShowAddUserForm(!showAddUserForm)}
+          >
             <FaPlus /> Add User
           </button>
         ) : null}
@@ -160,7 +285,157 @@ export default function UsersScreen() {
         </select>
       </div>
 
-      {loading ? (
+      {showAddUserForm && (
+        <div style={{
+          background: '#f8fafc',
+          border: '1px solid #e2e8f0',
+          borderRadius: '8px',
+          padding: '2rem',
+          marginBottom: '2rem',
+          maxWidth: '500px'
+        }}>
+          <h2 style={{ marginTop: 0, color: '#1e293b', marginBottom: '1rem' }}>Add New User</h2>
+          <form onSubmit={handleAddUser}>
+            <div style={{ marginBottom: '1rem' }}>
+              <label style={{ display: 'block', fontWeight: 600, marginBottom: '0.5rem', color: '#1e293b' }}>
+                Full Name *
+              </label>
+              <input
+                type="text"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                placeholder="Enter full name"
+                style={{
+                  width: '100%',
+                  padding: '0.75rem',
+                  border: '1px solid #cbd5e1',
+                  borderRadius: '6px',
+                  fontSize: '1rem',
+                  boxSizing: 'border-box'
+                }}
+              />
+            </div>
+
+            <div style={{ marginBottom: '1rem' }}>
+              <label style={{ display: 'block', fontWeight: 600, marginBottom: '0.5rem', color: '#1e293b' }}>
+                Email *
+              </label>
+              <input
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                placeholder="Enter email address"
+                style={{
+                  width: '100%',
+                  padding: '0.75rem',
+                  border: '1px solid #cbd5e1',
+                  borderRadius: '6px',
+                  fontSize: '1rem',
+                  boxSizing: 'border-box'
+                }}
+              />
+            </div>
+
+            <div style={{ marginBottom: '1rem' }}>
+              <label style={{ display: 'block', fontWeight: 600, marginBottom: '0.5rem', color: '#1e293b' }}>
+                Phone *
+              </label>
+              <input
+                type="tel"
+                value={formData.phone}
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                placeholder="Enter phone number (e.g., +256700000000)"
+                style={{
+                  width: '100%',
+                  padding: '0.75rem',
+                  border: '1px solid #cbd5e1',
+                  borderRadius: '6px',
+                  fontSize: '1rem',
+                  boxSizing: 'border-box'
+                }}
+              />
+            </div>
+
+            <div style={{ marginBottom: '1rem' }}>
+              <label style={{ display: 'block', fontWeight: 600, marginBottom: '0.5rem', color: '#1e293b' }}>
+                Password *
+              </label>
+              <input
+                type="password"
+                value={formData.password}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                placeholder="Enter password"
+                style={{
+                  width: '100%',
+                  padding: '0.75rem',
+                  border: '1px solid #cbd5e1',
+                  borderRadius: '6px',
+                  fontSize: '1rem',
+                  boxSizing: 'border-box'
+                }}
+              />
+            </div>
+
+            <div style={{ marginBottom: '1.5rem' }}>
+              <label style={{ display: 'block', fontWeight: 600, marginBottom: '0.5rem', color: '#1e293b' }}>
+                Role
+              </label>
+              <select
+                value={formData.role}
+                onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                style={{
+                  width: '100%',
+                  padding: '0.75rem',
+                  border: '1px solid #cbd5e1',
+                  borderRadius: '6px',
+                  fontSize: '1rem',
+                  boxSizing: 'border-box'
+                }}
+              >
+                <option value="user">User</option>
+                <option value="staff">Staff</option>
+                <option value="admin">Admin</option>
+              </select>
+            </div>
+
+            <div style={{ display: 'flex', gap: '1rem' }}>
+              <button
+                type="submit"
+                style={{
+                  flex: 1,
+                  padding: '0.75rem 1.5rem',
+                  background: '#16a34a',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '6px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  fontSize: '1rem'
+                }}
+              >
+                Create User
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowAddUserForm(false)}
+                style={{
+                  flex: 1,
+                  padding: '0.75rem 1.5rem',
+                  background: '#94a3b8',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '6px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  fontSize: '1rem'
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      )}      {loading ? (
         <div className="loading-state">
           <div className="spinner"></div>
           <p>Loading users...</p>
@@ -250,6 +525,7 @@ export default function UsersScreen() {
                             className="icon-btn"
                             title="Edit user"
                             style={{ color: '#2563eb' }}
+                            onClick={() => handleEditUser(u.id, u)}
                           >
                             <FaEdit />
                           </button>
@@ -258,6 +534,7 @@ export default function UsersScreen() {
                             title="Delete user"
                             style={{ color: '#dc2626' }}
                             disabled={u.id === user.id}
+                            onClick={() => handleDeleteUser(u.id)}
                           >
                             <FaTrash />
                           </button>

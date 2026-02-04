@@ -197,6 +197,7 @@ router.get(
 // PUT /:id -> update user
 router.put(
     '/:id',
+    protect,
     asyncHandler(async (req, res, next) => {
         if (typeof userController.updateUser !== 'function') {
             const err = new Error('updateUser not implemented');

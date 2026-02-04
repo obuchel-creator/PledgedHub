@@ -37,6 +37,29 @@ export function AuthProvider({ children }) {
       const response = await getCurrentUser();
       console.log('🔐 AuthContext: Full response:', response);
       
+      // Check if response indicates an error (401, 403, token expired, etc)
+      if (response && response.success === false) {
+        console.error('🔐 AuthContext: Server returned error:', response.error);
+        // Token is invalid, clear it
+        setUser(null);
+        setToken(null);
+        localStorage.removeItem(TOKEN_KEY);
+        setLoading(false);
+        setInitialized(true);
+        return null;
+      }
+
+      if (response && response.status && response.status >= 400) {
+        console.error('🔐 AuthContext: Server error response, status:', response.status);
+        // Token is invalid, clear it
+        setUser(null);
+        setToken(null);
+        localStorage.removeItem(TOKEN_KEY);
+        setLoading(false);
+        setInitialized(true);
+        return null;
+      }
+      
       // handleRequest wraps the backend response in { data: {...} }
       // Backend returns { success: true, user: {...} }
       // So the user is at response.data.user
@@ -56,6 +79,7 @@ export function AuthProvider({ children }) {
         }
         setUser(userObj);
       } else {
+        console.warn('🔐 AuthContext: Invalid user object:', userObj);
         setUser(null);
       }
       setLoading(false);
@@ -63,7 +87,8 @@ export function AuthProvider({ children }) {
       return userObj;
     } catch (err) {
       console.error('🔐 AuthContext: Error refreshing user:', err.message);
-      // token likely invalid
+      // token likely invalid or network error
+      console.log('🔐 AuthContext: Clearing invalid token');
       setUser(null);
       setToken(null);
       localStorage.removeItem(TOKEN_KEY);
@@ -77,6 +102,7 @@ export function AuthProvider({ children }) {
     // on mount, verify token validity if token exists
     console.log('🔐 AuthContext: useEffect mounting, token:', token ? '✓' : '✗');
     if (token) {
+      // Verify token is still valid by fetching user
       refreshUser();
     } else {
       setLoading(false);
@@ -84,6 +110,19 @@ export function AuthProvider({ children }) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Add effect to monitor token changes and clear invalid tokens
+  useEffect(() => {
+    const validateToken = async () => {
+      if (token && !user && !loading && initialized) {
+        // Token exists but no user data - token is invalid
+        console.log('🔐 AuthContext: Token exists but user is null - clearing invalid token');
+        setToken(null);
+        localStorage.removeItem(TOKEN_KEY);
+      }
+    };
+    validateToken();
+  }, [token, user, loading, initialized]);
 
   async function login(credentials = {}) {
     // credentials: { email, password } or { username, password }

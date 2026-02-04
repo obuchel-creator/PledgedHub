@@ -59,7 +59,19 @@ export default function LoginScreen() {
       if (result && result.success === false && result.error) {
         // Error response from handleRequest
         console.error('[LoginScreen] 🔐 Login API error:', result.error);
-        setError(result.error);
+        let errorMsg = result.error;
+        // Make error messages more user-friendly
+        if (typeof errorMsg === 'string') {
+          if (errorMsg.toLowerCase().includes('invalid credentials') || 
+              errorMsg.toLowerCase().includes('invalid password')) {
+            errorMsg = '❌ Incorrect phone number or password. Please try again.';
+          } else if (errorMsg.toLowerCase().includes('user not found')) {
+            errorMsg = '❌ No account found with this phone number. Please sign up first.';
+          } else if (errorMsg.toLowerCase().includes('too many failed')) {
+            errorMsg = '⏱️ Too many failed attempts. Please try again in 15 minutes.';
+          }
+        }
+        setError(errorMsg);
         setSuccess('');
       } else if (result && result.token) {
         console.log('[LoginScreen] ✅ Login successful, token received, showing success and redirecting');

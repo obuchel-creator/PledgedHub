@@ -17,6 +17,10 @@ export default function NavBar() {
   const location = useLocation();
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef(null);
+  
+  // Debug logging
+  console.log('🔵 NavBar - user:', user);
+  console.log('🔵 NavBar - user.role:', user?.role);
 
   const handleLogout = () => {
     logout();
@@ -40,7 +44,9 @@ export default function NavBar() {
       <div className="qb-navbar__logo"></div>
       <ul className="qb-navbar__links">
         {navLinks.map(link => {
-          if (link.adminOnly && (!user || (user.role !== 'admin' && user.role !== 'staff'))) return null;
+          // Show admin-only links to: admin, staff, super_admin, support_staff, finance_admin
+          const adminRoles = ['admin', 'staff', 'super_admin', 'support_staff', 'finance_admin'];
+          if (link.adminOnly && (!user || !adminRoles.includes(user.role))) return null;
           return (
             <li key={link.to} className={location.pathname.startsWith(link.to) ? 'active' : ''}>
               <Link to={link.to}>

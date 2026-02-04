@@ -2,20 +2,14 @@ const express = require('express');
 const router = express.Router();
 const reminderService = require('../services/reminderService');
 const cronScheduler = require('../services/cronScheduler');
-
-// Simple auth middleware (temporary - replace with proper auth later)
-const simpleAuth = (req, res, next) => {
-    // For now, allow all requests
-    // TODO: Replace with proper protect middleware
-    next();
-};
+const { authenticateToken, requireAdmin } = require('../middleware/authMiddleware');
 
 /**
  * @route   GET /api/reminders/test
- * @desc    Run reminders manually (for testing)
- * @access  Public (temporary)
+ * @desc    Run reminders manually (admin only)
+ * @access  Protected - Admin
  */
-router.get('/test', simpleAuth, async (req, res) => {
+router.get('/test', authenticateToken, requireAdmin, async (req, res) => {
     try {
         const results = await cronScheduler.runManually();
         res.json({
@@ -36,9 +30,9 @@ router.get('/test', simpleAuth, async (req, res) => {
 /**
  * @route   GET /api/reminders/status
  * @desc    Get status of scheduled jobs
- * @access  Public (temporary)
+ * @access  Protected - Admin
  */
-router.get('/status', simpleAuth, (req, res) => {
+router.get('/status', authenticateToken, requireAdmin, (req, res) => {
     try {
         const status = cronScheduler.getJobStatus();
         res.json({
@@ -58,9 +52,9 @@ router.get('/status', simpleAuth, (req, res) => {
 /**
  * @route   GET /api/reminders/upcoming
  * @desc    Get pledges that will need reminders
- * @access  Public (temporary)
+ * @access  Protected - Staff/Admin
  */
-router.get('/upcoming', simpleAuth, async (req, res) => {
+router.get('/upcoming', authenticateToken, async (req, res) => {
     try {
         const [
             sevenDays,
@@ -108,9 +102,9 @@ router.get('/upcoming', simpleAuth, async (req, res) => {
 /**
  * @route   POST /api/reminders/send/:pledgeId
  * @desc    Send reminder for specific pledge
- * @access  Public (temporary)
+ * @access  Protected - Staff/Admin
  */
-router.post('/send/:pledgeId', simpleAuth, async (req, res) => {
+router.post('/send/:pledgeId', authenticateToken, async (req, res) => {
     try {
         const { pledgeId } = req.params;
         const { type } = req.body; // '7_days', '3_days', 'due_today', 'overdue'

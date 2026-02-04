@@ -2,15 +2,9 @@ const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const FacebookStrategy = require('passport-facebook').Strategy;
 
-// Try to use real User model, fallback to mock for testing
-let User;
-try {
-    User = require('../models/User');
-    console.log('✅ Using real User model with database');
-} catch (err) {
-    console.warn('⚠️  Database not available, using mock user service for OAuth testing');
-    User = require('../services/mockUserService');
-}
+// ALWAYS use real User model - no mock data in production/development
+const User = require('../models/User');
+console.log('✅ Using real User model with database');
 
 // Serialize user to session
 passport.serializeUser((user, done) => {

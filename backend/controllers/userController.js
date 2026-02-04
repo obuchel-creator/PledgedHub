@@ -78,32 +78,50 @@ async function getUser(req, res) {
 }
 
 async function listUsers(req, res) {
-                console.log('=== /api/users route handler called ===');
-            // Direct DB check for debugging
-            const db = require('../config/db');
-            try {
-                const [countRows] = await db.execute('SELECT COUNT(*) as count FROM users');
-                const [sampleRows] = await db.execute('SELECT id, username, email, phone_number FROM users LIMIT 5');
-                console.log('[DEBUG] Direct DB user count:', countRows);
-                console.log('[DEBUG] Direct DB sample users:', sampleRows);
-            } catch (err) {
-                console.error('[DEBUG] Direct DB query error:', err);
-            }
-        console.log('[DEBUG] listUsers route called');
+    console.log('=== /api/users route handler called ===');
     try {
-        // Optional admin check, but for now allow
-        const users = await User.listAll({ limit: 100 });
-        console.log('[DEBUG] Controller listUsers - users from model:', users);
-        const safe = users.map(u => {
-            const o = { ...u };
-            delete o.passwordHash;
-            return o;
+        const tenantId = req.user?.tenant_id;
+        const userRole = req.user?.role;
+
+        if (!tenantId) {
+            return res.status(400).json({ error: 'Tenant ID required' });
+        }
+
+        // Get users from the same tenant only
+        const { pool } = require('../config/db');
+        const [users] = await pool.execute(
+            `SELECT id, name, username, email, phone_number as phone, role, created_at, tenant_id 
+             FROM users 
+             WHERE tenant_id = ? AND deleted = 0
+             ORDER BY created_at DESC`,
+            [tenantId]
+        );
+
+        console.log(`[DEBUG] Found ${users.length} users in tenant ${tenantId}`);
+
+        // Remove sensitive data
+        const safeUsers = users.map(u => ({
+            id: u.id,
+            name: u.name,
+            username: u.username,
+            email: u.email,
+            phone: u.phone,
+            role: u.role,
+            created_at: u.created_at,
+            tenant_id: u.tenant_id
+        }));
+
+        return res.status(200).json({ 
+            success: true,
+            users: safeUsers,
+            count: safeUsers.length
         });
-        console.log('[DEBUG] Controller listUsers - users sent to client:', safe);
-        return res.status(200).json({ users: safe });
     } catch (err) {
         console.error('listUsers error', err);
-        return res.status(500).json({ error: 'server error' });
+        return res.status(500).json({ 
+            success: false,
+            error: 'Failed to fetch users' 
+        });
     }
 }
 
@@ -151,7 +169,8 @@ async function deleteUser(req, res) {
         }
 
         // Check if requesting user is admin
-        if (!req.user || req.user.role !== 'admin') {
+        const adminRoles = ['admin', 'super_admin', 'superadmin', 'staff', 'support_staff', 'finance_admin'];
+        if (!req.user || !adminRoles.includes(req.user.role)) {
             return res.status(403).json({ 
                 error: 'Forbidden: Admin access required to delete users' 
             });
@@ -238,7 +257,8 @@ async function restoreUser(req, res) {
         }
 
         // Check if requesting user is admin
-        if (!req.user || req.user.role !== 'admin') {
+        const adminRoles = ['admin', 'super_admin', 'superadmin', 'staff', 'support_staff', 'finance_admin'];
+        if (!req.user || !adminRoles.includes(req.user.role)) {
             return res.status(403).json({ 
                 error: 'Forbidden: Admin access required' 
             });
@@ -282,7 +302,8 @@ async function updateUserRole(req, res) {
         }
 
         // Check if requesting user is superadmin
-        if (!req.user || req.user.role !== 'superadmin') {
+        const superAdminRoles = ['super_admin', 'superadmin'];
+        if (!req.user || !superAdminRoles.includes(req.user.role)) {
             return res.status(403).json({ 
                 error: 'Forbidden: Only superadmins can change user roles' 
             });
@@ -347,9 +368,10 @@ async function updateUserRole(req, res) {
 async function listAllUsers(req, res) {
     try {
         // Check if requesting user is admin or superadmin
-        if (!req.user || (req.user.role !== 'admin' && req.user.role !== 'superadmin')) {
+        const adminRoles = ['admin', 'super_admin', 'superadmin', 'staff', 'support_staff', 'finance_admin'];
+        if (!req.user || !adminRoles.includes(req.user.role)) {
             return res.status(403).json({ 
-                error: 'Forbidden: Admin or Superadmin access required' 
+                error: 'Forbidden: Admin access required' 
             });
         }
 
@@ -395,7 +417,8 @@ async function listAllUsers(req, res) {
  */
 async function promoteToAdmin(req, res) {
   // Only admins can promote
-  if (!req.user || req.user.role !== 'admin') {
+  const adminRoles = ['admin', 'super_admin', 'superadmin', 'staff', 'support_staff', 'finance_admin'];
+  if (!req.user || !adminRoles.includes(req.user.role)) {
     return res.status(403).json({ success: false, error: 'Access denied' });
   }
   const { identifier } = req.body;

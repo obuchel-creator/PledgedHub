@@ -9,13 +9,20 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
 
+  // Debug logging
+  console.log('🔵 Navbar - user:', user);
+  console.log('🔵 Navbar - user.role:', user?.role);
+
   // Dynamic nav links based on user role
+  const adminRoles = ['admin', 'staff', 'super_admin', 'superadmin', 'support_staff', 'finance_admin'];
+  const isAdmin = user && adminRoles.includes(user.role);
+  
   const navLinks = [
     ...(user ? [{ to: '/dashboard', label: 'Dashboard' }] : [{ to: '/explore', label: 'Explore' }]),
     { to: '/campaigns', label: 'Campaigns' },
     { to: '/analytics', label: 'Analytics' },
     { to: '/fundraise', label: 'Fundraise' },
-    ...(user?.role === 'admin' || user?.role === 'superadmin'
+    ...(isAdmin
       ? [
           { to: '/admin/users', label: '👥 Users' },
           { to: '/accounting/dashboard', label: '📊 Accounting' },

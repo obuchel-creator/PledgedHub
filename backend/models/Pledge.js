@@ -18,6 +18,21 @@ async function create(data = {}) {
     // The pledges table doesn't have a 'name' or 'title' column
     // It has: donor_name, purpose, amount, etc.
     
+    // SaaS: Ensure tenant_id is set
+    if (!data.tenant_id) {
+        throw new Error('tenant_id is required for pledge creation');
+    }
+    
+    // Privacy: Ensure created_by is set
+    if (!data.created_by) {
+        throw new Error('created_by (user_id) is required for pledge creation');
+    }
+    
+    // Privacy: Default to private pledges
+    if (!('is_private' in data)) {
+        data.is_private = true;
+    }
+    
     // Always set deleted = 0 unless explicitly set
     if (!('deleted' in data)) {
         data.deleted = 0;
@@ -46,10 +61,21 @@ async function create(data = {}) {
     }
 }
 
-async function findById(id) {
+async function findById(id, tenantId = null) {
     if (id == null) return null;
     try {
-        const [rows] = await pool.execute(`SELECT * FROM \`${TABLE}\` WHERE id = ? LIMIT 1`, [id]);
+        let sql = `SELECT * FROM \`${TABLE}\` WHERE id = ?`;
+        const params = [id];
+        
+        // SaaS: Add tenant filter if provided
+        if (tenantId) {
+            sql += ' AND tenant_id = ?';
+            params.push(tenantId);
+        }
+        
+        sql += ' LIMIT 1';
+        
+        const [rows] = await pool.execute(sql, params);
         const row = (rows && rows[0]) || null;
         if (!row) return null;
         
@@ -70,12 +96,33 @@ async function list(filter = {}) {
     const where = [];
     const params = [];
 
+    // SaaS: CRITICAL - Always filter by tenant_id first
+    if (filter.tenant_id) {
+        where.push('tenant_id = ?');
+        params.push(filter.tenant_id);
+    }
+
     // Always filter for deleted = 0 unless explicitly overridden
     if (!('deleted' in filter)) {
         where.push('deleted = 0');
     } else if (filter.deleted !== undefined) {
         where.push('deleted = ?');
         params.push(filter.deleted);
+    }
+
+    // Privacy: Filter by user ownership (unless admin/staff with permissions)
+    if (filter.created_by) {
+        where.push('created_by = ?');
+        params.push(filter.created_by);
+    }
+    
+    // Privacy: Handle staff access to non-private pledges
+    if (filter.includeOrgPledges && filter.created_by) {
+        // Staff can see their own + organization-shared pledges
+        const lastCondition = where.pop(); // Remove created_by = ?
+        const lastParam = params.pop();
+        where.push('(created_by = ? OR is_private = FALSE)');
+        params.push(lastParam);
     }
 
     if (filter.ownerId != null) {
@@ -116,7 +163,7 @@ async function list(filter = {}) {
     }
 }
 
-async function update(id, changes = {}) {
+async function update(id, changes = {}, tenantId = null, userId = null) {
     if (id == null) throw new Error('id is required');
 
     const sets = [];
@@ -132,7 +179,19 @@ async function update(id, changes = {}) {
     if (!sets.length) throw new Error('No valid fields to update');
 
     params.push(id);
-    const sql = `UPDATE \`${TABLE}\` SET ${sets.join(', ')} WHERE id = ?`;
+    let sql = `UPDATE \`${TABLE}\` SET ${sets.join(', ')} WHERE id = ?`;
+    
+    // SaaS: Add tenant validation
+    if (tenantId) {
+        sql += ' AND tenant_id = ?';
+        params.push(tenantId);
+    }
+    
+    // Privacy: Add user ownership validation (unless admin override)
+    if (userId) {
+        sql += ' AND created_by = ?';
+        params.push(userId);
+    }
 
     try {
         const [result] = await pool.execute(sql, params);
@@ -185,10 +244,25 @@ async function del(id) {
     }
 }
 
-async function softDelete(id) {
+async function softDelete(id, tenantId = null, userId = null) {
     if (id == null) throw new Error('id is required');
     try {
-        const [result] = await pool.execute(`UPDATE \`${TABLE}\` SET deleted = 1 WHERE id = ?`, [id]);
+        let sql = `UPDATE \`${TABLE}\` SET deleted = 1 WHERE id = ?`;
+        const params = [id];
+        
+        // SaaS: Add tenant validation
+        if (tenantId) {
+            sql += ' AND tenant_id = ?';
+            params.push(tenantId);
+        }
+        
+        // Privacy: Add user ownership validation
+        if (userId) {
+            sql += ' AND created_by = ?';
+            params.push(userId);
+        }
+        
+        const [result] = await pool.execute(sql, params);
         return result.affectedRows || 0;
     } catch (err) {
         console.error('DB error in softDelete:', err);

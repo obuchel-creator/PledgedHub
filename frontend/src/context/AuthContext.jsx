@@ -34,11 +34,18 @@ export function AuthProvider({ children }) {
     }
     try {
       console.log('🔐 AuthContext: Fetching user data...');
-      const data = await getCurrentUser();
-      console.log('🔐 AuthContext: User fetched successfully:', data?.user?.username || data?.username);
-      // Normalize user object for frontend
-      let userObj = data && data.user ? data.user : data;
-      if (userObj) {
+      const response = await getCurrentUser();
+      console.log('🔐 AuthContext: Full response:', response);
+      
+      // handleRequest wraps the backend response in { data: {...} }
+      // Backend returns { success: true, user: {...} }
+      // So the user is at response.data.user
+      const data = response?.data || response;
+      const userObj = data?.user || data;
+      
+      console.log('🔐 AuthContext: User fetched successfully:', userObj?.name || userObj?.username);
+      
+      if (userObj && userObj.id) {
         // Ensure phone field is set
         if (!userObj.phone && userObj.phone_number) {
           userObj.phone = userObj.phone_number;
@@ -47,8 +54,10 @@ export function AuthProvider({ children }) {
         if (!userObj.role) {
           userObj.role = 'user';
         }
+        setUser(userObj);
+      } else {
+        setUser(null);
       }
-      setUser(userObj);
       setLoading(false);
       setInitialized(true);
       return userObj;
@@ -91,13 +100,27 @@ export function AuthProvider({ children }) {
       const newToken = data && (data.token || data.accessToken);
       if (newToken) {
         console.log('🔐 AuthContext: Login successful, token received');
+        console.log('🔐 AuthContext: User data in response:', data.user);
         localStorage.setItem(TOKEN_KEY, newToken);
         setToken(newToken);
-        // Try to fetch user, but if it fails, set a minimal user object
-        const userData = await refreshUser();
-        if (!userData || !userData.user) {
-          if (data.user) setUser(data.user);
-          else setUser({ email: credentials.email }); // fallback minimal user
+        // Use user data from login response directly
+        if (data.user) {
+          // Normalize user object
+          const userObj = { ...data.user };
+          if (!userObj.phone && userObj.phone_number) {
+            userObj.phone = userObj.phone_number;
+          }
+          if (!userObj.role) {
+            userObj.role = 'user';
+          }
+          console.log('🔐 AuthContext: Setting user state:', userObj);
+          setUser(userObj);
+          setLoading(false);
+          setInitialized(true);
+          console.log('🔐 AuthContext: User data set successfully, name:', userObj.name, 'role:', userObj.role);
+        } else {
+          console.warn('🔐 AuthContext: No user data in login response!');
+          setLoading(false);
         }
         return data;
       } else if (data && data.user) {

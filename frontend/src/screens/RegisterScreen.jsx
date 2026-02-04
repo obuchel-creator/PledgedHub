@@ -114,12 +114,18 @@ function RegisterScreen({ disableRequired = false }) {
         navigate('/dashboard', { replace: true });
       } else {
         // Show backend error (duplicate phone/email, password strength, etc)
-        let errorMsg = result?.error || 'Registration failed. Please try again.';
+        let errorMsg = result?.error || result?.message || 'Registration failed. Please try again.';
         if (typeof errorMsg === 'string') {
-          if (errorMsg.toLowerCase().includes('phone number already registered')) {
-            errorMsg = 'This phone number is already in use. Please use a different phone or log in.';
-          } else if (errorMsg.toLowerCase().includes('email already registered')) {
-            errorMsg = 'This email is already in use. Please use a different email or log in.';
+          // Match backend messages exactly
+          if (errorMsg.toLowerCase().includes('phone number already in use') || 
+              errorMsg.toLowerCase().includes('phone already')) {
+            errorMsg = '❌ This phone number is already registered. Please use a different number or log in.';
+          } else if (errorMsg.toLowerCase().includes('email already in use') || 
+                     errorMsg.toLowerCase().includes('email already')) {
+            errorMsg = '❌ This email is already registered. Please use a different email or log in.';
+          } else if (errorMsg.toLowerCase().includes('password must')) {
+            // Password validation errors - show as-is with emoji
+            errorMsg = '❌ ' + errorMsg;
           }
         }
         setError(errorMsg);

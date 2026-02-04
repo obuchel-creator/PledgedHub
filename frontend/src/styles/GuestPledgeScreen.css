@@ -4,8 +4,11 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem 1.5rem;
-  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #f9fafb 100%);
+  background-color: #ffffff !important;
+  background-image: none !important;
+  background: #ffffff !important;
   min-height: 100vh;
+  min-height: 100%;
 }
 
 /* Hero Banner */
@@ -13,6 +16,7 @@
   text-align: center;
   padding: 3rem 2rem;
   background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+  background-attachment: scroll;
   border-radius: 20px;
   margin-bottom: 2rem;
   color: white;
@@ -41,6 +45,7 @@
   font-size: 0.9rem;
   font-weight: 600;
   margin-bottom: 1.5rem;
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.3);
 }
@@ -319,7 +324,8 @@
 }
 
 .pledge-form-modern {
-  background: white;
+  background: #ffffff !important;
+  background-color: #ffffff !important;
   padding: 2.5rem;
   border-radius: 16px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
@@ -333,12 +339,12 @@
 .form-title {
   font-size: 1.75rem;
   font-weight: 800;
-  color: #1f2937;
+  color: #1f2937 !important;
   margin: 0 0 0.5rem 0;
 }
 
 .form-subtitle {
-  color: #6b7280;
+  color: #6b7280 !important;
   font-size: 1rem;
 }
 
@@ -988,5 +994,64 @@
     border-color: #dc2626;
   }
 }
+
+/* Edge Browser Compatibility Fixes */
+@supports (-ms-ime-align: auto) {
+  .guest-pledge-container {
+    background: #f8f9fa;
+  }
+
+  .pledge-form-modern {
+    background: #ffffff;
+    -ms-filter: none;
+    filter: none;
+  }
+
+  .pledge-form-modern,
+  .recent-pledges-modern,
+  .stat-card,
+  .progress-card {
+    background-color: #ffffff;
+  }
+}
+
+/* Edge Text Rendering Fix */
+.guest-pledge-container,
+.pledge-form-modern,
+.form-title,
+.form-subtitle {
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Edge Specific Background Force */
+@supports (-ms-ime-align: auto) {
+  .guest-pledge-container {
+    background: #ffffff !important;
+  }
+
+  .pledge-form-modern {
+    background: #ffffff !important;
+    color: #1f2937 !important;
+  }
+
+  .form-title {
+    color: #1f2937 !important;
+  }
+
+  .form-subtitle {
+    color: #6b7280 !important;
+  }
+
+  .modern-label,
+  .pledge-timeline-item,
+  .form-group label {
+    color: #1f2937 !important;
+  }
+}
+
+
 
 

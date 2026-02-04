@@ -46,9 +46,14 @@ async function login({ email, password }) {
       return { success: false, error: 'Invalid password' };
     }
 
-    // Generate JWT
+    // Generate JWT (include tenant_id for multi-tenant SaaS)
     const token = jwt.sign(
-      { id: user.id, role: user.role, email: user.email },
+      { 
+        id: user.id, 
+        role: user.role, 
+        email: user.email,
+        tenant_id: user.tenant_id  // SaaS: Include tenant context in token
+      },
       JWT_SECRET,
       { expiresIn: '7d' }
     );

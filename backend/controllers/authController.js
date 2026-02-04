@@ -195,7 +195,11 @@ async function register(req, res) {
         });
 
         // Auto-issue a token with session tracking
-        const { token, jti } = signToken({ id: user.id || user._id });
+        const { token, jti } = signToken({ 
+            id: user.id || user._id,
+            role: user.role || 'user',
+            tenant_id: user.tenant_id
+        });
 
         // Security: Log registration event (in production, use proper logging service)
         console.log(`[SECURITY] New user registered: ${user.id || user._id} (phone: ${cleanPhone}) from IP: ${req.ip}`);
@@ -282,7 +286,11 @@ async function login(req, res) {
         clearLoginAttempts(loginId);
 
         // Generate token with session tracking
-        const { token, jti } = signToken({ id: user.id || user._id });
+        const { token, jti } = signToken({ 
+            id: user.id || user._id,
+            role: user.role || 'user',
+            tenant_id: user.tenant_id
+        });
 
         // Security: Log successful login
         console.log(`[SECURITY] Successful login: ${user.id || user._id} from IP: ${req.ip}`);

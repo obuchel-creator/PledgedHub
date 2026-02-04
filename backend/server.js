@@ -88,10 +88,14 @@ const allowedOrigins = process.env.NODE_ENV === 'production'
 const corsOptions = {
   origin: function (origin, callback) {
     // Allow requests with no origin (like mobile apps, curl, etc.)
+    console.log('🔍 CORS Check - Origin:', origin, 'NODE_ENV:', process.env.NODE_ENV);
+    console.log('🔍 Allowed Origins:', allowedOrigins);
     if (!origin) return callback(null, true);
     if (allowedOrigins.includes(origin)) {
+      console.log('✅ CORS allowed for:', origin);
       return callback(null, true);
     } else {
+      console.log('❌ CORS BLOCKED for:', origin);
       logger.warn('Blocked CORS origin', { origin });
       return callback(new Error('Not allowed by CORS'), false);
     }
@@ -148,6 +152,30 @@ app.get('/api/test', (req, res) => res.json({
 
 // ========================================
 // API ROUTES
+// ========================================
+
+// ========================================
+// SAAS ROUTES (Multi-Tenant)
+// ========================================
+const onboardingRoutes = require('./routes/saas/onboardingRoutes');
+const tenantRoutes = require('./routes/saas/tenantRoutes');
+
+// Public SaaS routes (no authentication)
+app.use('/api/saas/signup', securityService.rateLimiters.auth, onboardingRoutes);
+app.use('/api/saas/check-subdomain', onboardingRoutes);
+app.use('/api/saas/plans', onboardingRoutes);
+
+// Tenant management routes (authentication + tenant context required)
+app.use('/api/saas/tenant', tenantRoutes);
+
+// ========================================
+// PRIVACY ROUTES (User-Level Data Isolation)
+// ========================================
+const privacyRoutes = require('./routes/privacyRoutes');
+app.use('/api/privacy', securityService.rateLimiters.api, privacyRoutes);
+
+// ========================================
+// REGULAR API ROUTES
 // ========================================
 
 // Public routes (no authentication required)

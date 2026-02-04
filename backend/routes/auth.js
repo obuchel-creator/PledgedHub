@@ -47,10 +47,17 @@ router.post('/register', async (req, res) => {
     );
     const userId = insertResult.insertId;
     if (!userId) throw new Error('User insert failed: missing insertId');
-    const [rows] = await pool.execute('SELECT id, name, username, phone, email FROM users WHERE id = ?', [userId]);
+    const [rows] = await pool.execute('SELECT id, name, username, phone, email, tenant_id FROM users WHERE id = ?', [userId]);
     const user = rows[0];
     if (!user) return res.status(500).json({ error: 'User not found after insert' });
-    const token = jwt.sign({ id: user.id, name: user.name, username: user.username, phone: user.phone, email: user.email }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    const token = jwt.sign({ 
+      id: user.id, 
+      name: user.name, 
+      username: user.username, 
+      phone: user.phone, 
+      email: user.email,
+      tenant_id: user.tenant_id  // SaaS: Include tenant context
+    }, process.env.JWT_SECRET, { expiresIn: '7d' });
     const response = { token, user, success: true };
     console.log('[REGISTER] Sending response:', response);
     res.status(201).json(response);

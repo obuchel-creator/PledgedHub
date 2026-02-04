@@ -1,10 +1,26 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import autoprefixer from 'autoprefixer'
 
-// Minimal Vite config for a React (ESM) app
+// Minimal Vite config for a React (ESM) app with Edge compatibility
 export default defineConfig({
     base: '/',
     plugins: [react()],
+    css: {
+        postcss: {
+            plugins: [
+                autoprefixer({
+                    overrideBrowserslist: [
+                        'last 2 versions',
+                        'Edge >= 12',
+                        'Chrome >= 60',
+                        'Safari >= 12',
+                        'Firefox >= 60'
+                    ]
+                })
+            ]
+        }
+    },
     server: {
         port: 5173,
         hmr: { overlay: false },

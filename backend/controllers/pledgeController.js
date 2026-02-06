@@ -191,6 +191,42 @@ async function createPledge(req, res) {
                 error: `Pledge name must match your registered name (${loggedInUserName}). Individual pledges can only be created under your own account for data integrity and accountability.`
             });
         }
+
+        // Phone Number Validation: Check if phone matches user's registered phone
+        // Get logged-in user's registered phone for validation
+        const loggedInUserPhone = req.user?.phone || req.user?.phone_number;
+        const submittedPhone = typeof donor_phone === 'string' ? donor_phone.trim() : '';
+        
+        // Normalize phone numbers for comparison (remove spaces, dashes, and +)
+        const normalizePhone = (phone) => {
+            if (!phone) return '';
+            return phone.replace(/[\s\-\+]/g, '');
+        };
+        
+        const normalizedSubmittedPhone = normalizePhone(submittedPhone);
+        const normalizedUserPhone = normalizePhone(loggedInUserPhone);
+        
+        // Configuration: Check if strict phone validation is enabled
+        const strictPhoneValidation = process.env.ENABLE_STRICT_PHONE_VALIDATION === 'true';
+        
+        if (normalizedUserPhone && normalizedSubmittedPhone !== normalizedUserPhone) {
+            // Phone numbers don't match
+            if (strictPhoneValidation) {
+                // Strict mode: Reject the pledge
+                return res.status(400).json({
+                    success: false,
+                    error: `Phone number must match your registered phone (${loggedInUserPhone}). Individual pledges can only be created with your registered phone number for verification and accountability.`,
+                    details: {
+                        registeredPhone: loggedInUserPhone,
+                        submittedPhone: submittedPhone
+                    }
+                });
+            } else {
+                // Flexible mode: Log warning but allow the pledge
+                console.warn(`⚠️  [PLEDGE CREATE] Phone mismatch - User ID: ${userId}, Registered: ${loggedInUserPhone}, Submitted: ${submittedPhone}`);
+                console.warn(`⚠️  [PLEDGE CREATE] Allowing pledge with different phone number (flexible mode enabled)`);
+            }
+        }
         
         const payload = {
             tenant_id: tenantId,  // SaaS: Always include tenant_id

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { changePassword } from '../services/api';
 import ValidationItem from '../components/ValidationItem';
+import { formatFormErrorMessage } from '../utils/formErrors';
 
 export default function PasswordChangeScreen() {
   const { user } = useAuth();
@@ -42,7 +43,7 @@ export default function PasswordChangeScreen() {
     setMessage({ type: '', text: '' });
 
     if (!allValidationsPassed) {
-      setMessage({ type: 'error', text: 'Please meet all password requirements' });
+      setMessage({ type: 'error', text: 'Please meet all password requirements.' });
       return;
     }
 
@@ -58,8 +59,10 @@ export default function PasswordChangeScreen() {
         setMessage({
           type: 'error',
           text:
-            result.error ||
-            'Failed to change password. Please verify your current password is correct.',
+            formatFormErrorMessage(
+              result.error || 'Failed to change password. Please verify your current password is correct.',
+              'Failed to change password. Please verify your current password is correct.'
+            ),
         });
       } else {
         setMessage({
@@ -74,9 +77,10 @@ export default function PasswordChangeScreen() {
       setMessage({
         type: 'error',
         text:
-          error?.error ||
-          error?.message ||
-          'Failed to change password. Please verify your current password is correct.',
+          formatFormErrorMessage(
+            error?.error || error?.message || 'Failed to change password. Please verify your current password is correct.',
+            'Failed to change password. Please verify your current password is correct.'
+          ),
       });
     } finally {
       setLoading(false);

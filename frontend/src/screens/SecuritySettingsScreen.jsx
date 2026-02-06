@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import './SecuritySettingsScreen.css';
+import { formatFormErrorMessage } from '../utils/formErrors';
 
 export default function SecuritySettingsScreen() {
     const { token } = useAuth();
@@ -63,17 +64,17 @@ export default function SecuritySettingsScreen() {
         setSuccess('');
 
         if (!newPin || !confirmPin) {
-            setError('Please enter a new PIN');
+            setError('Please enter and confirm a new PIN.');
             return;
         }
 
         if (newPin !== confirmPin) {
-            setError('PINs do not match');
+            setError('PINs do not match.');
             return;
         }
 
         if (newPin.length !== 4 || !/^\d{4}$/.test(newPin)) {
-            setError('PIN must be 4 digits');
+            setError('PIN must be 4 digits.');
             return;
         }
 
@@ -94,10 +95,10 @@ export default function SecuritySettingsScreen() {
                 setNewPin('');
                 setConfirmPin('');
             } else {
-                setError(data.error || 'Failed to update PIN');
+                setError(formatFormErrorMessage(data.error || 'Failed to update PIN', 'Unable to update PIN. Please try again.'));
             }
         } catch (err) {
-            setError('Error updating PIN');
+            setError(formatFormErrorMessage(err?.message || 'Error updating PIN', 'Unable to update PIN. Please try again.'));
         } finally {
             setLoading(false);
         }
@@ -111,7 +112,7 @@ export default function SecuritySettingsScreen() {
 
         const threshold = parseInt(e.target.threshold.value);
         if (threshold < 10000) {
-            setError('Threshold must be at least 10,000 UGX');
+            setError('Threshold must be at least UGX 10,000.');
             return;
         }
 
@@ -131,10 +132,10 @@ export default function SecuritySettingsScreen() {
                 setSuccess('PIN threshold updated successfully');
                 setPinSettings(prev => ({ ...prev, pinRequiredThreshold: threshold }));
             } else {
-                setError(data.error || 'Failed to update threshold');
+                setError(formatFormErrorMessage(data.error || 'Failed to update threshold', 'Unable to update threshold. Please try again.'));
             }
         } catch (err) {
-            setError('Error updating threshold');
+            setError(formatFormErrorMessage(err?.message || 'Error updating threshold', 'Unable to update threshold. Please try again.'));
         } finally {
             setLoading(false);
         }
@@ -147,13 +148,13 @@ export default function SecuritySettingsScreen() {
         setSuccess('');
 
         if (!newIp) {
-            setError('Please enter an IP address');
+            setError('Please enter an IP address.');
             return;
         }
 
         const ips = ipWhitelist.split(',').map(ip => ip.trim());
         if (ips.includes(newIp)) {
-            setError('IP already in whitelist');
+            setError('This IP is already in the whitelist.');
             return;
         }
 
@@ -174,10 +175,10 @@ export default function SecuritySettingsScreen() {
                 setIpWhitelist(prev => `${prev},${newIp}`);
                 setNewIp('');
             } else {
-                setError(data.error || 'Failed to add IP');
+                setError(formatFormErrorMessage(data.error || 'Failed to add IP', 'Unable to add IP. Please try again.'));
             }
         } catch (err) {
-            setError('Error adding IP');
+            setError(formatFormErrorMessage(err?.message || 'Error adding IP', 'Unable to add IP. Please try again.'));
         } finally {
             setLoading(false);
         }
@@ -201,10 +202,10 @@ export default function SecuritySettingsScreen() {
                 setIpWhitelist(ips.join(','));
                 setSuccess(`IP ${ip} removed from whitelist`);
             } else {
-                setError(data.error || 'Failed to remove IP');
+                setError(formatFormErrorMessage(data.error || 'Failed to remove IP', 'Unable to remove IP. Please try again.'));
             }
         } catch (err) {
-            setError('Error removing IP');
+            setError(formatFormErrorMessage(err?.message || 'Error removing IP', 'Unable to remove IP. Please try again.'));
         } finally {
             setLoading(false);
         }

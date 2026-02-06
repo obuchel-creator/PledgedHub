@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getUsers, deleteUser, restoreUser, registerUser } from '../services/api';
+import { formatFormErrorMessage } from '../utils/formErrors';
 
 console.log('[DEBUG] UserManagementScreen mounted');
 // The following useEffect should be inside the component, not at the top level
@@ -71,7 +72,7 @@ export default function UserManagementScreen() {
       console.log('[DEBUG] Users received from API:', response.users);
       setUsers(response.users || []);
     } catch (err) {
-      setError(err.message || 'Failed to load users');
+      setError(formatFormErrorMessage(err.message || 'Failed to load users', 'Unable to load users. Please try again.'));
     } finally {
       setLoading(false);
     }
@@ -123,7 +124,7 @@ export default function UserManagementScreen() {
       closeDeleteModal();
       await loadUsers();
     } catch (err) {
-      setError(err.message || 'Failed to delete user');
+      setError(formatFormErrorMessage(err.message || 'Failed to delete user', 'Unable to delete user. Please try again.'));
     } finally {
       setDeleting(false);
     }
@@ -138,7 +139,7 @@ export default function UserManagementScreen() {
       setSuccess('User restored successfully');
       await loadUsers();
     } catch (err) {
-      setError(err.message || 'Failed to restore user');
+      setError(formatFormErrorMessage(err.message || 'Failed to restore user', 'Unable to restore user. Please try again.'));
     }
   };
 
@@ -149,18 +150,18 @@ export default function UserManagementScreen() {
 
     // Phone is required, must be in international format
     if (!newUser.name || !newUser.phone || !newUser.password) {
-      setError('Name, phone number, and password are required');
+      setError('Please enter a name, phone number, and password.');
       return;
     }
     // Validate phone format (basic international)
     const phonePattern = /^\+?[1-9]\d{7,14}$/;
     const cleanPhone = newUser.phone.replace(/[\s\-()]/g, '');
     if (!phonePattern.test(cleanPhone)) {
-      setError('Invalid phone number format. Use international format (e.g., +256700000000)');
+      setError('Please enter a valid phone number (e.g., +256700000000).');
       return;
     }
     if (newUser.password.length < 8) {
-      setError('Password must be at least 8 characters long');
+      setError('Password must be at least 8 characters long.');
       return;
     }
 
@@ -181,7 +182,7 @@ export default function UserManagementScreen() {
       setNewUser({ name: '', email: '', phone: '', password: '', role: 'donor' });
       await loadUsers();
     } catch (err) {
-      setError(err.message || 'Failed to add user');
+      setError(formatFormErrorMessage(err.message || 'Failed to add user', 'Unable to add user. Please try again.'));
     } finally {
       setAddingUser(false);
     }
@@ -199,12 +200,12 @@ export default function UserManagementScreen() {
     setSuccess('');
 
     if (!editingUser || !newRole) {
-      setError('Invalid role update request');
+      setError('Please select a valid role.');
       return;
     }
 
     if (newRole === editingUser.role) {
-      setError('Please select a different role');
+      setError('Please select a different role.');
       return;
     }
 
@@ -234,7 +235,7 @@ export default function UserManagementScreen() {
       setNewRole('');
       await loadUsers();
     } catch (err) {
-      setError(err.message || 'Failed to update role');
+      setError(formatFormErrorMessage(err.message || 'Failed to update role', 'Unable to update role. Please try again.'));
     } finally {
       setUpdatingRole(false);
     }

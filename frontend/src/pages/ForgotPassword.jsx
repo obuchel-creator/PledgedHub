@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { formatFormErrorMessage } from '../utils/formErrors';
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState('');
@@ -19,12 +20,17 @@ export default function ForgotPassword() {
     setError(null);
     setSuccess(null);
     setLoading(true);
+    if (!email.trim()) {
+      setLoading(false);
+      setError('Please enter your email address.');
+      return;
+    }
     try {
       // TODO: Replace with actual API call
       await new Promise((res) => setTimeout(res, 1200));
       setSuccess('If this email is registered, a password reset link has been sent.');
     } catch (err) {
-      setError('Failed to send reset email. Please try again.');
+      setError(formatFormErrorMessage('Failed to send reset email. Please try again.', 'Failed to send reset email. Please try again.'));
     } finally {
       setLoading(false);
     }

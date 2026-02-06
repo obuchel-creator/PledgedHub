@@ -59,6 +59,12 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
                 emailVerified: true // Google emails are verified
             });
 
+            // Set tenant_id to user's own ID for individual account
+            const userId = user.id || user._id;
+            const { pool } = require('../config/db');
+            await pool.execute('UPDATE users SET tenant_id = ? WHERE id = ?', [userId.toString(), userId]);
+            user.tenant_id = userId.toString();
+
             console.log('[OAuth] New user created:', user.id);
             done(null, user);
         } catch (err) {
@@ -107,6 +113,12 @@ if (process.env.FACEBOOK_APP_ID && process.env.FACEBOOK_APP_SECRET) {
                 oauthId: profile.id,
                 emailVerified: true // Facebook emails are verified
             });
+
+            // Set tenant_id to user's own ID for individual account
+            const userId = user.id || user._id;
+            const { pool } = require('../config/db');
+            await pool.execute('UPDATE users SET tenant_id = ? WHERE id = ?', [userId.toString(), userId]);
+            user.tenant_id = userId.toString();
 
             console.log('[OAuth] New user created:', user.id);
             done(null, user);

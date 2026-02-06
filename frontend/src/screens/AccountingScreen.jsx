@@ -1,10 +1,38 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { Navigate } from 'react-router-dom';
 import Toast from '../components/Toast';
 import './AccountingScreen.css';
 
 export default function AccountingScreen() {
   const { token, user } = useAuth();
+  
+  // Role-based access control: Only finance_admin and super_admin can access accounting
+  const allowedRoles = ['finance_admin', 'super_admin', 'admin'];
+  const hasAccess = user && allowedRoles.includes(user.role);
+  
+  // Redirect if user doesn't have permission
+  if (!hasAccess) {
+    return (
+      <div className="accounting-unauthorized">
+        <div className="unauthorized-content">
+          <h2>⛔ Access Denied</h2>
+          <p>You don't have permission to access the Accounting module.</p>
+          <p style={{ fontSize: '0.9rem', marginTop: '1rem' }}>
+            This section is restricted to Finance Admin and Administrators only.
+          </p>
+          <button 
+            className="btn btn-secondary" 
+            onClick={() => window.location.href = '/dashboard'}
+            style={{ marginTop: '1.5rem' }}
+          >
+            ← Return to Dashboard
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   const [activeTab, setActiveTab] = useState('dashboard');
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState(null);

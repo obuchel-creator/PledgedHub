@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getUsers, deleteUser, restoreUser } from '../services/api';
+import { formatFormErrorMessage } from '../utils/formErrors';
 
 export default function UserManagementScreen() {
   const { user, isAuthenticated } = useAuth();
@@ -44,7 +45,7 @@ export default function UserManagementScreen() {
       });
       setUsers(response.users || []);
     } catch (err) {
-      setError(err.message || 'Failed to load users');
+      setError(formatFormErrorMessage(err.message || 'Failed to load users', 'Unable to load users. Please try again.'));
     } finally {
       setLoading(false);
     }
@@ -96,7 +97,7 @@ export default function UserManagementScreen() {
       closeDeleteModal();
       await loadUsers();
     } catch (err) {
-      setError(err.message || 'Failed to delete user');
+      setError(formatFormErrorMessage(err.message || 'Failed to delete user', 'Unable to delete user. Please try again.'));
     } finally {
       setDeleting(false);
     }
@@ -111,7 +112,7 @@ export default function UserManagementScreen() {
       setSuccess('User restored successfully');
       await loadUsers();
     } catch (err) {
-      setError(err.message || 'Failed to restore user');
+      setError(formatFormErrorMessage(err.message || 'Failed to restore user', 'Unable to restore user. Please try again.'));
     }
   };
 

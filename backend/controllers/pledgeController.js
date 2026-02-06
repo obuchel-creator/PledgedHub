@@ -151,9 +151,9 @@ async function createPledge(req, res) {
         // SaaS: Get tenant_id from request context
         const tenantId = req.tenant?.id || req.user?.tenant_id;
         if (!tenantId) {
-            return res.status(400).json({
+            return res.status(401).json({
                 success: false,
-                error: 'Tenant context required. Please ensure you are logged in.'
+                error: 'Your session has expired or is invalid. Please logout and login again to refresh your credentials.'
             });
         }
         
@@ -165,13 +165,39 @@ async function createPledge(req, res) {
                 error: 'User authentication required. Please log in.'
             });
         }
+
+        // Get logged-in user's registered name for validation
+        const loggedInUserName = req.user?.name;
+        if (!loggedInUserName) {
+            return res.status(400).json({
+                success: false,
+                error: 'Unable to retrieve your registered name. Please log out and log back in.'
+            });
+        }
+
+        // Pledge Name Validation: Must match logged-in user's registered name
+        const submittedName = typeof donor_name === 'string' ? donor_name.trim() : '';
+        if (!submittedName) {
+            return res.status(400).json({
+                success: false,
+                error: 'Pledge name is required.'
+            });
+        }
+
+        // Strict name matching - names must match exactly (case-insensitive comparison)
+        if (submittedName.toLowerCase() !== loggedInUserName.trim().toLowerCase()) {
+            return res.status(400).json({
+                success: false,
+                error: `Pledge name must match your registered name (${loggedInUserName}). Individual pledges can only be created under your own account for data integrity and accountability.`
+            });
+        }
         
         const payload = {
             tenant_id: tenantId,  // SaaS: Always include tenant_id
             created_by: userId,   // Privacy: Track ownership
             is_private: req.body.is_private !== undefined ? req.body.is_private : true, // Default private
             campaign_id: typeof campaign_id !== 'undefined' ? campaign_id : null,
-            donor_name: typeof donor_name === 'string' ? donor_name : 'Anonymous',
+            donor_name: submittedName,  // Use validated name
             donor_email: typeof donor_email === 'string' ? donor_email : null,
             donor_phone: typeof donor_phone === 'string' ? donor_phone : null,
             purpose: typeof purpose === 'string' ? purpose : (typeof message === 'string' ? message : ''),

@@ -3,6 +3,7 @@ import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { fetchWithAuth, postWithAuth, putWithAuth } from '../utils/api';
 import { getCampaignDetails } from '../services/api';
 import Logo from '../components/Logo';
+import { formatFormErrorMessage } from '../utils/formErrors';
 
 export default function PledgeFormScreen() {
   const { id } = useParams();
@@ -42,10 +43,10 @@ export default function PledgeFormScreen() {
               collection_date: res.data.pledge.collection_date
             });
           } else {
-            setError(res.error || 'Failed to load pledge');
+            setError(formatFormErrorMessage(res.error || 'Failed to load pledge', 'Failed to load pledge.'));
           }
         } catch (err) {
-          setError('Server error');
+          setError(formatFormErrorMessage(err?.message || 'Server error', 'Server error. Please try again.'));
         }
         setLoading(false);
       }
@@ -64,7 +65,7 @@ export default function PledgeFormScreen() {
     setError('');
     try {
       if (!form.title || !form.amount) {
-        setError('Title and amount are required');
+        setError('Please enter a pledge title and amount.');
         setLoading(false);
         return;
       }
@@ -84,10 +85,10 @@ export default function PledgeFormScreen() {
       if (res.success) {
         navigate('/pledges');
       } else {
-        setError(res.error || 'Failed to save pledge');
+        setError(formatFormErrorMessage(res.error || 'Failed to save pledge', 'Failed to save pledge. Please try again.'));
       }
     } catch (err) {
-      setError('Server error');
+      setError(formatFormErrorMessage(err?.message || 'Server error', 'Server error. Please try again.'));
     }
     setLoading(false);
   };

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { FaUsers, FaUserShield, FaUserTie, FaUser, FaEnvelope, FaPhone, FaCalendar, FaEdit, FaTrash, FaPlus, FaSearch } from 'react-icons/fa';
 import './UsersScreen.css';
+import { formatFormErrorMessage } from '../utils/formErrors';
 
 export default function UsersScreen() {
   const { user } = useAuth();
@@ -41,7 +42,7 @@ export default function UsersScreen() {
       const data = await response.json();
       setUsers(data.users || []);
     } catch (err) {
-      setError(err.message);
+      setError(formatFormErrorMessage(err.message, 'Unable to load users. Please try again.'));
       console.error('Error fetching users:', err);
     } finally {
       setLoading(false);
@@ -124,9 +125,9 @@ export default function UsersScreen() {
       }
 
       setUsers(users.map(u => u.id === userId ? { ...u, name: newName } : u));
-      alert('User updated successfully');
+      alert('User updated successfully.');
     } catch (err) {
-      alert('Error: ' + err.message);
+      alert(formatFormErrorMessage(err.message, 'Unable to update user. Please try again.'));
       console.error('Error updating user:', err);
     }
   };
@@ -161,7 +162,7 @@ export default function UsersScreen() {
       alert('User deleted successfully');
     } catch (err) {
       console.error('Error deleting user:', err);
-      alert('❌ Error: ' + err.message);
+      alert(formatFormErrorMessage(err.message, 'Unable to delete user. Please try again.'));
     }
   };
 
@@ -192,9 +193,9 @@ export default function UsersScreen() {
 
       // Update user in state
       setUsers(users.map(u => u.id === userId ? { ...u, role: newRole } : u));
-      alert(`✅ User role updated to ${newRole} successfully`);
+      alert(`User role updated to ${newRole} successfully.`);
     } catch (err) {
-      alert('❌ Error: ' + err.message);
+      alert(formatFormErrorMessage(err.message, 'Unable to update user role. Please try again.'));
       console.error('Error updating user role:', err);
     }
   };
@@ -204,14 +205,14 @@ export default function UsersScreen() {
     
     // Validation
     if (!formData.name.trim() || !formData.email.trim() || !formData.password.trim() || !formData.phone.trim()) {
-      alert('Please fill in all required fields (name, email, phone, password)');
+      alert('Please complete all required fields: name, email, phone, and password.');
       return;
     }
 
     // Validate phone format (basic validation)
     const phoneRegex = /^[\d\+\-\s\(\)]{9,20}$/;
     if (!phoneRegex.test(formData.phone)) {
-      alert('Please enter a valid phone number');
+      alert('Please enter a valid phone number.');
       return;
     }
 
@@ -251,9 +252,9 @@ export default function UsersScreen() {
         role: 'user'
       });
       setShowAddUserForm(false);
-      alert('User created successfully');
+      alert('User created successfully.');
     } catch (err) {
-      alert('Error: ' + err.message);
+      alert(formatFormErrorMessage(err.message, 'Unable to create user. Please try again.'));
       console.error('Error creating user:', err);
     }
   };

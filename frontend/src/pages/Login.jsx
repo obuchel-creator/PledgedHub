@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { loginUser } from '../services/api';
 import TextInput from '../components/TextInput';
 import PasswordInput from '../components/PasswordInput';
+import { formatFormErrorMessage } from '../utils/formErrors';
 
 export default function Login() {
   const [form, setForm] = useState({
@@ -24,6 +25,10 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    if (!form.identifier.trim() || !form.password) {
+      setError('Please enter your email/username/phone and password.');
+      return;
+    }
     setLoading(true);
     try {
       const payload = {
@@ -36,10 +41,10 @@ export default function Login() {
         localStorage.setItem('pledgehub_token', response.token);
         navigate('/dashboard');
       } else {
-        setError(response?.error || response?.message || 'Invalid login response');
+        setError(formatFormErrorMessage(response?.error || response?.message || 'Invalid login response', 'Login failed. Please try again.'));
       }
     } catch (err) {
-      setError(err.message || 'Login failed. Please try again.');
+      setError(formatFormErrorMessage(err.message || 'Login failed. Please try again.', 'Login failed. Please try again.'));
     } finally {
       setLoading(false);
     }

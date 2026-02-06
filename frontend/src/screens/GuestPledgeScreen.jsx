@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import '../styles/GuestPledgeScreen.css';
+import { formatFormErrorMessage } from '../utils/formErrors';
 
 export default function GuestPledgeScreen() {
   const params = useParams();
@@ -42,7 +43,7 @@ export default function GuestPledgeScreen() {
       } else if (id) {
         url = `/api/public/campaigns/id/${id}`;
       } else {
-        setError('No campaign identifier provided');
+        setError('Campaign link is missing or invalid.');
         setLoading(false);
         return;
       }
@@ -51,14 +52,14 @@ export default function GuestPledgeScreen() {
       const data = await res.json();
 
       if (!data.success) {
-        setError(data.error || 'Campaign not found');
+        setError(formatFormErrorMessage(data.error || 'Campaign not found', 'Campaign not found.'));
         return;
       }
 
       setCampaign(data.data);
     } catch (err) {
       console.error('Error loading campaign:', err);
-      setError('Failed to load campaign');
+      setError(formatFormErrorMessage(err?.message || 'Failed to load campaign', 'Unable to load campaign. Please try again.'));
     } finally {
       setLoading(false);
     }
@@ -92,13 +93,13 @@ export default function GuestPledgeScreen() {
 
     // Validate
     if (!amount || parseFloat(amount) <= 0) {
-      setSubmitError('Please enter a valid amount');
+      setSubmitError('Please enter a valid amount.');
       return;
     }
 
     const normalizedPhone = normalizePhone(donorPhone);
     if (!normalizedPhone.match(/^256\d{9}$/)) {
-      setSubmitError('Invalid phone number. Must be 256XXXXXXXXX');
+      setSubmitError('Please enter a valid phone number (e.g., 256771234567).');
       return;
     }
 
@@ -120,7 +121,7 @@ export default function GuestPledgeScreen() {
       const data = await res.json();
 
       if (!data.success) {
-        setSubmitError(data.error || 'Failed to create pledge');
+        setSubmitError(formatFormErrorMessage(data.error || 'Failed to create pledge', 'Unable to create pledge. Please try again.'));
         return;
       }
 
@@ -128,7 +129,7 @@ export default function GuestPledgeScreen() {
       setPledgeCreated(data.data);
     } catch (err) {
       console.error('Error creating pledge:', err);
-      setSubmitError('Network error. Please try again.');
+      setSubmitError(formatFormErrorMessage(err?.message || 'Network error. Please try again.', 'Network error. Please try again.'));
     } finally {
       setIsSubmitting(false);
     }
@@ -153,7 +154,7 @@ export default function GuestPledgeScreen() {
       const data = await res.json();
 
       if (!data.success) {
-        setSubmitError(data.error || 'Payment failed');
+        setSubmitError(formatFormErrorMessage(data.error || 'Payment failed', 'Payment failed. Please try again.'));
         return;
       }
 
@@ -164,7 +165,7 @@ export default function GuestPledgeScreen() {
       loadCampaign();
     } catch (err) {
       console.error('Payment error:', err);
-      setSubmitError('Payment failed. Please try again.');
+      setSubmitError(formatFormErrorMessage(err?.message || 'Payment failed. Please try again.', 'Payment failed. Please try again.'));
     }
   };
 

@@ -1,6 +1,7 @@
 
 console.log('[API] api.js loaded - version 2025-12-16');
 import { getViteEnv } from '../utils/getViteEnv';
+import { formatFormErrorMessage } from '../utils/formErrors';
 const viteEnv = getViteEnv();
 // Force using proxy - always use /api to go through Vite dev server proxy
 const BASE_URL = '/api';
@@ -232,13 +233,13 @@ function handleRequest(promise) {
         // Return a structured error object instead of throwing
         return { 
           success: false, 
-          error: serverMsg,
+          error: formatFormErrorMessage(serverMsg, serverMsg),
           status: status
         };
       }
       // fetch fallback
       if (err && err.message) {
-        return { success: false, error: err.message };
+        return { success: false, error: formatFormErrorMessage(err.message, err.message) };
       }
       return { success: false, error: 'An unknown error occurred' };
     });

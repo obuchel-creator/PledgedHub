@@ -137,7 +137,26 @@ async function updateUser(req, res) {
         }
         if (!id) return res.status(400).json({ error: 'id required' });
 
-        const allowed = ['name', 'email', 'password'];
+        // Check if user is trying to edit their own profile
+        const isEditingOwnProfile = req.user && req.user.id === parseInt(id);
+        const userRole = req.user?.role || 'user';
+
+        // Determine which fields this user can edit
+        let allowed = ['name', 'email', 'password'];
+        
+        // Regular users (with 'user' role) CANNOT edit their name
+        if (isEditingOwnProfile && userRole === 'user') {
+            allowed = ['email', 'password']; // Remove 'name' from allowed fields
+            
+            // If user tried to edit their name, return error
+            if (req.body && Object.prototype.hasOwnProperty.call(req.body, 'name')) {
+                return res.status(403).json({ 
+                    success: false,
+                    error: 'You cannot edit your name. Contact an administrator if a correction is needed.' 
+                });
+            }
+        }
+
         const updates = {};
         for (const k of allowed) {
             if (req.body && Object.prototype.hasOwnProperty.call(req.body, k)) updates[k] = req.body[k];
@@ -330,7 +349,17 @@ async function updateUserRole(req, res) {
         }
 
         // Validate role
-        const validRoles = ['donor', 'staff', 'admin', 'superadmin'];
+        const validRoles = [
+            'user',
+            'donor',
+            'creator',
+            'staff',
+            'support_staff',
+            'finance_admin',
+            'admin',
+            'superadmin',
+            'super_admin'
+        ];
         if (!validRoles.includes(role)) {
             return res.status(400).json({ 
                 error: `Invalid role. Must be one of: ${validRoles.join(', ')}` 

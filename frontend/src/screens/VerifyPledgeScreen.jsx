@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { verifyPledge } from '../services/api';
 import './VerifyPledgeScreen.css';
+import { formatFormErrorMessage } from '../utils/formErrors';
 
 export default function VerifyPledgeScreen() {
   const [searchParams] = useSearchParams();
@@ -17,7 +18,7 @@ export default function VerifyPledgeScreen() {
         
         if (!token) {
           setStatus('error');
-          setError('No verification token provided');
+          setError('This verification link is missing or invalid.');
           return;
         }
 
@@ -39,11 +40,11 @@ export default function VerifyPledgeScreen() {
           }, 3000);
         } else {
           setStatus('error');
-          setError(result.error || 'Failed to verify pledge');
+          setError(formatFormErrorMessage(result.error || 'Failed to verify pledge', 'Unable to verify the pledge. Please request a new link.'));
         }
       } catch (err) {
         setStatus('error');
-        setError(err.message || 'An error occurred during verification');
+        setError(formatFormErrorMessage(err?.message || 'An error occurred during verification', 'Verification failed. Please try again.'));
       }
     };
 

@@ -63,6 +63,14 @@ router.post(
     })
 );
 
+// POST /reset-by-phone -> reset password with phone code
+router.post(
+    '/reset-by-phone',
+    asyncHandler(async (req, res, next) => {
+        await authController.resetByPhone(req, res, next);
+    })
+);
+
 // Legacy routes for backward compatibility
 // POST / -> registration (legacy)
 router.post(

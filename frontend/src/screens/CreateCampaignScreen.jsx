@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createCampaign } from '../services/api';
+import { formatFormErrorMessage } from '../utils/formErrors';
 import './FormScreens.css';
 
 export default function CreateCampaignScreen() {
@@ -23,13 +24,13 @@ export default function CreateCampaignScreen() {
 
   const validate = () => {
     if (!title.trim()) {
-      setError('Campaign title is required.');
+      setError('Please enter a campaign title.');
       return false;
     }
 
     const goalNum = Number(goalAmount);
     if (goalAmount === '' || Number.isNaN(goalNum) || goalNum <= 0) {
-      setError('Goal amount must be a positive number.');
+      setError('Campaign goal must be a positive number.');
       return false;
     }
 
@@ -41,7 +42,6 @@ export default function CreateCampaignScreen() {
       }
     }
 
-      setNewCampaignId(result?.data?.id);
     setError(null);
     return true;
   };
@@ -61,46 +61,45 @@ export default function CreateCampaignScreen() {
         suggestedAmount: suggestedAmount ? Number(suggestedAmount) : null,
       });
 
-      setMessage('Campaign created successfully!');
+      if (result?.success) {
+        setMessage('Campaign created successfully!');
+        setNewCampaignId(result?.data?.id);
 
-      // Redirect to campaign details page after 1.5 seconds
-      setTimeout(() => {
-        if (result?.data?.id) {
-          navigate(`/campaigns/${result.data.id}`);
-        } else {
-          navigate('/dashboard');
-        }
-        <section
-          className="card"
-          style={{
-            background: 'var(--surface)',
-            borderRadius: '12px',
-            padding: '2rem',
-            boxShadow: '0 4px 12px -4px rgba(15, 23, 42, 0.1), 0 2px 6px rgba(15, 23, 42, 0.05)',
-          }}
-          aria-labelledby="create-campaign-form"
-        >
-          {/* Show buttons to add pledge or view campaign if a new campaign was just created */}
-          {newCampaignId && (
-            <div style={{marginTop: '1rem'}}>
-              <button
-                className="btn btn-primary"
-                type="button"
-                onClick={() => navigate(`/pledges/new?campaignId=${newCampaignId}`)}
-                style={{marginRight: '1rem'}}>
-                Add a Pledge to this Campaign
-              </button>
-              <button
-                className="btn btn-secondary"
-                type="button"
-                onClick={() => navigate(`/campaigns/${newCampaignId}`)}>
-                View Campaign
-              </button>
-            </div>
-          )}
-            boxShadow: '0 4px 12px -4px rgba(15, 23, 42, 0.1), 0 2px 6px rgba(15, 23, 42, 0.05)',
-          }}
-        >
+        // Redirect to campaign details page after 1.5 seconds
+        setTimeout(() => {
+          if (result?.data?.id) {
+            navigate(`/campaigns/${result.data.id}`);
+          } else {
+            navigate('/dashboard');
+          }
+        }, 1500);
+      } else {
+        setError(formatFormErrorMessage(
+          result?.error || 'Failed to create campaign',
+          'Unable to create campaign. Please check your information and try again.'
+        ));
+      }
+    } catch (err) {
+      setError(formatFormErrorMessage(
+        err?.message || 'An error occurred while creating the campaign',
+        'Unable to create campaign. Please check your connection and try again.'
+      ));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div
+      style={{
+        fontFamily: 'system-ui, -apple-system, sans-serif',
+        background: 'var(--background)',
+        minHeight: '100vh',
+        padding: '2rem',
+      }}
+    >
+      <main style={{ maxWidth: '800px', marginLeft: 'auto', marginRight: 'auto' }}>
+        <header style={{ marginBottom: '2rem' }}>
           <p className="page-header__eyebrow" style={{ color: 'rgba(16, 185, 129, 0.9)', fontWeight: '600' }}>
             New Campaign
           </p>
@@ -125,25 +124,6 @@ export default function CreateCampaignScreen() {
             background: 'var(--surface)',
             borderRadius: '12px',
             padding: '2rem',
-              {newCampaignId && (
-                <div style={{marginTop: '1rem'}}>
-                  <button
-                    className="btn btn-primary"
-                    type="button"
-                    onClick={() => navigate(`/pledges/new?campaignId=${newCampaignId}`)}
-                    style={{marginRight: '1rem'}}
-                  >
-                    Add a Pledge to this Campaign
-                  </button>
-                  <button
-                    className="btn btn-secondary"
-                    type="button"
-                    onClick={() => navigate(`/campaigns/${newCampaignId}`)}
-                  >
-                    View Campaign
-                  </button>
-                </div>
-              )}
             boxShadow: '0 4px 12px -4px rgba(15, 23, 42, 0.1), 0 2px 6px rgba(15, 23, 42, 0.05)',
           }}
           aria-labelledby="create-campaign-form"
@@ -163,12 +143,12 @@ export default function CreateCampaignScreen() {
 
           {message && (
             <div className="alert alert--success" role="status">
-              {message}
+              ✓ {message}
             </div>
           )}
           {error && (
             <div className="alert alert--error" role="alert">
-              {error}
+              ⚠️ {error}
             </div>
           )}
 
@@ -288,6 +268,31 @@ export default function CreateCampaignScreen() {
               {message || error}
             </div>
           </form>
+
+          {/* Show buttons to add pledge or view campaign if a new campaign was just created */}
+          {newCampaignId && (
+            <div style={{ marginTop: '2rem', paddingTop: '2rem', borderTop: '1px solid #e5e7eb' }}>
+              <p style={{ color: 'var(--text-muted)', marginBottom: '1rem' }}>
+                What would you like to do next?
+              </p>
+              <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                <button
+                  className="btn btn-primary"
+                  type="button"
+                  onClick={() => navigate(`/pledges/new?campaignId=${newCampaignId}`)}
+                >
+                  Add a Pledge to this Campaign
+                </button>
+                <button
+                  className="btn btn-secondary"
+                  type="button"
+                  onClick={() => navigate(`/campaigns/${newCampaignId}`)}
+                >
+                  View Campaign
+                </button>
+              </div>
+            </div>
+          )}
         </section>
       </main>
     </div>

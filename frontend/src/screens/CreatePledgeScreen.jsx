@@ -1,8 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { createPledge, getCampaigns } from '../services/api';
+import { formatFormErrorMessage } from '../utils/formErrors';
+import { AuthContext } from '../context/AuthContext';
 import './FormScreens.css';
 
 export default function FundraisePledgeScreen() {
+  const { user } = useContext(AuthContext);
   const [campaigns, setCampaigns] = useState([]);
   const [campaignId, setCampaignId] = useState('');
   const [donor_name, setDonorName] = useState('');
@@ -16,6 +19,13 @@ export default function FundraisePledgeScreen() {
   const [message, setMessage] = useState(null);
   const [error, setError] = useState(null);
   const [formattedAmount, setFormattedAmount] = useState('');
+
+  // Auto-populate donor name from logged-in user
+  useEffect(() => {
+    if (user?.name && !donor_name) {
+      setDonorName(user.name);
+    }
+  }, [user?.name, donor_name]);
 
   useEffect(() => {
     loadCampaigns();
@@ -50,26 +60,27 @@ export default function FundraisePledgeScreen() {
   };
 
   const validate = () => {
+    // Name validation - should be pre-filled from user account
     if (!donor_name.trim()) {
-      setError('⚠️ Donor name is required.');
+      setError('Your name should be auto-filled. Please refresh the page.');
       return false;
     }
 
     if (!donorEmail.trim()) {
-      setError('⚠️ Email address is required.');
+      setError('Please enter your email address.');
       return false;
     }
 
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(donorEmail.trim())) {
-      setError('⚠️ Please enter a valid email address.');
+      setError('Please enter a valid email address.');
       return false;
     }
 
     // Phone validation - NOW MANDATORY
     if (!donorPhone.trim()) {
-      setError('⚠️ Phone number is required for donor tracking.');
+      setError('Please enter your phone number.');
       return false;
     }
     
@@ -77,18 +88,18 @@ export default function FundraisePledgeScreen() {
     const phoneClean = donorPhone.replace(/[\s\-\(\)]/g, '');
     const ugandaPhoneRegex = /^(\+?256|0)?[7][0-9]{8}$/;
     if (!ugandaPhoneRegex.test(phoneClean)) {
-      setError('⚠️ Please enter a valid Uganda phone number (e.g., +256 700 123456 or 0700 123456).');
+      setError('Please enter a valid Uganda phone number (e.g., +256700123456 or 0700123456).');
       return false;
     }
 
     const amountNum = Number(amount);
     if (amount === '' || Number.isNaN(amountNum) || amountNum <= 0) {
-      setError('⚠️ Pledge amount must be greater than zero.');
+      setError('Pledge amount must be greater than 0.');
       return false;
     }
 
     if (!collectionDate) {
-      setError('⚠️ Collection date is required.');
+      setError('Please select a collection date.');
       return false;
     }
 
@@ -105,6 +116,7 @@ export default function FundraisePledgeScreen() {
     setLoading(true);
     try {
       await createPledge({
+        donor_name: donor_name.trim(),  // Include authenticated user's name
         campaign_id: campaignId || null,
         donor_email: donorEmail.trim().toLowerCase(),
         donor_phone: donorPhone.trim() || null,
@@ -115,10 +127,10 @@ export default function FundraisePledgeScreen() {
         message: purpose.trim() || 'General donation',
         date: new Date().toISOString(),
       });
-      setMessage(`✅ Pledge submitted! Check your email (${donorEmail}) to verify your pledge.`);
+      setMessage(`Pledge submitted! Check your email (${donorEmail}) to verify your pledge.`);
       resetForm();
     } catch (err) {
-      setError((err && err.message) || 'An error occurred while creating the pledge.');
+      setError(formatFormErrorMessage(err?.message, 'An error occurred while creating the pledge.'));
     } finally {
       setLoading(false);
     }
@@ -252,10 +264,22 @@ export default function FundraisePledgeScreen() {
                   className="input"
                   required
                   aria-required="true"
-                  disabled={loading}
-                  placeholder="Enter your full name"
-                  style={{ fontSize: '1rem', padding: '12px 16px' }}
+                  disabled={true}
+                  placeholder="Your registered name will appear here"
+                  style={{ 
+                    fontSize: '1rem', 
+                    padding: '12px 16px',
+                    backgroundColor: '#f3f4f6',
+                    cursor: 'not-allowed',
+                    opacity: 0.7
+                  }}
                 />
+                <p
+                  className="form-hint"
+                  style={{ marginTop: '0.5rem', fontSize: '0.85rem', color: '#64748b' }}
+                >
+                  ℹ️ Your registered account name is used for data integrity and accountability. Individual pledges can only be created for your own account.
+                </p>
               </div>
 
               <div className="form-field">

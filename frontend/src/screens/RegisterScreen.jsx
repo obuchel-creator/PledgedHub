@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import '../authOutlook.css';
 import Logo from '../components/Logo';
 import { useAuth } from '../context/AuthContext';
+import { formatFormErrorMessage } from '../utils/formErrors';
 
 // More flexible phone pattern - accepts various formats
 // +256, 0256, 256, or just numbers starting with common prefixes
@@ -59,14 +60,14 @@ function RegisterScreen({ disableRequired = false }) {
   };
 
   const validate = () => {
-    if (!form.firstName.trim()) return 'First name is required.';
-    if (!form.lastName.trim()) return 'Last name is required.';
-    if (!form.phone.trim()) return 'Phone number is required.';
-    if (!phonePattern.test(form.phone.trim())) return 'Phone number must be in format';
-    if (form.email && !emailPattern.test(form.email)) return 'Invalid email address';
-    if (!form.password) return 'Password is required.';
+    if (!form.firstName.trim()) return 'Please enter your first name.';
+    if (!form.lastName.trim()) return 'Please enter your last name.';
+    if (!form.phone.trim()) return 'Please enter your phone number.';
+    if (!phonePattern.test(form.phone.trim())) return 'Please enter a valid phone number (e.g., +256700123456).';
+    if (form.email && !emailPattern.test(form.email)) return 'Please enter a valid email address.';
+    if (!form.password) return 'Please enter a password.';
     if (form.password.length < 6) return 'Password must be at least 6 characters.';
-    if (form.password !== form.confirmPassword) return 'Passwords do not match';
+    if (form.password !== form.confirmPassword) return 'Passwords do not match.';
     return '';
   };
 
@@ -74,7 +75,7 @@ function RegisterScreen({ disableRequired = false }) {
     e.preventDefault();
     console.log('🔵 RegisterScreen: handleSubmit called!');
     console.log('📋 Form data:', form);
-    setStatus('⏳ Validating form...');
+    setStatus('Validating form...');
     const err = validate();
     console.log('✓ Validation result:', err || 'PASSED');
     if (err) {
@@ -86,7 +87,7 @@ function RegisterScreen({ disableRequired = false }) {
     }
     setLoading(true);
     setError('');
-    setStatus('⏳ Creating account...');
+    setStatus('Creating account...');
     try {
       // Auto-generate username: firstName + last 4 digits of phone
       const phoneDigits = form.phone.replace(/\D/g, '');
@@ -101,13 +102,13 @@ function RegisterScreen({ disableRequired = false }) {
         username,
       };
       console.log('📝 RegisterScreen: Submitting registration with payload:', payload);
-      setStatus('⏳ Sending to server...');
+      setStatus('Sending to server...');
       // Use context's register function which handles token + user data loading
       const result = await register(payload);
       console.log('✅ RegisterScreen: Registration result:', result);
       if (result && result.token) {
         console.log('✅ RegisterScreen: Token received and user context loaded');
-        setStatus('✅ Account created! Redirecting to dashboard...');
+        setStatus('Account created! Redirecting to dashboard...');
         // The context's register() already called refreshUser() and set loading=false
         // Now we can safely navigate
         console.log('✅ RegisterScreen: Navigating to dashboard');
@@ -119,23 +120,22 @@ function RegisterScreen({ disableRequired = false }) {
           // Match backend messages exactly
           if (errorMsg.toLowerCase().includes('phone number already in use') || 
               errorMsg.toLowerCase().includes('phone already')) {
-            errorMsg = '❌ This phone number is already registered. Please use a different number or log in.';
+            errorMsg = 'This phone number is already registered. Please use a different number or log in.';
           } else if (errorMsg.toLowerCase().includes('email already in use') || 
                      errorMsg.toLowerCase().includes('email already')) {
-            errorMsg = '❌ This email is already registered. Please use a different email or log in.';
+            errorMsg = 'This email is already registered. Please use a different email or log in.';
           } else if (errorMsg.toLowerCase().includes('password must')) {
-            // Password validation errors - show as-is with emoji
-            errorMsg = '❌ ' + errorMsg;
+            errorMsg = errorMsg;
           }
         }
-        setError(errorMsg);
+        setError(formatFormErrorMessage(errorMsg, 'Registration failed. Please try again.'));
         setStatus('');
       }
     } catch (err) {
       // Show network/server error
       console.error('❌ RegisterScreen: Catch error:', err);
       const msg = err?.response?.data?.error || err?.response?.data?.message || err?.message || err?.toString();
-      setError(msg || 'Server error. Please try again.');
+      setError(formatFormErrorMessage(msg || 'Server error. Please try again.', 'Server error. Please try again.'));
       setStatus('');
     } finally {
       setLoading(false);

@@ -26,7 +26,7 @@ const registerRoute = require('./routes/register');
 const feedbackRoutes = require('./routes/feedbackRoutes');
 const adminFeedbackRoutes = require('./routes/adminFeedbackRoutes');
 const userRoutes = require('./routes/userRoutes');
-const passwordRoutes = require('./routes/passwordRoutes');
+// const passwordRoutes = require('./routes/passwordRoutes'); // Password routes now under /api/auth
 const twoFactorRoutes = require('./routes/twoFactorRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 const oauthRoutes = require('./routes/oauthRoutes');
@@ -219,10 +219,11 @@ app.use('/api/users',
   userRoutes
 );
 
-app.use('/api/password', 
-  authenticateToken, 
-  passwordRoutes
-);
+// Password routes are now under /api/auth via userRoutes
+// app.use('/api/password', 
+//   authenticateToken, 
+//   passwordRoutes
+// );
 
 app.use('/api/2fa', 
   authenticateToken, 

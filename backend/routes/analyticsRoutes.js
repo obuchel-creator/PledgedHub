@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const analyticsService = require('../services/analyticsService');
+const financialAnalyticsService = require('../services/financialAnalyticsService');
 const { requireStaff } = require('../middleware/authMiddleware');
 const { authenticateToken } = require('../middleware/authMiddleware');
 const db = require('../config/db');
@@ -591,6 +592,96 @@ router.get('/referrals/stats', authenticateToken, async (req, res) => {
       },
     });
   }
+});
+
+// ============================================
+// FINANCIAL ANALYTICS ENDPOINTS (QuickBooks-Style)
+// ============================================
+
+// GET /api/analytics/profit-loss
+// Profit & Loss Statement (Income vs Expenses)
+router.get('/profit-loss', authenticateToken, async (req, res) => {
+    try {
+        const { start, end } = req.query;
+        const startDate = start || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+        const endDate = end || new Date().toISOString().split('T')[0];
+        
+        const userId = req.user.role === 'user' ? req.user.id : null;
+        const result = await financialAnalyticsService.getProfitAndLoss(startDate, endDate, userId);
+        
+        res.json(result);
+    } catch (error) {
+        console.error('Error in /profit-loss:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// GET /api/analytics/cash-flow
+// Cash Flow Analysis (Money in vs Money out over time)
+router.get('/cash-flow', authenticateToken, async (req, res) => {
+    try {
+        const { start, end, groupBy = 'day' } = req.query;
+        const startDate = start || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+        const endDate = end || new Date().toISOString().split('T')[0];
+        
+        const userId = req.user.role === 'user' ? req.user.id : null;
+        const result = await financialAnalyticsService.getCashFlow(startDate, endDate, userId, groupBy);
+        
+        res.json(result);
+    } catch (error) {
+        console.error('Error in /cash-flow:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// GET /api/analytics/financial-health
+// Financial Health Metrics & KPIs
+router.get('/financial-health', authenticateToken, async (req, res) => {
+    try {
+        const userId = req.user.role === 'user' ? req.user.id : null;
+        const result = await financialAnalyticsService.getFinancialHealth(userId);
+        
+        res.json(result);
+    } catch (error) {
+        console.error('Error in /financial-health:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// GET /api/analytics/expense-breakdown
+// Expense Breakdown by Category (for donut chart)
+router.get('/expense-breakdown', authenticateToken, async (req, res) => {
+    try {
+        const { start, end } = req.query;
+        const startDate = start || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+        const endDate = end || new Date().toISOString().split('T')[0];
+        
+        const userId = req.user.role === 'user' ? req.user.id : null;
+        const result = await financialAnalyticsService.getExpenseBreakdown(startDate, endDate, userId);
+        
+        res.json(result);
+    } catch (error) {
+        console.error('Error in /expense-breakdown:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// GET /api/analytics/revenue-breakdown
+// Revenue Breakdown by Payment Method (for donut chart)
+router.get('/revenue-breakdown', authenticateToken, async (req, res) => {
+    try {
+        const { start, end } = req.query;
+        const startDate = start || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+        const endDate = end || new Date().toISOString().split('T')[0];
+        
+        const userId = req.user.role === 'user' ? req.user.id : null;
+        const result = await financialAnalyticsService.getRevenueBreakdown(startDate, endDate, userId);
+        
+        res.json(result);
+    } catch (error) {
+        console.error('Error in /revenue-breakdown:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
 });
 
 module.exports = router;

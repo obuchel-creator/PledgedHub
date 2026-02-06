@@ -1,11 +1,13 @@
 import React, { useState, useMemo } from 'react';
-import { Link, useParams, useNavigate } from 'react-router-dom';
+import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { resetPassword } from '../services/api';
 import Logo from '../components/Logo';
 import '../authOutlook.css';
+import { formatFormErrorMessage } from '../utils/formErrors';
 
 export default function ResetPasswordScreen() {
-  const { token } = useParams();
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get('token');
   const navigate = useNavigate();
 
   const [password, setPassword] = useState('');
@@ -37,7 +39,7 @@ export default function ResetPasswordScreen() {
     setError('');
 
     if (!token) {
-      setError('Invalid reset token. Please request a new password reset link.');
+      setError('No reset token found in the URL. Please click the reset link from your email or request a new one.');
       return;
     }
 
@@ -58,7 +60,7 @@ export default function ResetPasswordScreen() {
 
     setLoading(true);
     try {
-      await resetPassword(token, password);
+      const result = await resetPassword(token, password);
       setSuccess(true);
 
       // Redirect to login after 3 seconds
@@ -66,7 +68,13 @@ export default function ResetPasswordScreen() {
         navigate('/login');
       }, 3000);
     } catch (err) {
-      setError(err?.message || 'Failed to reset password. The link may have expired.');
+      console.error('Reset password error:', err);
+      const errorMsg = err?.message || 'Failed to reset password';
+      if (errorMsg.includes('expired') || errorMsg.includes('Invalid')) {
+        setError('This reset link has expired or is invalid. Please request a new password reset.');
+      } else {
+        setError(formatFormErrorMessage(errorMsg, 'Failed to reset password. Please try again or request a new link.'));
+      }
     } finally {
       setLoading(false);
     }
@@ -285,6 +293,37 @@ export default function ResetPasswordScreen() {
                   : 'Create a strong password for your account'}
               </p>
             </header>
+
+            {/* Warning if no token */}
+            {!token && (
+              <div
+                role="alert"
+                aria-live="polite"
+                style={{
+                  background: '#fff3cd',
+                  border: '1px solid #ffc107',
+                  borderRadius: '8px',
+                  padding: '12px 16px',
+                  marginBottom: '16px',
+                  color: '#856404',
+                  fontSize: '14px',
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: '8px',
+                }}
+              >
+                <span style={{ fontSize: '16px', marginTop: '2px' }}>⚠️</span>
+                <div>
+                  <strong>No reset token found</strong>
+                  <p style={{ margin: '4px 0 0 0' }}>
+                    Please click the reset link from your email. If you don't have one,{' '}
+                    <Link to="/forgot-password" style={{ color: '#856404', textDecoration: 'underline' }}>
+                      request a new password reset
+                    </Link>.
+                  </p>
+                </div>
+              </div>
+            )}
 
             {/* Error Alert */}
             {error && (

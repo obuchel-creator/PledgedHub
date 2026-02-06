@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getPledges, getPayments, createPayment } from '../services/api';
+import { formatFormErrorMessage } from '../utils/formErrors';
 
 /**
  * Enhanced Dashboard component with statistics and better UX
@@ -114,7 +115,7 @@ export default function Dashboard() {
       return;
     }
     if (Number.isNaN(amount) || amount <= 0) {
-      setError('Please enter an amount greater than 0.');
+      setError('Please enter a valid amount.');
       return;
     }
 
@@ -128,7 +129,7 @@ export default function Dashboard() {
       // refresh lists
       await refreshData();
     } catch (err) {
-      if (mountedRef.current) setError(err?.message || 'Failed to record donation.');
+      if (mountedRef.current) setError(formatFormErrorMessage(err?.message || 'Failed to record donation.', 'Failed to record donation. Please try again.'));
     } finally {
       if (mountedRef.current) setSubmitting(false);
     }

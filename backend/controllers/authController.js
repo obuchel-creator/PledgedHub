@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
-const db = require('../config/db');
+const { pool } = require('../config/db');
 
 require('dotenv').config();
 
@@ -156,8 +156,8 @@ async function register(req, res) {
             }
 
             // Security: Check if email already exists
-            const existingEmail = await User.findOne({ email: sanitizedEmail });
-            if (existingEmail) {
+            const [existingEmail] = await pool.execute('SELECT id FROM users WHERE email = ?', [sanitizedEmail]);
+            if (existingEmail && existingEmail.length > 0) {
                 const response = { success: false, message: 'Email already in use.' };
                 console.log('❌ [REGISTER] Validation failed: Email already in use', { sanitizedEmail });
                 console.log('🟠 [REGISTER] Responding with:', JSON.stringify(response, null, 2));
@@ -166,7 +166,7 @@ async function register(req, res) {
         }
 
         // Security: Check if phone already exists
-        const [existingPhone] = await db.execute('SELECT id FROM users WHERE phone_number = ?', [cleanPhone]);
+        const [existingPhone] = await pool.execute('SELECT id FROM users WHERE phone_number = ?', [cleanPhone]);
         if (existingPhone && existingPhone.length > 0) {
             const response = { success: false, message: 'Phone number already in use.' };
             console.log('❌ [REGISTER] Validation failed: Phone already in use', { cleanPhone });
@@ -194,8 +194,21 @@ async function register(req, res) {
             password: hashed 
         });
 
+        // CRITICAL: Set tenant_id to user's own ID immediately after creation
+        // This ensures the JWT token includes tenant_id from the start
+        const userId = user.id || user._id;
+        await pool.execute('UPDATE users SET tenant_id = ? WHERE id = ?', [userId.toString(), userId]);
+        
+        // Fetch updated user with tenant_id
+        const [updatedUser] = await pool.execute('SELECT * FROM users WHERE id = ?', [userId]);
+        const userWithTenant = updatedUser && updatedUser.length > 0 ? updatedUser[0] : user;
+
         // Auto-issue a token with session tracking
-        const { token, jti } = signToken({ id: user.id || user._id });
+        const { token, jti } = signToken({ 
+            id: userId,
+            role: userWithTenant.role || 'user',
+            tenant_id: userWithTenant.tenant_id || userId.toString()
+        });
 
         // Security: Log registration event (in production, use proper logging service)
         console.log(`[SECURITY] New user registered: ${user.id || user._id} (phone: ${cleanPhone}) from IP: ${req.ip}`);
@@ -251,13 +264,15 @@ async function login(req, res) {
         }
 
         if (!user) {
-            recordFailedAttempt(loginId);
+            if (String(process.env.DISABLE_RATE_LIMIT || '').toLowerCase() !== 'true') {
+                recordFailedAttempt(loginId);
+            }
             console.log(`[SECURITY] Failed login attempt - user not found: ${loginId} from IP: ${req.ip}`);
             return res.status(401).json({ success: false, message: 'Invalid credentials.' });
         }
 
         // Security: Check if account is locked due to failed attempts
-        if (isAccountLocked(loginId)) {
+        if (String(process.env.DISABLE_RATE_LIMIT || '').toLowerCase() !== 'true' && isAccountLocked(loginId)) {
             console.log(`[SECURITY] Account locked due to failed attempts: ${loginId} from IP: ${req.ip}`);
             return res.status(429).json({ 
                 success: false, 
@@ -273,7 +288,9 @@ async function login(req, res) {
         }
         const ok = await bcrypt.compare(password, userPassword);
         if (!ok) {
-            recordFailedAttempt(loginId);
+            if (String(process.env.DISABLE_RATE_LIMIT || '').toLowerCase() !== 'true') {
+                recordFailedAttempt(loginId);
+            }
             console.log(`[SECURITY] Failed login attempt - invalid password: ${loginId} from IP: ${req.ip}`);
             return res.status(401).json({ success: false, message: 'Invalid credentials.' });
         }
@@ -281,16 +298,44 @@ async function login(req, res) {
         // Security: Clear failed login attempts on successful login
         clearLoginAttempts(loginId);
 
+        // CRITICAL: Ensure tenant_id is set - fetch from database if missing
+        let tenantId = user.tenant_id;
+        const userId = user.id || user._id;
+        
+        if (!tenantId) {
+            console.log(`[WARNING] User ${userId} missing tenant_id, fetching from database`);
+            const [dbUser] = await pool.execute('SELECT tenant_id FROM users WHERE id = ?', [userId]);
+            if (dbUser && dbUser.length > 0 && dbUser[0].tenant_id) {
+                tenantId = dbUser[0].tenant_id;
+            } else {
+                // Last resort: set it now
+                console.log(`[WARNING] Setting tenant_id for user ${userId}`);
+                await pool.execute('UPDATE users SET tenant_id = ? WHERE id = ?', [userId.toString(), userId]);
+                tenantId = userId.toString();
+            }
+        }
+
         // Generate token with session tracking
-        const { token, jti } = signToken({ id: user.id || user._id });
+        const { token, jti } = signToken({ 
+            id: userId,
+            role: user.role || 'user',
+            tenant_id: tenantId,
+            email: user.email,
+            name: user.name
+        });
 
         // Security: Log successful login
-        console.log(`[SECURITY] Successful login: ${user.id || user._id} from IP: ${req.ip}`);
+        console.log(`[SECURITY] Successful login: ${userId} (tenant_id: ${tenantId}) from IP: ${req.ip}`);
+
+        // Ensure user object has updated tenant_id and name for frontend
+        const userResponse = sanitizeUser(user);
+        userResponse.tenant_id = tenantId;
+        userResponse.name = user.name;
 
         return res.status(200).json({ 
             success: true, 
             token, 
-            user: sanitizeUser(user),
+            user: userResponse,
             message: 'Login successful.'
         });
     } catch (err) {
@@ -353,66 +398,76 @@ function isSessionActive(jti) {
  */
 async function forgotPassword(req, res) {
     try {
-        const { email } = req.body;
+        const { email, phone } = req.body;
+        const emailService = require('../services/emailService');
+        const smsService = require('../services/smsService');
 
-        // Security: Input validation
-        if (!email) {
-            return res.status(400).json({ success: false, message: 'Email is required.' });
+        // Validate input
+        if (!email && !phone) {
+            return res.status(400).json({ error: 'Email or phone is required' });
         }
 
-        // Security: Sanitize email
-        const sanitizedEmail = sanitizeInput(email.toLowerCase());
-
-        // Security: Validate email format
-        const emailValidation = validateEmail(sanitizedEmail);
-        if (!emailValidation.valid) {
-            return res.status(400).json({ success: false, message: emailValidation.message });
-        }
-
-        // Find user
-        const user = await User.findOne({ email: sanitizedEmail });
-        
-        // Security: Don't reveal if email exists or not (timing-safe response)
-        if (!user) {
-            console.log(`[SECURITY] Password reset requested for non-existent email: ${sanitizedEmail}`);
-            // Still return success to prevent email enumeration
-            return res.status(200).json({ 
-                success: true, 
-                message: 'If that email exists, a reset link has been sent.' 
+        let user;
+        if (email) {
+            // Email reset flow
+            const [users] = await pool.execute('SELECT id, email, name FROM users WHERE email = ?', [email.toLowerCase()]);
+            if (users.length === 0) {
+                // Security: Don't reveal if email exists
+                return res.json({ success: true, message: 'If that email exists, a reset link has been sent' });
+            }
+            user = users[0];
+            
+            // Generate reset token
+            const resetToken = crypto.randomBytes(32).toString('hex');
+            const resetTokenHash = crypto.createHash('sha256').update(resetToken).digest('hex');
+            const resetTokenExpiry = new Date(Date.now() + 3600000); // 1 hour
+            
+            await pool.execute('UPDATE users SET reset_token = ?, reset_token_expiry = ? WHERE id = ?', 
+                [resetTokenHash, resetTokenExpiry, user.id]);
+            
+            // Send reset email
+            const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/reset-password?token=${resetToken}`;
+            await emailService.sendEmail({
+                to: user.email,
+                subject: 'Password Reset Request - PledgeHub',
+                html: `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;"><h2 style="color: #2563eb;">Password Reset Request</h2><p>Hi ${user.name},</p><p>You requested to reset your password. Click the button below to create a new password:</p><a href="${resetUrl}" style="display: inline-block; padding: 12px 24px; background: linear-gradient(135deg, #2563eb 0%, #0ea5e9 100%); color: white; text-decoration: none; border-radius: 8px; margin: 20px 0;">Reset Password</a><p>Or copy and paste this link into your browser:</p><p style="color: #64748b; word-break: break-all;">${resetUrl}</p><p style="color: #ef4444; margin-top: 20px;"><strong>This link expires in 1 hour.</strong></p><p>If you didn't request this, please ignore this email.</p><hr style="margin: 30px 0; border: none; border-top: 1px solid #e2e8f0;"><p style="color: #94a3b8; font-size: 12px;">PledgeHub Management System</p></div>`
             });
+            
+            return res.json({ success: true, message: 'If that email exists, a reset link has been sent' });
+        } else if (phone) {
+            // Phone reset flow
+            let normalizedPhone = phone.replace(/\+/g, '');
+            if (normalizedPhone.startsWith('0')) {
+                normalizedPhone = '256' + normalizedPhone.substring(1);
+            } else if (!normalizedPhone.startsWith('256')) {
+                normalizedPhone = '256' + normalizedPhone;
+            }
+            
+            const [users] = await pool.execute('SELECT id, phone, name FROM users WHERE phone = ?', [normalizedPhone]);
+            if (users.length === 0) {
+                // Security: Don't reveal if phone exists
+                return res.json({ success: true, message: 'If that phone exists, a reset code has been sent' });
+            }
+            user = users[0];
+            
+            // Generate reset code (6 digits)
+            const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
+            const resetCodeExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 min
+            
+            await pool.execute('UPDATE users SET reset_code = ?, reset_code_expiry = ? WHERE id = ?', 
+                [resetCode, resetCodeExpiry, user.id]);
+            
+            // Send reset SMS
+            await smsService.sendSMS({
+                to: normalizedPhone,
+                message: `Your PledgeHub password reset code is: ${resetCode}. It expires in 10 minutes.`
+            });
+            
+            return res.json({ success: true, message: 'If that phone exists, a reset code has been sent' });
         }
-
-        // Generate reset token
-        const resetToken = crypto.randomBytes(32).toString('hex');
-        const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
-
-        // Set token and expiry (1 hour)
-        user.passwordResetToken = hashedToken;
-        user.passwordResetExpires = Date.now() + 3600000; // 1 hour
-        await User.save(user);
-
-        // In production, send email here
-        // For now, we'll just log it
-        console.log(`[SECURITY] Password reset token generated for user: ${user._id}`);
-        console.log(`Reset token (development only): ${resetToken}`);
-
-        // TODO: Send email with reset link
-        // const resetUrl = `${req.protocol}://${req.get('host')}/reset-password/${resetToken}`;
-        // await sendEmail({
-        //     to: user.email,
-        //     subject: 'Password Reset Request',
-        //     text: `Reset your password: ${resetUrl}`
-        // });
-
-        return res.status(200).json({ 
-            success: true, 
-            message: 'If that email exists, a reset link has been sent.',
-            // In development, include token for testing
-            ...(process.env.NODE_ENV === 'development' && { resetToken })
-        });
-    } catch (err) {
-        console.error('[SECURITY ERROR] Forgot password error:', err);
-        return res.status(500).json({ success: false, message: 'Server error.' });
+    } catch (error) {
+        console.error('[AuthController] Forgot password error:', error);
+        return res.status(500).json({ error: 'Failed to process password reset request' });
     }
 }
 
@@ -422,59 +477,132 @@ async function forgotPassword(req, res) {
 async function resetPassword(req, res) {
     try {
         const { token, password } = req.body;
+        const emailService = require('../services/emailService');
 
         // Security: Input validation
         if (!token || !password) {
-            return res.status(400).json({ success: false, message: 'Token and password are required.' });
+            return res.status(400).json({ error: 'Token and password are required.' });
         }
 
-        // Security: Validate password strength
-        const passwordValidation = validatePassword(password);
-        if (!passwordValidation.valid) {
-            return res.status(400).json({ success: false, message: passwordValidation.message });
+        if (password.length < 8) {
+            return res.status(400).json({ error: 'Password must be at least 8 characters' });
         }
 
         // Hash the token to compare
         const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
 
         // Find user with valid reset token
-        const user = await User.findOne({
-            passwordResetToken: hashedToken,
-            passwordResetExpires: { $gt: Date.now() }
-        });
+        const [users] = await pool.execute(
+            'SELECT id, email, name FROM users WHERE reset_token = ? AND reset_token_expiry > NOW()',
+            [hashedToken]
+        );
 
-        if (!user) {
-            console.log(`[SECURITY] Invalid or expired reset token attempt`);
+        if (users.length === 0) {
             return res.status(400).json({ 
-                success: false, 
-                message: 'Invalid or expired reset token.' 
+                error: 'Invalid or expired reset token.' 
             });
         }
 
+        const user = users[0];
+
         // Hash new password
-        const hashed = await bcrypt.hash(password, 12);
+        const passwordHash = await bcrypt.hash(password, 10);
         
         // Update password and clear reset fields
-        user.password = hashed;
-        user.password_hash = hashed;
-        user.passwordResetToken = undefined;
-        user.passwordResetExpires = undefined;
-        await User.save(user);
+        await pool.execute(
+            'UPDATE users SET password_hash = ?, password = ?, reset_token = NULL, reset_token_expiry = NULL WHERE id = ?',
+            [passwordHash, passwordHash, user.id]
+        );
 
-        // Security: Log password reset
-        console.log(`[SECURITY] Password reset successful for user: ${user._id}`);
+        // Send confirmation email
+        await emailService.sendEmail({
+            to: user.email,
+            subject: 'Password Changed Successfully - PledgeHub',
+            html: `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;"><h2 style="color: #22c55e;">Password Changed Successfully</h2><p>Hi ${user.name},</p><p>Your password has been changed successfully. You can now log in with your new password.</p><p style="color: #ef4444; margin-top: 20px;">If you didn't make this change, please contact support immediately.</p><hr style="margin: 30px 0; border: none; border-top: 1px solid #e2e8f0;"><p style="color: #94a3b8; font-size: 12px;">PledgeHub Management System</p></div>`
+        });
 
-        // Clear any failed login attempts
-        clearLoginAttempts(user.email);
-
-        return res.status(200).json({ 
+        return res.json({ 
             success: true, 
-            message: 'Password reset successfully. You can now login with your new password.' 
+            message: 'Password reset successfully. You can now log in with your new password.' 
         });
     } catch (err) {
         console.error('[SECURITY ERROR] Reset password error:', err);
-        return res.status(500).json({ success: false, message: 'Server error.' });
+        return res.status(500).json({ error: 'Failed to reset password' });
     }
 }
 
-module.exports = { register, login, me, logout, isSessionActive, forgotPassword, resetPassword };
+/**
+ * Reset Password by Phone - Verify code and update password
+ */
+async function resetByPhone(req, res) {
+    try {
+        const { phone, code, newPassword } = req.body;
+        const emailService = require('../services/emailService');
+
+        // Validation
+        if (!phone || !code || !newPassword) {
+            return res.status(400).json({ error: 'Phone, code, and new password are required' });
+        }
+
+        if (newPassword.length < 8) {
+            return res.status(400).json({ error: 'Password must be at least 8 characters' });
+        }
+
+        // Normalize phone
+        let normalizedPhone = phone.replace(/\+/g, '');
+        if (normalizedPhone.startsWith('0')) {
+            normalizedPhone = '256' + normalizedPhone.substring(1);
+        } else if (!normalizedPhone.startsWith('256')) {
+            normalizedPhone = '256' + normalizedPhone;
+        }
+
+        // Find user and verify code
+        const [users] = await pool.execute(
+            'SELECT id, reset_code, reset_code_expiry, email, name FROM users WHERE phone = ?',
+            [normalizedPhone]
+        );
+
+        if (users.length === 0) {
+            return res.status(400).json({ error: 'Invalid phone or code' });
+        }
+
+        const user = users[0];
+        if (!user.reset_code || !user.reset_code_expiry || user.reset_code !== code) {
+            return res.status(400).json({ error: 'Invalid code' });
+        }
+
+        // Check if code expired
+        if (new Date(user.reset_code_expiry) < new Date()) {
+            return res.status(400).json({ error: 'Code has expired' });
+        }
+
+        // Hash new password
+        const passwordHash = await bcrypt.hash(newPassword, 10);
+
+        // Update password and clear reset code
+        await pool.execute(
+            'UPDATE users SET password_hash = ?, password = ?, reset_code = NULL, reset_code_expiry = NULL WHERE id = ?',
+            [passwordHash, passwordHash, user.id]
+        );
+
+        // Send confirmation email if user has email
+        if (user.email) {
+            await emailService.sendEmail({
+                to: user.email,
+                subject: 'Password Changed Successfully - PledgeHub',
+                html: `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;"><h2 style="color: #22c55e;">Password Changed Successfully</h2><p>Hi ${user.name},</p><p>Your password has been changed successfully. You can now log in with your new password.</p><p style="color: #ef4444; margin-top: 20px;">If you didn't make this change, please contact support immediately.</p><hr style="margin: 30px 0; border: none; border-top: 1px solid #e2e8f0;"><p style="color: #94a3b8; font-size: 12px;">PledgeHub Management System</p></div>`
+            });
+        }
+
+        return res.json({
+            success: true,
+            message: 'Password reset successfully. You can now log in with your new password.'
+        });
+
+    } catch (error) {
+        console.error('[AuthController] Reset by phone error:', error);
+        return res.status(500).json({ error: 'Failed to reset password' });
+    }
+}
+
+module.exports = { register, login, me, logout, isSessionActive, forgotPassword, resetPassword, resetByPhone };

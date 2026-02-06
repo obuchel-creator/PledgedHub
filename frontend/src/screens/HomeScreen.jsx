@@ -5,7 +5,7 @@ import { Bar, Pie } from 'react-chartjs-2';
 import { CSVLink } from 'react-csv';
 import { getViteEnv } from '../utils/getViteEnv';
 import { Link } from 'react-router-dom';
-import { getCampaigns } from '../services/api';
+import { getCampaigns, getAnalyticsOverview } from '../services/api';
 import AIFeatureBanner from '../components/AIFeatureBanner';
 import HeroBanner from '../components/HeroBanner';
 import { FaChartBar, FaMoneyBillWave, FaUsers, FaRobot, FaMobileAlt, FaShieldAlt } from 'react-icons/fa'; // Only this import for icons used in stats/features
@@ -34,6 +34,9 @@ function HomeScreen() {
   const [search, setSearch] = useState('');
   const [sort, setSort] = useState('newest');
   const [highContrast, setHighContrast] = useState(false);
+  const [realStats, setRealStats] = useState(null);
+  const [statsLoading, setStatsLoading] = useState(true);
+  const isAuthenticated = localStorage.getItem('token');
 
   // Notifications/reminders logic
   useEffect(() => {
@@ -124,6 +127,27 @@ function HomeScreen() {
     fetchCampaigns();
   }, []);
 
+  // Fetch real statistics for authenticated users
+  useEffect(() => {
+    async function fetchStats() {
+      if (!isAuthenticated) {
+        setStatsLoading(false);
+        return;
+      }
+      try {
+        const response = await getAnalyticsOverview();
+        if (response.success) {
+          setRealStats(response.data);
+        }
+      } catch (error) {
+        console.error('Error fetching stats:', error);
+      } finally {
+        setStatsLoading(false);
+      }
+    }
+    fetchStats();
+  }, [isAuthenticated]);
+
   // Chart data for analytics
   // Insights calculations
   const totalRaised = useMemo(() =>
@@ -165,15 +189,21 @@ function HomeScreen() {
     return filtered;
   }, [campaigns, search, sort]);
 
-  // Fancy HomeScreen additions
-  const homeStats = [
-    { icon: <FaUsers />, label: 'Active Donors', value: '2,340+' },
-    { icon: <FaMoneyBillWave />, label: 'Total Pledges', value: 'UGX 120M+' },
-    { icon: <FaChartBar />, label: 'Campaigns', value: '58' },
-    { icon: <FaMobileAlt />, label: 'Mobile Payments', value: 'UGX 80M' },
-    { icon: <FaRobot />, label: 'AI Reminders', value: '4,200+' },
-    { icon: <FaShieldAlt />, label: 'Security Events', value: '0 Critical' },
-  ];
+  // Format currency helper
+  const formatCurrency = (amount) => {
+    if (!amount) return 'UGX 0';
+    return `UGX ${Number(amount).toLocaleString()}`;
+  };
+
+  // Dynamic stats from real data
+  const homeStats = realStats ? [
+    { icon: <FaUsers />, label: 'Active Donors', value: realStats.totalDonors || '0' },
+    { icon: <FaMoneyBillWave />, label: 'Total Pledges', value: formatCurrency(realStats.totalAmount || 0) },
+    { icon: <FaChartBar />, label: 'Campaigns', value: realStats.totalCampaigns || '0' },
+    { icon: <FaMobileAlt />, label: 'Collected', value: formatCurrency(realStats.totalCollected || 0) },
+    { icon: <FaRobot />, label: 'Pending Pledges', value: realStats.pendingPledges || '0' },
+    { icon: <FaShieldAlt />, label: 'Collection Rate', value: realStats.collectionRate ? `${realStats.collectionRate}%` : '0%' },
+  ] : [];
   const homeFeatures = [
     {
       icon: <FaRobot style={{ color: '#16a34a', fontSize: '2rem' }} />, title: 'AI Reminders',
@@ -202,25 +232,40 @@ function HomeScreen() {
         aria-live="polite"
         tabIndex={0}
       >
-        {/* Fancy Animated Hero Section */}
-        <div style={{ background: 'linear-gradient(120deg, #16a34a 0%, #22d3ee 100%)', color: '#fff', borderRadius: '0 0 32px 32px', padding: '3.2rem 2rem 2.2rem 2rem', textAlign: 'center', boxShadow: '0 4px 32px rgba(16,185,129,0.08)', marginBottom: '2.5rem', position: 'relative', overflow: 'hidden' }}>
-          <h1 style={{ fontSize: '2.7rem', fontWeight: 900, marginBottom: '0.5rem', letterSpacing: '-1.5px', textShadow: '0 2px 12px rgba(0,0,0,0.13)' }}>Welcome to PledgeHub</h1>
-          <p style={{ fontSize: '1.18rem', fontWeight: 400, marginBottom: '1.2rem', color: '#e0f2fe' }}>
-            A smarter way to manage pledges, campaigns, and payments across Africa.<br />
-            Discover the power of automation, analytics, and mobile money—all in one platform.
+        {/* Hero Banner Section */}
+        <section className="home-hero">
+          <h1 className="home-hero__title">Welcome to PledgeHub</h1>
+          <p className="home-hero__desc">
+            Transform your pledge collection with intelligent automation and real-time insights.
+            <br />
+            Streamline campaigns, payments, and reminders—all in one powerful platform.
           </p>
-          <a href="/explore" style={{ display: 'inline-block', background: 'linear-gradient(90deg, #16a34a 60%, #22d3ee 100%)', color: '#fff', fontWeight: 700, fontSize: '1.08rem', padding: '0.7rem 2.1rem', borderRadius: '999px', textDecoration: 'none', boxShadow: '0 2px 12px rgba(22,163,74,0.13)', transition: 'background 0.2s, box-shadow 0.2s, transform 0.13s', outline: 'none', marginTop: '0.7rem' }}>Explore Features</a>
-        </div>
+          <a href="/explore" className="home-hero__cta">Explore Features</a>
+        </section>
 
         {/* Stats Section */}
         <section style={{ display: 'flex', flexWrap: 'wrap', gap: '2rem', justifyContent: 'center', margin: '0 0 2.5rem 0' }}>
-          {homeStats.map((stat, i) => (
-            <div key={i} style={{ background: '#f0fdf4', borderRadius: 14, boxShadow: '0 2px 8px #16a34a0a', padding: '1.2rem 2.2rem', minWidth: 160, textAlign: 'center', flex: '1 1 180px', maxWidth: 220 }}>
-              <div style={{ fontSize: '2.2rem', color: '#16a34a', marginBottom: 8 }}>{stat.icon}</div>
-              <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#1e293b' }}>{stat.value}</div>
-              <div style={{ fontSize: '1.01rem', color: '#64748b' }}>{stat.label}</div>
+          {!isAuthenticated ? (
+            <div style={{ background: '#f0fdf4', borderRadius: 14, boxShadow: '0 2px 8px #16a34a0a', padding: '2rem', textAlign: 'center', minWidth: 300 }}>
+              <div style={{ fontSize: '2.2rem', color: '#16a34a', marginBottom: 12 }}><FaUsers /></div>
+              <div style={{ fontSize: '1.2rem', fontWeight: 600, color: '#1e293b', marginBottom: 8 }}>Sign in to view your statistics</div>
+              <Link to="/login" style={{ display: 'inline-block', background: orgColor, color: '#fff', padding: '0.5rem 1.5rem', borderRadius: '8px', textDecoration: 'none', marginTop: '0.5rem' }}>Sign In</Link>
             </div>
-          ))}
+          ) : statsLoading ? (
+            <div style={{ padding: '2rem', textAlign: 'center', color: '#64748b' }}>Loading your statistics...</div>
+          ) : homeStats.length > 0 ? (
+            homeStats.map((stat, i) => (
+              <div key={i} style={{ background: '#f0fdf4', borderRadius: 14, boxShadow: '0 2px 8px #16a34a0a', padding: '1.2rem 2.2rem', minWidth: 160, textAlign: 'center', flex: '1 1 180px', maxWidth: 220 }}>
+                <div style={{ fontSize: '2.2rem', color: '#16a34a', marginBottom: 8 }}>{stat.icon}</div>
+                <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#1e293b' }}>{stat.value}</div>
+                <div style={{ fontSize: '1.01rem', color: '#64748b' }}>{stat.label}</div>
+              </div>
+            ))
+          ) : (
+            <div style={{ padding: '2rem', textAlign: 'center', color: '#64748b' }}>
+              No data available yet. <Link to="/pledges/create" style={{ color: orgColor }}>Create your first pledge</Link> to get started!
+            </div>
+          )}
         </section>
 
         {/* Feature Highlights Section */}
@@ -286,7 +331,78 @@ function HomeScreen() {
 
       {/* Responsive styles */}
       <style>{`
+        .home-hero {
+          background: linear-gradient(120deg, #16a34a 0%, #22d3ee 100%);
+          color: #fff;
+          border-radius: 18px;
+          padding: 3rem 2rem;
+          margin-bottom: 2.5rem;
+          text-align: center;
+          box-shadow: 0 4px 32px rgba(16,185,129,0.12);
+          position: relative;
+          overflow: hidden;
+        }
+        .home-hero::before {
+          content: '';
+          position: absolute;
+          top: -50%;
+          right: -50%;
+          width: 200%;
+          height: 200%;
+          background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+          animation: pulse 8s ease-in-out infinite;
+        }
+        @keyframes pulse {
+          0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.5; }
+          50% { transform: scale(1.1) rotate(180deg); opacity: 0.8; }
+        }
+        .home-hero__title {
+          font-size: 2.8rem;
+          font-weight: 900;
+          margin-bottom: 1rem;
+          letter-spacing: -1.5px;
+          text-shadow: 0 2px 12px rgba(0,0,0,0.1);
+          position: relative;
+          z-index: 1;
+        }
+        .home-hero__desc {
+          font-size: 1.25rem;
+          font-weight: 500;
+          line-height: 1.7;
+          margin-bottom: 1.5rem;
+          color: rgba(255,255,255,0.95);
+          max-width: 800px;
+          margin-left: auto;
+          margin-right: auto;
+          position: relative;
+          z-index: 1;
+        }
+        .home-hero__cta {
+          display: inline-block;
+          background: rgba(255,255,255,0.95);
+          color: #16a34a;
+          font-weight: 700;
+          font-size: 1.1rem;
+          padding: 0.85rem 2.5rem;
+          border-radius: 999px;
+          text-decoration: none;
+          box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+          transition: all 0.3s ease;
+          position: relative;
+          z-index: 1;
+        }
+        .home-hero__cta:hover {
+          background: #fff;
+          transform: translateY(-3px);
+          box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        }
         @media (max-width: 900px) {
+          .home-hero__title {
+            font-size: 2.2rem;
+          }
+          .home-hero__desc {
+            font-size: 1.1rem;
+          }
           .stat-card, .campaign-card, .section__title, .section.card.card--muted {
             min-width: 180px !important;
             max-width: 100% !important;
@@ -297,6 +413,20 @@ function HomeScreen() {
           }
         }
         @media (max-width: 600px) {
+          .home-hero {
+            padding: 2rem 1.5rem;
+            border-radius: 12px;
+          }
+          .home-hero__title {
+            font-size: 1.8rem;
+          }
+          .home-hero__desc {
+            font-size: 1rem;
+          }
+          .home-hero__cta {
+            font-size: 1rem;
+            padding: 0.75rem 2rem;
+          }
           main {
             padding: 0.5rem !important;
           }

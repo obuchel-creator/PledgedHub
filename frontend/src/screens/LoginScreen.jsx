@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Logo from '../components/Logo';
 import { socialLogos } from '../assets/social-logos';
+import { formatFormErrorMessage } from '../utils/formErrors';
 
 export default function LoginScreen() {
   const { login, user } = useAuth();
@@ -42,7 +43,7 @@ export default function LoginScreen() {
     }
 
     if (!form.email.trim() || !form.password) {
-      setError('Email and password are required');
+      setError('Please enter your email and password.');
       return;
     }
 
@@ -59,8 +60,22 @@ export default function LoginScreen() {
       if (result && result.success === false && result.error) {
         // Error response from handleRequest
         console.error('[LoginScreen] 🔐 Login API error:', result.error);
-        setError(result.error);
+        let errorMsg = result.error;
+        // Make error messages more user-friendly
+        if (typeof errorMsg === 'string') {
+          if (errorMsg.toLowerCase().includes('invalid credentials') || 
+              errorMsg.toLowerCase().includes('invalid password')) {
+            errorMsg = 'Incorrect email/phone or password. Please try again.';
+          } else if (errorMsg.toLowerCase().includes('user not found')) {
+            errorMsg = 'No account found for this login. Please sign up.';
+          } else if (errorMsg.toLowerCase().includes('too many failed')) {
+            errorMsg = 'Too many failed attempts. Please try again in 15 minutes.';
+          }
+        }
+        setError(errorMsg || 'Login failed. Please check your credentials.');
         setSuccess('');
+        setLoading(false);
+        return;
       } else if (result && result.token) {
         console.log('[LoginScreen] ✅ Login successful, token received, showing success and redirecting');
         setSuccess('Login successful! Redirecting to dashboard...');
@@ -70,7 +85,7 @@ export default function LoginScreen() {
         }, 800); // Show success for 0.8s before redirect
       } else if (result && result.user && !result.token) {
         console.error('[LoginScreen] 🔐 User received but no token');
-        setError('Login failed: No authentication token received');
+        setError('Login failed. Please try again.');
         setSuccess('');
       } else if (!result) {
         console.error('[LoginScreen] 🔐 No response from login');
@@ -78,13 +93,13 @@ export default function LoginScreen() {
         setSuccess('');
       } else {
         console.error('[LoginScreen] 🔐 Unexpected login response:', result);
-        setError(result?.error || 'Login failed. Please check your credentials.');
+        setError(formatFormErrorMessage(result?.error || 'Login failed. Please check your credentials.'));
         setSuccess('');
       }
     } catch (err) {
       console.error('[LoginScreen] 🔐 Login exception:', err);
       const errorMsg = err?.response?.data?.error || err?.message || 'Login failed. Please try again.';
-      setError(errorMsg);
+      setError(formatFormErrorMessage(errorMsg, 'Login failed. Please try again.'));
       setSuccess('');
     } finally {
       setLoading(false);
@@ -93,7 +108,7 @@ export default function LoginScreen() {
 
   const handleNext = () => {
     if (!form.email.trim()) {
-      setError('Email is required');
+      setError('Please enter your email.');
       return;
     }
     setError('');
@@ -104,14 +119,33 @@ export default function LoginScreen() {
     <div className="auth-bg">
       <main>
         <section className="auth-center-card">
+          {/* Toast Error Notification */}
+          {error && (
+            <div className="toast-notification error-toast" role="alert" aria-live="assertive">
+              <div className="toast-icon">⚠</div>
+              <div className="toast-content">
+                <div className="toast-title">Login Failed</div>
+                <div className="toast-message">{error}</div>
+              </div>
+            </div>
+          )}
+
+          {/* Toast Success Notification */}
+          {success && (
+            <div className="toast-notification success-toast" role="status" aria-live="polite">
+              <div className="toast-icon">✓</div>
+              <div className="toast-content">
+                <div className="toast-title">Success!</div>
+                <div className="toast-message">{success}</div>
+              </div>
+            </div>
+          )}
+
           <div style={{ width: '100%', textAlign: 'center', marginBottom: '32px' }}>
             <Logo size="medium" showText={false} />
           </div>
 
           <h2>Sign in to PledgeHub</h2>
-          
-          {error && <div className="error-message">{error}</div>}
-          {success && <div className="success-message">{success}</div>}
           
           <form onSubmit={handleSubmit} noValidate style={{ width: '100%' }}>
             {/* Email/Username/Phone field */}

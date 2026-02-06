@@ -87,10 +87,10 @@ router.post('/batch', authenticateToken, requireStaff, batchCreatePledges);
 /**
  * Create a new pledge
  * POST /
- * Protected: Public - allow anyone to create a pledge
+ * Protected: Authenticated users (individual pledges)
  * Adds validation middleware
  */
-router.post('/', (req, res, next) => {
+router.post('/', authenticateToken, (req, res, next) => {
   const { donor_name, donor_email, donor_phone, amount } = req.body;
   // Validate required fields
   const requiredFields = [

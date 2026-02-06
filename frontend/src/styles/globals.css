@@ -1,5 +1,28 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
 
+/* Universal browser reset - MUST BE AT TOP */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: #ffffff;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  background-image: none !important;
+}
+
+/* Kill all gradient backgrounds globally for Edge */
+body::before,
+body::after {
+  display: none !important;
+}
+
 :root {
   /* Professional Typography System */
   --font-body:
@@ -121,6 +144,72 @@
   box-sizing: border-box;
 }
 
+/* Edge Browser Compatibility Fixes */
+html {
+  -ms-text-size-adjust: 100%; /* Edge text scaling fix */
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: var(--font-normal);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -ms-overflow-style: scrollbar; /* Edge scrollbar fix */
+}
+
+/* Edge Flexbox Fixes */
+.flex, [class*="flex-"], [style*="display: flex"], [style*="display:flex"] {
+  display: -ms-flexbox; /* Edge 10-11 */
+  display: flex;
+}
+
+.flex-col, [style*="flex-direction: column"], [style*="flex-direction:column"] {
+  -ms-flex-direction: column;
+  flex-direction: column;
+}
+
+.flex-row, [style*="flex-direction: row"], [style*="flex-direction:row"] {
+  -ms-flex-direction: row;
+  flex-direction: row;
+}
+
+/* Edge Grid Fixes */
+.grid, [class*="grid-"], [style*="display: grid"], [style*="display:grid"] {
+  display: -ms-grid; /* Edge 10-15 */
+  display: grid;
+}
+
+/* Edge Button Reset */
+button, input, select, textarea {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  font-family: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  outline: none;
+}
+
+/* Edge Transform Fixes */
+[style*="transform"], .transform {
+  -ms-transform: translate(0, 0); /* Edge fallback */
+  transform: translate(0, 0);
+}
+
+/* Edge Transition Fixes */
+[style*="transition"], .transition {
+  -ms-transition: all 0.3s ease;
+  -webkit-transition: all 0.3s ease;
+  transition: all 0.3s ease;
+}
+
 .visually-hidden {
   position: absolute;
   width: 1px;
@@ -137,9 +226,12 @@ html,
 body,
 #root {
   min-height: 100%;
+  min-height: 100vh; /* Fallback for Edge */
 }
 
 html {
+  -ms-text-size-adjust: 100%; /* Edge text scaling fix */
+  -webkit-text-size-adjust: 100%;
   scroll-behavior: smooth;
 }
 
@@ -156,6 +248,36 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   letter-spacing: -0.011em;
+}
+
+/* Edge-specific background fix - Multiple strategies */
+@supports (-ms-ime-align: auto) {
+  body {
+    background: #ffffff !important;
+    background-image: none !important;
+    background-color: #ffffff !important;
+  }
+  
+  .guest-pledge-container,
+  .pledge-container,
+  [class*="container"] {
+    background: #ffffff !important;
+    background-image: none !important;
+    color: #1f2937 !important;
+  }
+}
+
+/* Modern Edge (Chromium-based) fallback */
+@supports (-webkit-appearance: none) and (not (-moz-appearance: none)) {
+  body {
+    background: #ffffff !important;
+    background-image: none !important;
+    background-color: #ffffff !important;
+  }
+  
+  .min-h-screen {
+    background: white !important;
+  }
 }
 
 /* Professional Typography Classes */
@@ -2304,6 +2426,99 @@ a:focus-visible {
     /* scrollbar-width: none; */
     -ms-overflow-style: none;
   }
+}
+
+/* ============================================
+   EDGE BROWSER COMPATIBILITY FIXES
+   ============================================ */
+
+/* Edge Grid Gap Fallback */
+.grid, [class*="grid-"] {
+  grid-gap: 1rem; /* Fallback for Edge 12-15 */
+  gap: 1rem; /* Modern syntax */
+}
+
+/* Edge Flexbox Min-Height Bug Fix */
+.flex-container, [class*="flex-"] {
+  -ms-flex: 1 0 auto;
+  flex: 1 0 auto;
+}
+
+/* Edge Input/Select Styling */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="tel"],
+input[type="number"],
+input[type="date"],
+select,
+textarea {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-clip: padding-box; /* Edge border-radius fix */
+}
+
+/* Edge Transform Vendor Prefix */
+@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+  .transform, [style*="transform"] {
+    -ms-transform: translateZ(0); /* Force hardware acceleration */
+    transform: translateZ(0);
+  }
+}
+
+/* Edge Animation Fixes */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    -ms-transform: translateY(10px);
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    -ms-transform: translateY(0);
+    transform: translateY(0);
+  }
+}
+
+/* Edge Box-Shadow Rendering Fix */
+.card, .modal, .dropdown, [class*="shadow"] {
+  -webkit-backface-visibility: hidden;
+  -ms-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+/* Edge Gradient Background Fix */
+[style*="gradient"], .gradient {
+  background-attachment: scroll; /* Fix Edge gradient rendering */
+}
+
+/* Edge Opacity Transition Fix */
+.fade, .transition-opacity {
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
+  filter: alpha(opacity=100);
+}
+
+/* Edge Viewport Height Fix */
+.full-height, [style*="100vh"] {
+  min-height: -webkit-fill-available; /* iOS Safari */
+  min-height: 100vh;
+}
+
+/* Edge Text Rendering */
+body, button, input, select, textarea {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "kern" 1;
+  font-kerning: normal;
+}
+
+/* Edge SVG Rendering Fix */
+svg {
+  max-width: 100%;
+  height: auto;
+  vertical-align: middle;
 }
 
 

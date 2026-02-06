@@ -48,6 +48,7 @@ import VerifyPledgeScreen from './screens/VerifyPledgeScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import SharePledgeScreen from './screens/SharePledgeScreen';
 import PricingScreen from './screens/PricingScreen';
+import UsersScreen from './screens/UsersScreen';
 
 function App() {
   // Removed debug log
@@ -163,6 +164,14 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/users"
+          element={
+            <ProtectedRoute requiredRole="admin">
+              <UsersScreen />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/payment" element={
           <ProtectedRoute>
             <PaymentInitiationScreen />
@@ -184,6 +193,28 @@ function App() {
         <Route path="/terms" element={<TermsScreen />} />
         <Route path="/verify-pledge" element={<VerifyPledgeScreen />} />
         <Route path="/share/pledge/:id" element={<SharePledgeScreen />} />
+        <Route path="/unauthorized" element={
+          <div style={{ padding: '3rem', textAlign: 'center', maxWidth: '600px', margin: '0 auto' }}>
+            <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🚫</div>
+            <h1 style={{ fontSize: '1.8rem', fontWeight: 700, color: '#1e293b', marginBottom: '1rem' }}>
+              Access Denied
+            </h1>
+            <p style={{ fontSize: '1.1rem', color: '#64748b', marginBottom: '2rem' }}>
+              You don't have permission to access this page. Please contact your administrator if you believe this is an error.
+            </p>
+            <a href="/dashboard" style={{
+              display: 'inline-block',
+              padding: '0.75rem 2rem',
+              background: '#16a34a',
+              color: '#fff',
+              borderRadius: '8px',
+              textDecoration: 'none',
+              fontWeight: 600
+            }}>
+              Go to Dashboard
+            </a>
+          </div>
+        } />
         <Route path="*" element={<NotFoundScreen />} />
           </Routes>
         </div>

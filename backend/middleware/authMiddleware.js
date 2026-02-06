@@ -5,9 +5,9 @@ const User = require('../models/User');
 
 require('dotenv').config();
 
-// Test mode flag (set to false for production)
-const TEST_MODE = process.env.NODE_ENV === 'test' || process.env.ENABLE_TEST_MODE === 'true';
-const DEFAULT_TEST_USER = { _id: 'test-user-id', role: 'super_admin' };
+// Test mode DISABLED - Application always uses real authentication
+const TEST_MODE = false; // NEVER enable in production or development
+const DEFAULT_TEST_USER = null; // No mock users allowed
 
 /**
  * RBAC Permissions Matrix
@@ -67,12 +67,8 @@ async function auditRoleAccess(userId, action, details = {}) {
 
 async function protect(req, res, next) {
   try {
-    // Test mode: bypass authentication
-    if (TEST_MODE) {
-      req.user = req.user || DEFAULT_TEST_USER;
-      return next();
-    }
-
+    // SECURITY: Always require real authentication - NO test mode bypass
+    
     // Security: Extract token from Authorization header
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -131,7 +127,8 @@ async function protect(req, res, next) {
       id: user.id,
       email: user.email,
       name: user.name || user.username,
-      role: user.role || 'donor'
+      role: user.role || 'donor',
+      tenant_id: user.tenant_id || decoded.tenant_id  // SaaS: Include tenant context
     };
     next();
   } catch (err) {
@@ -151,12 +148,8 @@ async function protect(req, res, next) {
  */
 async function authenticateToken(req, res, next) {
     try {
-        // Test mode: bypass authentication
-        if (TEST_MODE) {
-            req.user = req.user || DEFAULT_TEST_USER;
-            return next();
-        }
-
+        // SECURITY: Always require real authentication - NO test mode bypass
+        
         // Get token from header
         const authHeader = req.headers['authorization'];
         const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
@@ -191,7 +184,8 @@ async function authenticateToken(req, res, next) {
             id: user.id,
             email: user.email,
             name: user.name || user.username,
-            role: user.role || user.user_role || 'donor'
+            role: user.role || user.user_role || 'donor',
+            tenant_id: user.tenant_id || decoded.tenant_id  // SaaS: Include tenant context
         };
 
         next();

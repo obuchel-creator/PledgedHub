@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import '../styles/GuestPledgeScreen.css';
+import { formatFormErrorMessage } from '../utils/formErrors';
 
 export default function GuestPledgeScreen() {
   const params = useParams();
@@ -42,7 +43,7 @@ export default function GuestPledgeScreen() {
       } else if (id) {
         url = `/api/public/campaigns/id/${id}`;
       } else {
-        setError('No campaign identifier provided');
+        setError('Campaign link is missing or invalid.');
         setLoading(false);
         return;
       }
@@ -51,14 +52,14 @@ export default function GuestPledgeScreen() {
       const data = await res.json();
 
       if (!data.success) {
-        setError(data.error || 'Campaign not found');
+        setError(formatFormErrorMessage(data.error || 'Campaign not found', 'Campaign not found.'));
         return;
       }
 
       setCampaign(data.data);
     } catch (err) {
       console.error('Error loading campaign:', err);
-      setError('Failed to load campaign');
+      setError(formatFormErrorMessage(err?.message || 'Failed to load campaign', 'Unable to load campaign. Please try again.'));
     } finally {
       setLoading(false);
     }
@@ -92,13 +93,13 @@ export default function GuestPledgeScreen() {
 
     // Validate
     if (!amount || parseFloat(amount) <= 0) {
-      setSubmitError('Please enter a valid amount');
+      setSubmitError('Please enter a valid amount.');
       return;
     }
 
     const normalizedPhone = normalizePhone(donorPhone);
     if (!normalizedPhone.match(/^256\d{9}$/)) {
-      setSubmitError('Invalid phone number. Must be 256XXXXXXXXX');
+      setSubmitError('Please enter a valid phone number (e.g., 256771234567).');
       return;
     }
 
@@ -120,7 +121,7 @@ export default function GuestPledgeScreen() {
       const data = await res.json();
 
       if (!data.success) {
-        setSubmitError(data.error || 'Failed to create pledge');
+        setSubmitError(formatFormErrorMessage(data.error || 'Failed to create pledge', 'Unable to create pledge. Please try again.'));
         return;
       }
 
@@ -128,7 +129,7 @@ export default function GuestPledgeScreen() {
       setPledgeCreated(data.data);
     } catch (err) {
       console.error('Error creating pledge:', err);
-      setSubmitError('Network error. Please try again.');
+      setSubmitError(formatFormErrorMessage(err?.message || 'Network error. Please try again.', 'Network error. Please try again.'));
     } finally {
       setIsSubmitting(false);
     }
@@ -153,7 +154,7 @@ export default function GuestPledgeScreen() {
       const data = await res.json();
 
       if (!data.success) {
-        setSubmitError(data.error || 'Payment failed');
+        setSubmitError(formatFormErrorMessage(data.error || 'Payment failed', 'Payment failed. Please try again.'));
         return;
       }
 
@@ -164,7 +165,7 @@ export default function GuestPledgeScreen() {
       loadCampaign();
     } catch (err) {
       console.error('Payment error:', err);
-      setSubmitError('Payment failed. Please try again.');
+      setSubmitError(formatFormErrorMessage(err?.message || 'Payment failed. Please try again.', 'Payment failed. Please try again.'));
     }
   };
 
@@ -274,13 +275,76 @@ export default function GuestPledgeScreen() {
   const remaining = campaign.goal_amount - campaign.raised_amount;
   
   return (
-    <div className="guest-pledge-container">
-      {/* Hero Banner */}
-      <div className="campaign-hero">
-        <div className="hero-badge">🎯 Active Campaign</div>
-        <h1 className="hero-title">{campaign.title}</h1>
-        {campaign.description && (
-          <p className="hero-description">{campaign.description}</p>
+    <>
+      <style>
+        {`
+          .guest-pledge-container {
+            background-color: #ffffff !important;
+            background-image: none !important;
+            background: #ffffff !important;
+          }
+          .pledge-form-modern {
+            background-color: #ffffff !important;
+            background: #ffffff !important;
+          }
+          .form-title {
+            color: #1f2937 !important;
+          }
+          .form-subtitle {
+            color: #6b7280 !important;
+          }
+          .modern-label {
+            color: #374151 !important;
+          }
+          .modern-input {
+            background-color: #ffffff !important;
+            color: #1f2937 !important;
+          }
+        `}
+      </style>
+      <div 
+        className="guest-pledge-container"
+        style={{
+          backgroundColor: '#ffffff',
+          backgroundImage: 'none',
+          color: '#1f2937',
+          minHeight: '100vh',
+          background: 'white'
+        }}
+      >
+        <style dangerouslySetInnerHTML={{__html: `
+          body {
+            background: #ffffff !important;
+            background-color: #ffffff !important;
+            background-image: none !important;
+          }
+          .guest-pledge-container,
+          .guest-pledge-container * {
+            background-color: white !important;
+          }
+          .guest-pledge-container input,
+          .guest-pledge-container select,
+          .guest-pledge-container textarea {
+            background-color: #ffffff !important;
+            color: #1f2937 !important;
+            border: 1px solid #d1d5db !important;
+          }
+          .modern-input {
+            background: #ffffff !important;
+            background-color: #ffffff !important;
+            color: #1f2937 !important;
+          }
+          .pledge-form-modern {
+            background: #ffffff !important;
+            background-color: #ffffff !important;
+          }
+        `}} />
+        {/* Hero Banner */}
+        <div className="campaign-hero">
+          <div className="hero-badge">🎯 Active Campaign</div>
+          <h1 className="hero-title">{campaign.title}</h1>
+          {campaign.description && (
+            <p className="hero-description">{campaign.description}</p>
         )}
       </div>
 
@@ -391,10 +455,16 @@ export default function GuestPledgeScreen() {
 
         {/* Right Column - Pledge Form */}
         <div className="form-column">
-          <div className="pledge-form-modern">
+          <div 
+            className="pledge-form-modern"
+            style={{
+              backgroundColor: '#ffffff',
+              color: '#1f2937'
+            }}
+          >
             <div className="form-header">
-              <h2 className="form-title">💝 Make Your Contribution</h2>
-              <p className="form-subtitle">Join {campaign.pledgeCount || 0} others supporting this cause</p>
+              <h2 className="form-title" style={{ color: '#1f2937' }}>💝 Make Your Contribution</h2>
+              <p className="form-subtitle" style={{ color: '#6b7280' }}>Join {campaign.pledgeCount || 0} others supporting this cause</p>
             </div>
 
             {submitError && (
@@ -406,8 +476,8 @@ export default function GuestPledgeScreen() {
 
             <form onSubmit={handlePledgeSubmit} className="modern-form">
               {/* Quick Amount Buttons */}
-              <div className="amount-section">
-                <label className="modern-label">
+              <div className="amount-section" style={{ backgroundColor: '#ffffff', color: '#1f2937' }}>
+                <label className="modern-label" style={{ color: '#374151' }}>
                   <span className="label-icon">💰</span>
                   Contribution Amount
                 </label>
@@ -434,14 +504,15 @@ export default function GuestPledgeScreen() {
                     value={amount}
                     onChange={(e) => setAmount(e.target.value)}
                     className="modern-input"
+                    style={{ backgroundColor: '#ffffff', color: '#1f2937' }}
                     required
                   />
                 </div>
               </div>
 
               {/* Name */}
-              <div className="form-group-modern">
-                <label htmlFor="name" className="modern-label">
+              <div className="form-group-modern" style={{ backgroundColor: '#ffffff' }}>
+                <label htmlFor="name" className="modern-label" style={{ color: '#374151' }}>
                   <span className="label-icon">👤</span>
                   Your Name <span className="optional">(optional)</span>
                 </label>
@@ -452,12 +523,13 @@ export default function GuestPledgeScreen() {
                   value={donor_name}
                   onChange={(e) => setDonorName(e.target.value)}
                   className="modern-input"
+                  style={{ backgroundColor: '#ffffff', color: '#1f2937' }}
                 />
               </div>
 
               {/* Phone */}
-              <div className="form-group-modern">
-                <label htmlFor="phone" className="modern-label">
+              <div className="form-group-modern" style={{ backgroundColor: '#ffffff' }}>
+                <label htmlFor="phone" className="modern-label" style={{ color: '#374151' }}>
                   <span className="label-icon">📱</span>
                   Mobile Money Number <span className="required">*</span>
                 </label>
@@ -468,16 +540,17 @@ export default function GuestPledgeScreen() {
                   value={donorPhone}
                   onChange={(e) => setDonorPhone(e.target.value)}
                   className="modern-input"
+                  style={{ backgroundColor: '#ffffff', color: '#1f2937' }}
                   required
                 />
-                <div className="input-hint">
+                <div className="input-hint" style={{ color: '#6b7280' }}>
                   MTN or Airtel number for payment
                 </div>
               </div>
 
               {/* Email */}
-              <div className="form-group-modern">
-                <label htmlFor="email" className="modern-label">
+              <div className="form-group-modern" style={{ backgroundColor: '#ffffff' }}>
+                <label htmlFor="email" className="modern-label" style={{ color: '#374151' }}>
                   <span className="label-icon">✉️</span>
                   Email <span className="optional">(optional)</span>
                 </label>
@@ -488,8 +561,9 @@ export default function GuestPledgeScreen() {
                   value={donorEmail}
                   onChange={(e) => setDonorEmail(e.target.value)}
                   className="modern-input"
+                  style={{ backgroundColor: '#ffffff', color: '#1f2937' }}
                 />
-                <div className="input-hint">
+                <div className="input-hint" style={{ color: '#6b7280' }}>
                   Receive receipt and updates
                 </div>
               </div>
@@ -513,7 +587,7 @@ export default function GuestPledgeScreen() {
                 )}
               </button>
 
-              <div className="security-note">
+              <div className="security-note" style={{ color: '#6b7280' }}>
                 <span className="lock-icon">🔒</span>
                 Secure payment • Your data is protected
               </div>
@@ -521,10 +595,10 @@ export default function GuestPledgeScreen() {
           </div>
 
           {/* Share Card */}
-          <div className="share-card-modern">
+          <div className="share-card-modern" style={{ backgroundColor: '#ffffff', color: '#1f2937' }}>
             <div className="share-icon-large">📢</div>
-            <h3 className="share-title">Help us reach the goal!</h3>
-            <p className="share-text">Share this campaign with your network</p>
+            <h3 className="share-title" style={{ color: '#1f2937' }}>Help us reach the goal!</h3>
+            <p className="share-text" style={{ color: '#6b7280' }}>Share this campaign with your network</p>
             <button
               className="share-button-modern"
               onClick={async () => {
@@ -556,6 +630,7 @@ export default function GuestPledgeScreen() {
         </div>
       </div>
     </div>
+    </>
   );
 }
 

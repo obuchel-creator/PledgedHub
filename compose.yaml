@@ -1,0 +1,6 @@
+services:
+  pledgehub:
+    image: pledgehub
+    build:
+      context: .
+      dockerfile: ./Dockerfile

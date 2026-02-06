@@ -1,6 +1,7 @@
 
 console.log('[API] api.js loaded - version 2025-12-16');
 import { getViteEnv } from '../utils/getViteEnv';
+import { formatFormErrorMessage } from '../utils/formErrors';
 const viteEnv = getViteEnv();
 // Force using proxy - always use /api to go through Vite dev server proxy
 const BASE_URL = '/api';
@@ -232,13 +233,13 @@ function handleRequest(promise) {
         // Return a structured error object instead of throwing
         return { 
           success: false, 
-          error: serverMsg,
+          error: formatFormErrorMessage(serverMsg, serverMsg),
           status: status
         };
       }
       // fetch fallback
       if (err && err.message) {
-        return { success: false, error: err.message };
+        return { success: false, error: formatFormErrorMessage(err.message, err.message) };
       }
       return { success: false, error: 'An unknown error occurred' };
     });
@@ -344,9 +345,10 @@ export async function getPayments(query = {}) {
 
 export async function loginUser(credentials) {
   const client = await getClient();
-  // Use email for login (backend expects { email, password })
+  // Backend auth.js route expects { email, password }
+  // The 'email' field actually accepts email, phone, or username
   const payload = {
-    email: credentials.email || credentials.identifier || '',
+    email: credentials.email || credentials.identifier || credentials.phone || '',
     password: credentials.password,
   };
   return handleRequest(client.post('auth/login', payload));
@@ -354,61 +356,20 @@ export async function loginUser(credentials) {
 
 export async function registerUser(userData) {
   // Accepts { name, email, phone, password }
-  try {
-    const client = await getClient();
-    if (!client || typeof client.post !== 'function') {
-      return { success: false, error: 'HTTP client not available' };
-    }
-    // Only send required fields
-    const payload = {
-      name: userData.name,
-      email: userData.email,
-      phone: userData.phone,
-      password: userData.password,
-    };
-    
-    console.debug('🔵 [API] Registering user with payload:', payload);
-    console.log('🔵 [API] Calling POST to /api/register...');
-    
-    // Create a timeout promise
-    const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Request timeout after 10 seconds')), 10000)
-    );
-    
-    // Race: API call vs timeout
-    const res = await Promise.race([
-      client.post('register', payload, {
-        headers: { 'Content-Type': 'application/json' },
-      }),
-      timeoutPromise
-    ]);
-    
-    console.log('🔵 [API] Registration response received:', res);
-    
-    // Expect { token, user } or { data: { token, user } }
-    if (res && res.data) {
-      if (res.data.token) {
-        console.log('✅ [API] Registration successful, token:', res.data.token.substring(0, 20) + '...');
-        return { token: res.data.token, user: res.data.user };
-      }
-      // Handle nested response
-      if (res.data.data && res.data.data.token) {
-        console.log('✅ [API] Registration successful (nested), token:', res.data.data.token.substring(0, 20) + '...');
-        return { token: res.data.data.token, user: res.data.data.user };
-      }
-    }
-    
-    console.error('❌ [API] No token in response:', res);
-    return { success: false, error: 'Registration failed. Please try again.' };
-  } catch (err) {
-    console.error('❌ [API] Registration error:', err);
-    console.error('❌ [API] Error type:', err.constructor.name);
-    console.error('❌ [API] Error message:', err?.message);
-    return { 
-      success: false, 
-      error: err?.response?.data?.error || err?.message || 'Registration failed - please check your connection.' 
-    };
-  }
+  const client = await getClient();
+  
+  // Only send required fields
+  const payload = {
+    name: userData.name,
+    email: userData.email || null,
+    phone: userData.phone,
+    password: userData.password,
+  };
+  
+  console.debug('🔵 [API] Registering user with payload:', payload);
+  
+  // Use handleRequest to properly handle errors like loginUser does
+  return handleRequest(client.post('auth/register', payload));
 }
 
 export async function getCurrentUser() {
@@ -681,6 +642,22 @@ export async function sendThankYou(pledgeId) {
 export async function getAnalyticsOverview() {
   const client = await getClient();
   return handleRequest(client.get('analytics/overview'));
+}
+
+// Public platform statistics (no authentication required)
+export async function getPlatformStats() {
+  const client = await getClient();
+  // This endpoint doesn't require auth, so no token is added
+  const response = await fetch('/api/analytics/platform-stats', {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' }
+  });
+  
+  if (!response.ok) {
+    throw new Error('Failed to fetch platform statistics');
+  }
+  
+  return response.json();
 }
 
 export async function getTopDonors(limit = 10) {

@@ -14,7 +14,18 @@ export default function ProfileScreen() {
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    
+    // Block name field for regular users
+    if (name === 'name' && user?.role === 'user') {
+      setMessage({ 
+        type: 'error', 
+        text: 'Your name cannot be edited. Contact an administrator if a correction is needed.' 
+      });
+      return;
+    }
+    
+    setFormData({ ...formData, [name]: value });
     setMessage({ type: '', text: '' });
   };
 
@@ -151,25 +162,38 @@ export default function ProfileScreen() {
             fontWeight: '600',
             color: '#202124'
           }}>
-            Full Name
+            Full Name {user?.role === 'user' && <span style={{ color: '#ff6b6b', fontSize: '12px' }}>(Read-only)</span>}
           </label>
           <input
             type="text"
             name="name"
             value={formData.name}
             onChange={handleChange}
-            disabled={!isEditing}
+            disabled={!isEditing || user?.role === 'user'}
+            readOnly={user?.role === 'user'}
             style={{
               width: '100%',
               padding: '12px 16px',
-              border: '1px solid #dadce0',
+              border: user?.role === 'user' ? '1px solid #ffcccc' : '1px solid #dadce0',
               borderRadius: '6px',
               fontSize: '15px',
-              backgroundColor: isEditing ? 'white' : '#f8f9fa',
-              cursor: isEditing ? 'text' : 'not-allowed',
-              boxSizing: 'border-box'
+              backgroundColor: user?.role === 'user' ? '#fff5f5' : (isEditing ? 'white' : '#f8f9fa'),
+              cursor: user?.role === 'user' ? 'not-allowed' : (isEditing ? 'text' : 'not-allowed'),
+              boxSizing: 'border-box',
+              color: user?.role === 'user' ? '#999' : 'inherit'
             }}
           />
+          {user?.role === 'user' && (
+            <small style={{
+              display: 'block',
+              marginTop: '8px',
+              color: '#ff9800',
+              fontSize: '12px',
+              fontWeight: '500'
+            }}>
+              ℹ️ Your name is locked for security. Contact an administrator if you need a correction.
+            </small>
+          )}
         </div>
 
         <div style={{ marginBottom: '24px' }}>

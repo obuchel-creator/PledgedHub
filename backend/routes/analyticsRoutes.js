@@ -2,9 +2,78 @@ const express = require('express');
 const router = express.Router();
 
 const analyticsService = require('../services/analyticsService');
+const financialAnalyticsService = require('../services/financialAnalyticsService');
 const { requireStaff } = require('../middleware/authMiddleware');
 const { authenticateToken } = require('../middleware/authMiddleware');
 const db = require('../config/db');
+
+// PUBLIC ENDPOINT - Platform-wide aggregate statistics (no auth required)
+// GET /api/analytics/platform-stats
+router.get('/platform-stats', async (req, res) => {
+    try {
+        const { pool } = require('../config/db');
+        
+        // Get aggregate statistics across ALL tenants/organizations
+        const [pledgeStats] = await pool.execute(`
+            SELECT 
+                COUNT(DISTINCT id) as totalPledges,
+                COUNT(DISTINCT donor_name) as totalDonors,
+                SUM(amount) as totalAmount,
+                SUM(CASE WHEN status = 'paid' OR payment_status = 'completed' THEN amount ELSE 0 END) as totalCollected,
+                COUNT(CASE WHEN status = 'pending' OR status = 'unpaid' THEN 1 END) as pendingPledges
+            FROM pledges
+            WHERE deleted = 0
+        `);
+
+        const [campaignStats] = await pool.execute(`
+            SELECT COUNT(DISTINCT id) as totalCampaigns
+            FROM campaigns
+            WHERE deleted = 0
+        `);
+
+        const [tenantStats] = await pool.execute(`
+            SELECT COUNT(DISTINCT id) as totalOrganizations
+            FROM tenants
+        `);
+
+        const stats = pledgeStats[0];
+        const totalAmount = parseFloat(stats.totalAmount) || 0;
+        const totalCollected = parseFloat(stats.totalCollected) || 0;
+        const collectionRate = totalAmount > 0 
+            ? Math.round((totalCollected / totalAmount) * 100) 
+            : 0;
+
+        res.json({
+            success: true,
+            data: {
+                totalPledges: parseInt(stats.totalPledges) || 0,
+                totalDonors: parseInt(stats.totalDonors) || 0,
+                totalAmount: totalAmount,
+                totalCollected: totalCollected,
+                pendingPledges: parseInt(stats.pendingPledges) || 0,
+                totalCampaigns: parseInt(campaignStats[0].totalCampaigns) || 0,
+                totalOrganizations: parseInt(tenantStats[0].totalOrganizations) || 0,
+                collectionRate: collectionRate
+            }
+        });
+    } catch (err) {
+        console.error('Platform stats error:', err);
+        res.status(500).json({ 
+            success: false, 
+            error: 'Failed to fetch platform statistics',
+            data: {
+                totalPledges: 0,
+                totalDonors: 0,
+                totalAmount: 0,
+                totalCollected: 0,
+                pendingPledges: 0,
+                totalCampaigns: 0,
+                totalOrganizations: 0,
+                collectionRate: 0
+            }
+        });
+    }
+});
 
 // DRILL-DOWN ANALYTICS ENDPOINTS
 // GET /api/analytics/drilldown/by-purpose
@@ -523,6 +592,96 @@ router.get('/referrals/stats', authenticateToken, async (req, res) => {
       },
     });
   }
+});
+
+// ============================================
+// FINANCIAL ANALYTICS ENDPOINTS (QuickBooks-Style)
+// ============================================
+
+// GET /api/analytics/profit-loss
+// Profit & Loss Statement (Income vs Expenses)
+router.get('/profit-loss', authenticateToken, async (req, res) => {
+    try {
+        const { start, end } = req.query;
+        const startDate = start || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+        const endDate = end || new Date().toISOString().split('T')[0];
+        
+        const userId = req.user.role === 'user' ? req.user.id : null;
+        const result = await financialAnalyticsService.getProfitAndLoss(startDate, endDate, userId);
+        
+        res.json(result);
+    } catch (error) {
+        console.error('Error in /profit-loss:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// GET /api/analytics/cash-flow
+// Cash Flow Analysis (Money in vs Money out over time)
+router.get('/cash-flow', authenticateToken, async (req, res) => {
+    try {
+        const { start, end, groupBy = 'day' } = req.query;
+        const startDate = start || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+        const endDate = end || new Date().toISOString().split('T')[0];
+        
+        const userId = req.user.role === 'user' ? req.user.id : null;
+        const result = await financialAnalyticsService.getCashFlow(startDate, endDate, userId, groupBy);
+        
+        res.json(result);
+    } catch (error) {
+        console.error('Error in /cash-flow:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// GET /api/analytics/financial-health
+// Financial Health Metrics & KPIs
+router.get('/financial-health', authenticateToken, async (req, res) => {
+    try {
+        const userId = req.user.role === 'user' ? req.user.id : null;
+        const result = await financialAnalyticsService.getFinancialHealth(userId);
+        
+        res.json(result);
+    } catch (error) {
+        console.error('Error in /financial-health:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// GET /api/analytics/expense-breakdown
+// Expense Breakdown by Category (for donut chart)
+router.get('/expense-breakdown', authenticateToken, async (req, res) => {
+    try {
+        const { start, end } = req.query;
+        const startDate = start || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+        const endDate = end || new Date().toISOString().split('T')[0];
+        
+        const userId = req.user.role === 'user' ? req.user.id : null;
+        const result = await financialAnalyticsService.getExpenseBreakdown(startDate, endDate, userId);
+        
+        res.json(result);
+    } catch (error) {
+        console.error('Error in /expense-breakdown:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// GET /api/analytics/revenue-breakdown
+// Revenue Breakdown by Payment Method (for donut chart)
+router.get('/revenue-breakdown', authenticateToken, async (req, res) => {
+    try {
+        const { start, end } = req.query;
+        const startDate = start || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+        const endDate = end || new Date().toISOString().split('T')[0];
+        
+        const userId = req.user.role === 'user' ? req.user.id : null;
+        const result = await financialAnalyticsService.getRevenueBreakdown(startDate, endDate, userId);
+        
+        res.json(result);
+    } catch (error) {
+        console.error('Error in /revenue-breakdown:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
 });
 
 module.exports = router;

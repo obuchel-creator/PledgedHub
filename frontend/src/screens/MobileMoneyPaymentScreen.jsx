@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { postWithAuth } from '../utils/api';
 import Logo from '../components/Logo';
+import { formatFormErrorMessage } from '../utils/formErrors';
 
 export default function MobileMoneyPaymentScreen() {
   const { pledgeId } = useParams();
@@ -19,7 +20,7 @@ export default function MobileMoneyPaymentScreen() {
     setError('');
     setStatus('');
     if (!phone || !amount) {
-      setError('Phone and amount are required');
+      setError('Please enter a phone number and amount.');
       setLoading(false);
       return;
     }
@@ -34,10 +35,10 @@ export default function MobileMoneyPaymentScreen() {
       if (res.success) {
         setStatus('Payment initiated. Please check your phone for a USSD prompt.');
       } else {
-        setError(res.error || 'Failed to initiate payment');
+        setError(formatFormErrorMessage(res.error || 'Failed to initiate payment', 'Failed to initiate payment. Please try again.'));
       }
     } catch (err) {
-      setError('Server error');
+      setError(formatFormErrorMessage(err?.message || 'Server error', 'Server error. Please try again.'));
     }
     setLoading(false);
   };

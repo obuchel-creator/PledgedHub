@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getPledges, createPledge, getPayments } from '../services/api';
+import { formatFormErrorMessage } from '../utils/formErrors';
 
 // Real implementation with API calls
 export default function useDashboardData() {
@@ -139,7 +140,7 @@ export default function useDashboardData() {
       console.error('❌ [PLEDGE CREATE] Error:', err);
       setState((prev) => ({
         ...prev,
-        pledgeMessage: { text: err?.message || 'Failed to create pledge. Please try again.', type: 'error' },
+        pledgeMessage: { text: formatFormErrorMessage(err?.message, 'Failed to create pledge. Please try again.'), type: 'error' },
         creatingPledge: false,
       }));
     }

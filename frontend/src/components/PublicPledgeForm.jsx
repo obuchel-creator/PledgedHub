@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { formatFormErrorMessage } from '../utils/formErrors';
 
 export default function PublicPledgeForm() {
   const [form, setForm] = useState({
@@ -23,6 +24,30 @@ export default function PublicPledgeForm() {
     setSubmitting(true);
     setError('');
     setSuccess(false);
+    if (!form.name.trim()) {
+      setSubmitting(false);
+      setError('Please enter your name.');
+      return;
+    }
+    if (!form.phone.trim()) {
+      setSubmitting(false);
+      setError('Please enter a phone number.');
+      return;
+    }
+    const amountValue = Number(form.amount);
+    if (!form.amount || Number.isNaN(amountValue) || amountValue <= 0) {
+      setSubmitting(false);
+      setError('Please enter a valid amount.');
+      return;
+    }
+    if (form.email && form.email.trim()) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(form.email.trim())) {
+        setSubmitting(false);
+        setError('Please enter a valid email address.');
+        return;
+      }
+    }
     try {
       const res = await axios.post('/pledges', {
         title: form.name,
@@ -37,10 +62,10 @@ export default function PublicPledgeForm() {
         setSuccess(true);
         setForm({ name: '', phone: '', email: '', amount: '', purpose: '', collection_date: '' });
       } else {
-        setError(res.data.error || 'Submission failed');
+        setError(formatFormErrorMessage(res.data.error || 'Submission failed', 'Submission failed. Please try again.'));
       }
     } catch (err) {
-      setError(err.response?.data?.error || 'Submission failed');
+      setError(formatFormErrorMessage(err.response?.data?.error || err.message || 'Submission failed', 'Submission failed. Please try again.'));
     }
     setSubmitting(false);
   };

@@ -1,6 +1,7 @@
 // ...existing code...
 import React, { useState } from 'react';
 import { createPledge } from '../services/api';
+import { formatFormErrorMessage } from '../utils/formErrors';
 
 export default function PledgeForm() {
   const [form, setForm] = useState({
@@ -32,12 +33,12 @@ export default function PledgeForm() {
     console.log('🔵 [FORM] Form validation - types:', typeof title, typeof goal, typeof amount);
     console.log('🔵 [FORM] Raw form data:', form);
 
-    if (!title) return setError('Title is required.');
-    if (!goal && !amount) return setError('Either campaign goal or suggested amount is required.');
+    if (!title) return setError('Please enter a campaign title.');
+    if (!goal && !amount) return setError('Please enter either a campaign goal or a suggested amount.');
     if (form.goal && (Number.isNaN(goal) || goal <= 0))
-      return setError('Goal must be a positive number.');
+      return setError('Campaign goal must be a positive number.');
     if (form.amount && (Number.isNaN(amount) || amount <= 0))
-      return setError('Amount must be a positive number.');
+      return setError('Suggested amount must be a positive number.');
 
     // Map frontend form fields to backend expected format
     const payload = {
@@ -63,28 +64,7 @@ export default function PledgeForm() {
         name: err.name,
       });
 
-      // Enhanced error message parsing
-      let errorMessage = 'Failed to create pledge.';
-
-      if (err.message) {
-        if (err.message.includes('400')) {
-          // Try to extract the detailed error from 400 responses
-          try {
-            const match = err.message.match(/400\s+(.+)/);
-            if (match) {
-              errorMessage = `Bad Request: ${match[1]}`;
-            } else {
-              errorMessage = err.message;
-            }
-          } catch (parseError) {
-            errorMessage = err.message;
-          }
-        } else {
-          errorMessage = err.message;
-        }
-      }
-
-      setError(errorMessage);
+      setError(formatFormErrorMessage(err?.message, 'Failed to create pledge. Please try again.'));
     } finally {
       setLoading(false);
     }

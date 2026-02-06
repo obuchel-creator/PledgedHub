@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { forgotPassword } from "../services/api";
 import Logo from "../components/Logo";
 import { socialLogos } from "../assets/social-logos";
+import { formatFormErrorMessage } from "../utils/formErrors";
 
 export default function ForgotPasswordScreen() {
   const [email, setEmail] = useState("");
@@ -17,6 +18,8 @@ export default function ForgotPasswordScreen() {
   const [success, setSuccess] = useState(false);
   const [countdown, setCountdown] = useState(0);
   const [canResend, setCanResend] = useState(true);
+  const [emailError, setEmailError] = useState("");
+  const [phoneError, setPhoneError] = useState("");
 
   useEffect(() => {
     let timer;
@@ -32,6 +35,40 @@ export default function ForgotPasswordScreen() {
     }
   }, [countdown]);
 
+  // Auto-hide success message after 5 seconds
+  useEffect(() => {
+    if (success) {
+      const timer = setTimeout(() => {
+        setSuccess(false);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [success]);
+
+  // Email validation handler
+  const handleEmailChange = (e) => {
+    const value = e.target.value;
+    setEmail(value);
+    
+    if (value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+      setEmailError("Please enter a valid email address (e.g., user@example.com)");
+    } else {
+      setEmailError("");
+    }
+  };
+
+  // Phone validation handler
+  const handlePhoneChange = (e) => {
+    const value = e.target.value;
+    setPhone(value);
+    
+    if (value && value.trim().length > 0 && value.trim().length < 10) {
+      setPhoneError("Phone number must be at least 10 digits");
+    } else {
+      setPhoneError("");
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -40,15 +77,30 @@ export default function ForgotPasswordScreen() {
 
     try {
       if (usePhone) {
+        // Phone validation
+        if (!phone || phone.trim().length < 10) {
+          setLoading(false);
+          setError("Please enter a valid phone number (at least 10 digits).");
+          return;
+        }
+        
         const res = await forgotPassword(undefined, phone);
         setLoading(false);
         if (res && res.success) {
           setStep("verify");
           setSuccess(true);
         } else {
-          setError((res && res.error) || "Failed to send reset code.");
+          setError(formatFormErrorMessage((res && res.error) || "Failed to send reset code.", "Unable to send reset code. Please try again."));
         }
       } else {
+        // Email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!email || !emailRegex.test(email)) {
+          setLoading(false);
+          setError("Please enter a valid email address (e.g., user@example.com).");
+          return;
+        }
+        
         const res = await forgotPassword(email, undefined);
         setLoading(false);
         if (res && res.success) {
@@ -56,12 +108,12 @@ export default function ForgotPasswordScreen() {
           setCanResend(false);
           setCountdown(60);
         } else {
-          setError((res && res.error) || "Failed to send reset link.");
+          setError(formatFormErrorMessage((res && res.error) || "Failed to send reset link.", "Unable to send reset link. Please try again."));
         }
       }
     } catch (err) {
       setLoading(false);
-      setError(err?.message || "Failed to send reset link.");
+      setError(formatFormErrorMessage(err?.message || "Failed to send reset link.", "Unable to send reset link. Please try again."));
     }
   };
 
@@ -77,11 +129,11 @@ export default function ForgotPasswordScreen() {
       if (res && res.success) {
         setSuccess(true);
       } else {
-        setError((res && res.error) || "Failed to reset password.");
+        setError(formatFormErrorMessage((res && res.error) || "Failed to reset password.", "Unable to reset password. Please try again."));
       }
     } catch (err) {
       setLoading(false);
-      setError("Failed to reset password.");
+      setError(formatFormErrorMessage("Failed to reset password.", "Unable to reset password. Please try again."));
     }
   };
 
@@ -92,6 +144,19 @@ export default function ForgotPasswordScreen() {
     <div className="auth-bg">
       <main>
         <section className="auth-center-card" aria-label="Forgot Password Section">
+          {/* Toast Success Notification */}
+          {success && (
+            <div className="toast-notification success-toast" role="status" aria-live="polite">
+              <div className="toast-icon">✓</div>
+              <div className="toast-content">
+                <div className="toast-title">Success!</div>
+                <div className="toast-message">
+                  {usePhone ? "Reset code sent! Check your phone." : "Reset link sent! Check your email."}
+                </div>
+              </div>
+            </div>
+          )}
+
           <div style={{ width: "100%", textAlign: "center", marginBottom: "32px" }}>
             <Logo size="large" showText={false} />
           </div>
@@ -102,11 +167,6 @@ export default function ForgotPasswordScreen() {
           </p>
 
           {error && <div className="error-message" role="alert">{error}</div>}
-          {success && !error && step === "request" && (
-            <div className="success-message" role="status">
-              {usePhone ? "Reset code sent! Please check your phone." : "Reset link sent! Please check your email inbox."}
-            </div>
-          )}
 
           <div className="forgot-password-container">
             {step === "request" ? (
@@ -118,13 +178,14 @@ export default function ForgotPasswordScreen() {
                       type="tel"
                       id="phone"
                       value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
+                      onChange={handlePhoneChange}
                       required
                       disabled={loading}
                       placeholder="e.g. 2567XXXXXXXX"
                       aria-required="true"
                       aria-label="Phone Number"
                     />
+                    {phoneError && <div className="field-error" style={{color: '#ff6b6b', fontSize: '12px', marginTop: '4px'}}>{phoneError}</div>}
                   </div>
                 ) : (
                   <div className="form-group">
@@ -133,19 +194,21 @@ export default function ForgotPasswordScreen() {
                       type="email"
                       id="email"
                       value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      onChange={handleEmailChange}
                       required
                       disabled={loading}
+                      placeholder="e.g. user@example.com"
                       aria-required="true"
                       aria-label="Email Address"
                     />
+                    {emailError && <div className="field-error" style={{color: '#ff6b6b', fontSize: '12px', marginTop: '4px'}}>{emailError}</div>}
                   </div>
                 )}
 
                 <button
                   type="submit"
                   className="btn-primary"
-                  disabled={loading || (!email && !phone)}
+                  disabled={loading || (!email && !phone) || emailError || phoneError}
                   aria-busy={loading}
                   aria-label={displayLabel}
                 >
@@ -157,7 +220,13 @@ export default function ForgotPasswordScreen() {
                   <button
                     type="button"
                     className="btn-link"
-                    onClick={() => setUsePhone(!usePhone)}
+                    onClick={() => {
+                      setUsePhone(!usePhone);
+                      setError("");
+                      setEmailError("");
+                      setPhoneError("");
+                      setSuccess(false);
+                    }}
                     aria-label={usePhone ? "Switch to email reset" : "Switch to phone reset"}
                   >
                     {usePhone ? "Use email instead" : "Use phone instead"}
@@ -199,7 +268,6 @@ export default function ForgotPasswordScreen() {
                   />
                 </div>
                 {error && <div className="error-message" role="alert">{error}</div>}
-                {success && !error && <div className="success-message" role="status">Password reset successful! You can now log in.</div>}
                 <button type="submit" className="btn-primary" disabled={loading || !code || !newPassword} aria-busy={loading} aria-label="Reset password">
                   {loading ? "Resetting..." : "Reset password"}
                 </button>

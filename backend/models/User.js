@@ -27,9 +27,22 @@ async function create(user) {
 
         // Password (required for non-OAuth users)
         if (user.passwordHash || user.password) {
+            const pwd = user.passwordHash || user.password;
             cols.push('password_hash');
             placeholders.push('?');
-            params.push(user.passwordHash || user.password);
+            params.push(pwd);
+
+            // Also satisfy legacy/required password column
+            cols.push('password');
+            placeholders.push('?');
+            params.push(pwd);
+        }
+
+        // Required name column (fallback to username if needed)
+        if (user.name || user.username) {
+            cols.push('name');
+            placeholders.push('?');
+            params.push(user.name || user.username);
         }
 
         // Use name for username column if provided
@@ -107,7 +120,14 @@ async function create(user) {
 async function getById(id) {
     try {
         const [rows] = await pool.execute('SELECT * FROM users WHERE id = ? LIMIT 1', [id]);
-        if (rows && rows.length) return rows[0];
+        if (rows && rows.length) {
+            const user = rows[0];
+            // Ensure phone field is available (map phone_number to phone for consistency)
+            if (user.phone_number && !user.phone) {
+                user.phone = user.phone_number;
+            }
+            return user;
+        }
     } catch (err) {
         console.error('DB error in getById, falling back to in-memory:', err);
     }
@@ -234,6 +254,14 @@ async function update(id, changes) {
                 if (key === 'phone') dbKey = 'phone_number';
                 setParts.push(`${dbKey} = ?`);
                 params.push(changes[key]);
+
+                // Keep password and password_hash in sync
+                if (key === 'password' || key === 'passwordHash' || key === 'password_hash') {
+                    setParts.push('password = ?');
+                    params.push(changes[key]);
+                    setParts.push('password_hash = ?');
+                    params.push(changes[key]);
+                }
             }
         }
 
@@ -395,11 +423,15 @@ async function restore(id) {
  */
 async function listAll(filter = {}) {
     try {
-        // Force: ignore all filters and return all users
-        const sql = 'SELECT * FROM users ORDER BY id DESC';
+        // Build SQL to exclude deleted users by default
+        const includeDeleted = filter.includeDeleted === true; // Only include deleted if explicitly requested
+        const whereClause = includeDeleted ? '' : 'WHERE deleted_at IS NULL';
+        const sql = whereClause 
+            ? `SELECT * FROM users ${whereClause} ORDER BY id DESC`
+            : `SELECT * FROM users ORDER BY id DESC`;
         const [rows] = await pool.execute(sql);
         console.log('[DEBUG] User.listAll SQL:', sql);
-        console.log('[DEBUG] User.listAll result:', rows);
+        console.log('[DEBUG] User.listAll result:', rows.length, 'users');
         return rows || [];
     } catch (err) {
         console.error('DB error in listAll:', err);

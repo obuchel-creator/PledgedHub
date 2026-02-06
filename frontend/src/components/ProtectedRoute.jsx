@@ -47,9 +47,12 @@ const ProtectedRoute = ({
     );
   }
   
-  // After loading is complete, check if user has token
-  if (!token) {
-    console.log('🔐 ProtectedRoute: No token, redirecting to login');
+  // STRICT: After loading is complete, check if user has BOTH token AND user data
+  if (!token || !user) {
+    console.log('🔐 ProtectedRoute: Access denied - Missing token or user data', { 
+      hasToken: !!token, 
+      hasUser: !!user 
+    });
     return <Navigate to="/login" replace />;
   }
 

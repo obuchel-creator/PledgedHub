@@ -11,10 +11,16 @@ const accountingService = require('../services/accountingService');
 const financialReportsService = require('../services/financialReportsService');
 
 /**
+ * Finance staff middleware - requires finance_admin or accounting access
+ */
+const requireFinance = requireRole(['finance_admin', 'super_admin']);
+
+/**
  * GET /api/accounting/accounts
  * Get all accounts in Chart of Accounts
+ * Requires: finance_admin, super_admin, or admin role
  */
-router.get('/accounts', authenticateToken, async (req, res) => {
+router.get('/accounts', authenticateToken, requireFinance, async (req, res) => {
   try {
     const { type, includeBalances } = req.query;
     
@@ -39,8 +45,9 @@ router.get('/accounts', authenticateToken, async (req, res) => {
 /**
  * GET /api/accounting/accounts/:id
  * Get specific account with balance
+ * Requires: finance_admin, super_admin, or admin role
  */
-router.get('/accounts/:id', authenticateToken, async (req, res) => {
+router.get('/accounts/:id', authenticateToken, requireFinance, async (req, res) => {
   try {
     const { asOfDate } = req.query;
     const account = await Account.getWithBalance(
@@ -61,9 +68,10 @@ router.get('/accounts/:id', authenticateToken, async (req, res) => {
 
 /**
  * POST /api/accounting/accounts
- * Create new account (Admin only)
+ * Create new account (Finance/Admin only)
+ * Requires: finance_admin, super_admin, or admin role
  */
-router.post('/accounts', authenticateToken, requireAdmin, async (req, res) => {
+router.post('/accounts', authenticateToken, requireFinance, async (req, res) => {
   try {
     const { code, name, type, parent_id, description } = req.body;
     
@@ -89,9 +97,10 @@ router.post('/accounts', authenticateToken, requireAdmin, async (req, res) => {
 
 /**
  * PUT /api/accounting/accounts/:id
- * Update account (Admin only)
+ * Update account (Admin/Finance only)
+ * Requires: finance_admin, super_admin, or admin role
  */
-router.put('/accounts/:id', authenticateToken, requireAdmin, async (req, res) => {
+router.put('/accounts/:id', authenticateToken, requireFinance, async (req, res) => {
   try {
     const { name, description, is_active } = req.body;
     const updates = {};
@@ -116,8 +125,9 @@ router.put('/accounts/:id', authenticateToken, requireAdmin, async (req, res) =>
 /**
  * GET /api/accounting/journal-entries
  * Get journal entries with filters
+ * Requires: finance_admin, super_admin, or admin role
  */
-router.get('/journal-entries', authenticateToken, requireStaff, async (req, res) => {
+router.get('/journal-entries', authenticateToken, requireFinance, async (req, res) => {
   try {
     const { startDate, endDate, accountId, reference, status, limit, offset } = req.query;
     
@@ -165,7 +175,7 @@ router.get('/journal-entries/:id', authenticateToken, requireStaff, async (req, 
  * POST /api/accounting/journal-entries
  * Create manual journal entry (Admin only)
  */
-router.post('/journal-entries', authenticateToken, requireAdmin, async (req, res) => {
+router.post('/journal-entries', authenticateToken, requireFinance, async (req, res) => {
   try {
     const { date, description, reference, lines } = req.body;
     
@@ -199,7 +209,7 @@ router.post('/journal-entries', authenticateToken, requireAdmin, async (req, res
  * POST /api/accounting/journal-entries/:id/void
  * Void journal entry (Admin only)
  */
-router.post('/journal-entries/:id/void', authenticateToken, requireAdmin, async (req, res) => {
+router.post('/journal-entries/:id/void', authenticateToken, requireFinance, async (req, res) => {
   try {
     const { reason } = req.body;
     
@@ -260,7 +270,7 @@ router.get('/ledger/:accountId', authenticateToken, requireStaff, async (req, re
  * GET /api/accounting/reports/balance-sheet
  * Generate Balance Sheet
  */
-router.get('/reports/balance-sheet', authenticateToken, requireStaff, async (req, res) => {
+router.get('/reports/balance-sheet', authenticateToken, requireFinance, async (req, res) => {
   try {
     const { asOfDate } = req.query;
     const result = await financialReportsService.generateBalanceSheet(
@@ -282,7 +292,7 @@ router.get('/reports/balance-sheet', authenticateToken, requireStaff, async (req
  * GET /api/accounting/reports/income-statement
  * Generate Income Statement (P&L)
  */
-router.get('/reports/income-statement', authenticateToken, requireStaff, async (req, res) => {
+router.get('/reports/income-statement', authenticateToken, requireFinance, async (req, res) => {
   try {
     const { startDate, endDate } = req.query;
     
@@ -313,7 +323,7 @@ router.get('/reports/income-statement', authenticateToken, requireStaff, async (
  * GET /api/accounting/reports/trial-balance
  * Generate Trial Balance
  */
-router.get('/reports/trial-balance', authenticateToken, requireStaff, async (req, res) => {
+router.get('/reports/trial-balance', authenticateToken, requireFinance, async (req, res) => {
   try {
     const { asOfDate } = req.query;
     const result = await financialReportsService.generateTrialBalance(
@@ -335,7 +345,7 @@ router.get('/reports/trial-balance', authenticateToken, requireStaff, async (req
  * GET /api/accounting/reports/cash-flow
  * Generate Cash Flow Statement
  */
-router.get('/reports/cash-flow', authenticateToken, requireStaff, async (req, res) => {
+router.get('/reports/cash-flow', authenticateToken, requireFinance, async (req, res) => {
   try {
     const { startDate, endDate } = req.query;
     
@@ -366,7 +376,7 @@ router.get('/reports/cash-flow', authenticateToken, requireStaff, async (req, re
  * GET /api/accounting/reports/ar-aging
  * Generate Accounts Receivable Aging Report
  */
-router.get('/reports/ar-aging', authenticateToken, requireStaff, async (req, res) => {
+router.get('/reports/ar-aging', authenticateToken, requireFinance, async (req, res) => {
   try {
     const { asOfDate } = req.query;
     const result = await financialReportsService.generateARAgingReport(
@@ -388,7 +398,7 @@ router.get('/reports/ar-aging', authenticateToken, requireStaff, async (req, res
  * GET /api/accounting/reports/dashboard
  * Get financial dashboard summary
  */
-router.get('/reports/dashboard', authenticateToken, requireStaff, async (req, res) => {
+router.get('/reports/dashboard', authenticateToken, requireFinance, async (req, res) => {
   try {
     const result = await financialReportsService.generateDashboard();
     

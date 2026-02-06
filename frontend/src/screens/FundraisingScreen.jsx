@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Toast from '../components/Toast';
+import { formatFormErrorMessage } from '../utils/formErrors';
 import './FundraisingScreen.css';
 
 export default function FundraisingScreen() {
@@ -37,10 +38,14 @@ export default function FundraisingScreen() {
       setCampaigns(data.campaigns || []);
       setError(null);
     } catch (err) {
-      setError(err.message);
+      const errorMsg = formatFormErrorMessage(
+        err?.message || 'Failed to load campaigns',
+        'Unable to load fundraising campaigns. Please check your connection and try again.'
+      );
+      setError(errorMsg);
       setToast({
         type: 'error',
-        message: 'Failed to load fundraising campaigns',
+        message: errorMsg,
         duration: 4000
       });
     } finally {
@@ -149,7 +154,8 @@ export default function FundraisingScreen() {
       {/* Error State */}
       {error && !loading && (
         <div className="error-container">
-          <p className="error-message">⚠️ {error}</p>
+          <div className="error-icon">⚠️</div>
+          <p className="error-message">{error}</p>
           <button className="btn btn-secondary" onClick={fetchCampaigns}>
             Try Again
           </button>

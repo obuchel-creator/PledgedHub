@@ -6,6 +6,25 @@ async function batchCreatePledges(req, res) {
         if (!pledges.length) {
             return res.status(400).json({ error: 'No pledges provided' });
         }
+        
+        // SaaS: Get tenant context
+        const tenantId = req.tenant?.id || req.user?.tenant_id;
+        if (!tenantId) {
+            return res.status(400).json({
+                success: false,
+                error: 'Tenant context required'
+            });
+        }
+        
+        // Privacy: Get user_id for ownership tracking
+        const userId = req.user?.id;
+        if (!userId) {
+            return res.status(400).json({
+                success: false,
+                error: 'User authentication required'
+            });
+        }
+        
         // Validate and prepare values
         const validPledges = pledges.filter(p => p && p.amount && !isNaN(Number(p.amount)));
         if (!validPledges.length) {
@@ -13,6 +32,9 @@ async function batchCreatePledges(req, res) {
         }
         // Prepare bulk insert
         const values = validPledges.map(p => [
+            tenantId,  // SaaS: Include tenant_id
+            userId,    // Privacy: Include created_by
+            userId,    // Privacy: Include created_by
             p.campaign_id || null,
             p.donor_name || p.donorName || 'Anonymous',
             p.donor_email || null,
@@ -23,12 +45,13 @@ async function batchCreatePledges(req, res) {
             p.status || 'pending',
             null,
             p.purpose || p.message || '',
+            true, // is_private - default to private
             0 // deleted
         ]);
         const insertSql = `INSERT INTO pledges (
-            campaign_id, donor_name, donor_email, donor_phone, 
-            purpose, collection_date, amount, status, payment_method, notes, deleted, created_at
-        ) VALUES ${values.map(() => '(?,?,?,?,?,?,?,?,?,?,?,NOW())').join(',')}`;
+            tenant_id, created_by, campaign_id, donor_name, donor_email, donor_phone, 
+            purpose, collection_date, amount, status, payment_method, notes, is_private, deleted, created_at
+        ) VALUES ${values.map(() => '(?,?,?,?,?,?,?,?,?,?,?,?,?,?,NOW())').join(',')}`;
         const flatValues = values.flat();
         const [result] = await pool.execute(insertSql, flatValues);
         return res.status(201).json({ success: true, inserted: result.affectedRows });
@@ -124,9 +147,93 @@ async function createPledge(req, res) {
         // Always use the Pledge model for creation to ensure field mapping and DB consistency
         // Note: pledges table does NOT have 'title' or 'name' columns - only donor_name, purpose, etc.
         // Only allow valid pledge fields
+        
+        // SaaS: Get tenant_id from request context
+        const tenantId = req.tenant?.id || req.user?.tenant_id;
+        if (!tenantId) {
+            return res.status(401).json({
+                success: false,
+                error: 'Your session has expired or is invalid. Please logout and login again to refresh your credentials.'
+            });
+        }
+        
+        // Privacy: Get user_id for ownership tracking
+        const userId = req.user?.id;
+        if (!userId) {
+            return res.status(400).json({
+                success: false,
+                error: 'User authentication required. Please log in.'
+            });
+        }
+
+        // Get logged-in user's registered name for validation
+        const loggedInUserName = req.user?.name;
+        if (!loggedInUserName) {
+            return res.status(400).json({
+                success: false,
+                error: 'Unable to retrieve your registered name. Please log out and log back in.'
+            });
+        }
+
+        // Pledge Name Validation: Must match logged-in user's registered name
+        const submittedName = typeof donor_name === 'string' ? donor_name.trim() : '';
+        if (!submittedName) {
+            return res.status(400).json({
+                success: false,
+                error: 'Pledge name is required.'
+            });
+        }
+
+        // Strict name matching - names must match exactly (case-insensitive comparison)
+        if (submittedName.toLowerCase() !== loggedInUserName.trim().toLowerCase()) {
+            return res.status(400).json({
+                success: false,
+                error: `Pledge name must match your registered name (${loggedInUserName}). Individual pledges can only be created under your own account for data integrity and accountability.`
+            });
+        }
+
+        // Phone Number Validation: Check if phone matches user's registered phone
+        // Get logged-in user's registered phone for validation
+        const loggedInUserPhone = req.user?.phone || req.user?.phone_number;
+        const submittedPhone = typeof donor_phone === 'string' ? donor_phone.trim() : '';
+        
+        // Normalize phone numbers for comparison (remove spaces, dashes, and +)
+        const normalizePhone = (phone) => {
+            if (!phone) return '';
+            return phone.replace(/[\s\-\+]/g, '');
+        };
+        
+        const normalizedSubmittedPhone = normalizePhone(submittedPhone);
+        const normalizedUserPhone = normalizePhone(loggedInUserPhone);
+        
+        // Configuration: Check if strict phone validation is enabled
+        const strictPhoneValidation = process.env.ENABLE_STRICT_PHONE_VALIDATION === 'true';
+        
+        if (normalizedUserPhone && normalizedSubmittedPhone !== normalizedUserPhone) {
+            // Phone numbers don't match
+            if (strictPhoneValidation) {
+                // Strict mode: Reject the pledge
+                return res.status(400).json({
+                    success: false,
+                    error: `Phone number must match your registered phone (${loggedInUserPhone}). Individual pledges can only be created with your registered phone number for verification and accountability.`,
+                    details: {
+                        registeredPhone: loggedInUserPhone,
+                        submittedPhone: submittedPhone
+                    }
+                });
+            } else {
+                // Flexible mode: Log warning but allow the pledge
+                console.warn(`⚠️  [PLEDGE CREATE] Phone mismatch - User ID: ${userId}, Registered: ${loggedInUserPhone}, Submitted: ${submittedPhone}`);
+                console.warn(`⚠️  [PLEDGE CREATE] Allowing pledge with different phone number (flexible mode enabled)`);
+            }
+        }
+        
         const payload = {
+            tenant_id: tenantId,  // SaaS: Always include tenant_id
+            created_by: userId,   // Privacy: Track ownership
+            is_private: req.body.is_private !== undefined ? req.body.is_private : true, // Default private
             campaign_id: typeof campaign_id !== 'undefined' ? campaign_id : null,
-            donor_name: typeof donor_name === 'string' ? donor_name : 'Anonymous',
+            donor_name: submittedName,  // Use validated name
             donor_email: typeof donor_email === 'string' ? donor_email : null,
             donor_phone: typeof donor_phone === 'string' ? donor_phone : null,
             purpose: typeof purpose === 'string' ? purpose : (typeof message === 'string' ? message : ''),
@@ -186,7 +293,17 @@ const { pool } = require('../config/db');
 async function getPledge(req, res) {
     try {
         const id = parseInt(req.params.id, 10);
-        // Fetch pledge details
+        
+        // SaaS: Get tenant context
+        const tenantId = req.tenant?.id || req.user?.tenant_id;
+        if (!tenantId) {
+            return res.status(400).json({
+                success: false,
+                error: 'Tenant context required'
+            });
+        }
+        
+        // Fetch pledge details with tenant filter
         const [pledges] = await pool.execute(
             `SELECT 
                 id,
@@ -209,8 +326,8 @@ async function getPledge(req, res) {
                 payment_reference,
                 created_at,
                 updated_at
-             FROM pledges WHERE id = ? AND deleted = 0 LIMIT 1`,
-            [id]
+             FROM pledges WHERE id = ? AND tenant_id = ? AND deleted = 0 LIMIT 1`,
+            [id, tenantId]
         );
         if (!pledges || !pledges[0]) {
             return res.status(404).json({ success: false, error: 'Pledge not found' });
@@ -246,9 +363,40 @@ async function listPledges(req, res) {
         console.log('🔵 [PLEDGE LIST] Request headers:', req.headers);
         console.log('🔵 [PLEDGE LIST] Request query:', req.query);
         
-        const pledges = await Pledge.list();
+        // SaaS: Get tenant context
+        const tenantId = req.tenant?.id || req.user?.tenant_id;
+        if (!tenantId) {
+            return res.status(400).json({
+                success: false,
+                error: 'Tenant context required'
+            });
+        }
+        
+        // Privacy: Get user context
+        const userId = req.user?.id;
+        const userRole = req.user?.role;
+        
+        // Build filter based on user role
+        const filter = { tenant_id: tenantId };
+        
+        // Admins see all pledges in their tenant
+        if (userRole === 'admin' || userRole === 'super_admin') {
+            // No additional filter - admins see everything
+        }
+        // Staff see their own + organization-shared pledges
+        else if (userRole === 'staff') {
+            filter.created_by = userId;
+            filter.includeOrgPledges = true; // Flag to include non-private pledges
+        }
+        // Regular users see ONLY their own pledges
+        else {
+            filter.created_by = userId;
+        }
+        
+        // Pass filters to list
+        const pledges = await Pledge.list(filter);
         console.log('✅ [PLEDGE LIST] Pledges found:', pledges.length);
-        console.log('🔵 [PLEDGE LIST] Returning pledges:', JSON.stringify(pledges, null, 2));
+        console.log('🔒 [PLEDGE LIST] User role:', userRole, '- Showing', pledges.length, 'pledges');
         
         // Return both formats for compatibility
         return res.status(200).json({ 

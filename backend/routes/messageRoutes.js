@@ -2,13 +2,7 @@ const express = require('express');
 const router = express.Router();
 const messageGenerator = require('../services/messageGenerator');
 const Pledge = require('../models/Pledge');
-
-/**
- * Temporary simple auth middleware
- */
-const simpleAuth = (req, res, next) => {
-    next();
-};
+const { authenticateToken } = require('../middleware/authMiddleware');
 
 /**
  * POST /api/messages/reminder
@@ -22,7 +16,7 @@ const simpleAuth = (req, res, next) => {
  *   language?: 'English'|'Luganda'
  * }
  */
-router.post('/reminder', simpleAuth, async (req, res) => {
+router.post('/reminder', authenticateToken, async (req, res) => {
     try {
         const { pledgeId, type, tone, useAI, language } = req.body;
         
@@ -77,7 +71,7 @@ router.post('/reminder', simpleAuth, async (req, res) => {
  *   useAI?: boolean
  * }
  */
-router.post('/thank-you', simpleAuth, async (req, res) => {
+router.post('/thank-you', authenticateToken, async (req, res) => {
     try {
         const { pledgeId, tone, useAI } = req.body;
         
@@ -130,7 +124,7 @@ router.post('/thank-you', simpleAuth, async (req, res) => {
  *   useAI?: boolean
  * }
  */
-router.post('/follow-up', simpleAuth, async (req, res) => {
+router.post('/follow-up', authenticateToken, async (req, res) => {
     try {
         const { pledgeId, approach, useAI } = req.body;
         
@@ -183,7 +177,7 @@ router.post('/follow-up', simpleAuth, async (req, res) => {
  *   style?: 'standard'|'detailed'
  * }
  */
-router.post('/confirmation', simpleAuth, async (req, res) => {
+router.post('/confirmation', authenticateToken, async (req, res) => {
     try {
         const { pledgeId, style } = req.body;
         
@@ -237,7 +231,7 @@ router.post('/confirmation', simpleAuth, async (req, res) => {
  *   options: {...}
  * }
  */
-router.post('/bulk', simpleAuth, async (req, res) => {
+router.post('/bulk', authenticateToken, async (req, res) => {
     try {
         const { pledgeIds, messageType, options } = req.body;
         
@@ -301,7 +295,7 @@ router.post('/bulk', simpleAuth, async (req, res) => {
  * GET /api/messages/templates
  * Get available message templates
  */
-router.get('/templates', simpleAuth, (req, res) => {
+router.get('/templates', authenticateToken, (req, res) => {
     res.json({
         success: true,
         templates: {

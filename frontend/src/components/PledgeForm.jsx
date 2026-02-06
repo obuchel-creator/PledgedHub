@@ -28,25 +28,25 @@ const PledgeForm = ({ onSubmit, onCancel, initialData = {}, loading = false, use
     const newErrors = {};
 
     if (!formData.title.trim()) {
-      newErrors.title = 'Title is required';
+      newErrors.title = 'Please enter a title.';
     }
 
     const amount = parseFloat(formData.amount);
     if (!formData.amount || isNaN(amount) || amount <= 0) {
-      newErrors.amount = 'Valid amount is required';
+      newErrors.amount = 'Please enter a valid amount.';
     }
 
     if (!formData.donor_name.trim()) {
-      newErrors.donor_name = 'Donor name is required';
+      newErrors.donor_name = "Please enter the donor's name.";
     }
 
     // Phone is required
     if (!formData.phone.trim()) {
-      newErrors.phone = 'Phone number is required';
+      newErrors.phone = 'Please enter a phone number.';
     } else {
       const phoneRegex = /^\+\d{9,15}$/;
       if (!phoneRegex.test(formData.phone.trim())) {
-        newErrors.phone = 'Phone must be in format: +256771234567';
+        newErrors.phone = 'Please enter a valid phone number (e.g., +256771234567).';
       }
     }
 
@@ -54,7 +54,7 @@ const PledgeForm = ({ onSubmit, onCancel, initialData = {}, loading = false, use
     if (formData.email && formData.email.trim()) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(formData.email.trim())) {
-        newErrors.email = 'Please enter a valid email address';
+        newErrors.email = 'Please enter a valid email address.';
       }
     }
 

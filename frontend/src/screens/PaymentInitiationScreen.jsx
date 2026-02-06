@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import PINDialog from '../components/PINDialog';
 import Toast from '../components/Toast';
 import './PaymentInitiationScreen.css';
+import { formatFormErrorMessage } from '../utils/formErrors';
 
 export default function PaymentInitiationScreen({ pledgeId, pledgeAmount, onSuccess, onCancel }) {
     const { token } = useAuth();
@@ -106,12 +107,12 @@ export default function PaymentInitiationScreen({ pledgeId, pledgeAmount, onSucc
     // Step 2: Validate phone and proceed
     const handlePhoneNext = () => {
         if (!validatePhoneNumber(phoneNumber)) {
-            setError('Please enter a valid Uganda phone number (256 77/78/70/75 + 7 digits)');
+            setError('Please enter a valid Uganda phone number (e.g., 256701234567).');
             return;
         }
 
         if (selectedPaymentMethod !== 'mtn' && selectedPaymentMethod !== 'airtel') {
-            setError('Please select MTN or Airtel for this phone number');
+            setError('Please select MTN or Airtel for this phone number.');
             return;
         }
 
@@ -175,7 +176,7 @@ export default function PaymentInitiationScreen({ pledgeId, pledgeAmount, onSucc
                 // Handle PIN-related errors
                 if (response.status === 400 && data.pinRequired) {
                     setShowPINDialog(true);
-                    setError('PIN required for this amount');
+                    setError('PIN is required for this amount.');
                     setLoading(false);
                     return;
                 } else if (response.status === 401) {
@@ -201,7 +202,7 @@ export default function PaymentInitiationScreen({ pledgeId, pledgeAmount, onSucc
                 if (onSuccess) onSuccess(data.data);
             }, 2000);
         } catch (err) {
-            setError(err.message || 'Failed to initiate payment');
+            setError(formatFormErrorMessage(err.message || 'Failed to initiate payment', 'Failed to initiate payment. Please try again.'));
             console.error('Payment error:', err);
         } finally {
             setLoading(false);

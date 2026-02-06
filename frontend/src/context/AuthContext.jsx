@@ -34,11 +34,41 @@ export function AuthProvider({ children }) {
     }
     try {
       console.log('🔐 AuthContext: Fetching user data...');
-      const data = await getCurrentUser();
-      console.log('🔐 AuthContext: User fetched successfully:', data?.user?.username || data?.username);
-      // Normalize user object for frontend
-      let userObj = data && data.user ? data.user : data;
-      if (userObj) {
+      const response = await getCurrentUser();
+      console.log('🔐 AuthContext: Full response:', response);
+      
+      // Check if response indicates an error (401, 403, token expired, etc)
+      if (response && response.success === false) {
+        console.error('🔐 AuthContext: Server returned error:', response.error);
+        // Token is invalid, clear it
+        setUser(null);
+        setToken(null);
+        localStorage.removeItem(TOKEN_KEY);
+        setLoading(false);
+        setInitialized(true);
+        return null;
+      }
+
+      if (response && response.status && response.status >= 400) {
+        console.error('🔐 AuthContext: Server error response, status:', response.status);
+        // Token is invalid, clear it
+        setUser(null);
+        setToken(null);
+        localStorage.removeItem(TOKEN_KEY);
+        setLoading(false);
+        setInitialized(true);
+        return null;
+      }
+      
+      // handleRequest wraps the backend response in { data: {...} }
+      // Backend returns { success: true, user: {...} }
+      // So the user is at response.data.user
+      const data = response?.data || response;
+      const userObj = data?.user || data;
+      
+      console.log('🔐 AuthContext: User fetched successfully:', userObj?.name || userObj?.username);
+      
+      if (userObj && userObj.id) {
         // Ensure phone field is set
         if (!userObj.phone && userObj.phone_number) {
           userObj.phone = userObj.phone_number;
@@ -47,14 +77,18 @@ export function AuthProvider({ children }) {
         if (!userObj.role) {
           userObj.role = 'user';
         }
+        setUser(userObj);
+      } else {
+        console.warn('🔐 AuthContext: Invalid user object:', userObj);
+        setUser(null);
       }
-      setUser(userObj);
       setLoading(false);
       setInitialized(true);
       return userObj;
     } catch (err) {
       console.error('🔐 AuthContext: Error refreshing user:', err.message);
-      // token likely invalid
+      // token likely invalid or network error
+      console.log('🔐 AuthContext: Clearing invalid token');
       setUser(null);
       setToken(null);
       localStorage.removeItem(TOKEN_KEY);
@@ -68,6 +102,7 @@ export function AuthProvider({ children }) {
     // on mount, verify token validity if token exists
     console.log('🔐 AuthContext: useEffect mounting, token:', token ? '✓' : '✗');
     if (token) {
+      // Verify token is still valid by fetching user
       refreshUser();
     } else {
       setLoading(false);
@@ -75,6 +110,19 @@ export function AuthProvider({ children }) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Add effect to monitor token changes and clear invalid tokens
+  useEffect(() => {
+    const validateToken = async () => {
+      if (token && !user && !loading && initialized) {
+        // Token exists but no user data - token is invalid
+        console.log('🔐 AuthContext: Token exists but user is null - clearing invalid token');
+        setToken(null);
+        localStorage.removeItem(TOKEN_KEY);
+      }
+    };
+    validateToken();
+  }, [token, user, loading, initialized]);
 
   async function login(credentials = {}) {
     // credentials: { email, password } or { username, password }
@@ -91,13 +139,27 @@ export function AuthProvider({ children }) {
       const newToken = data && (data.token || data.accessToken);
       if (newToken) {
         console.log('🔐 AuthContext: Login successful, token received');
+        console.log('🔐 AuthContext: User data in response:', data.user);
         localStorage.setItem(TOKEN_KEY, newToken);
         setToken(newToken);
-        // Try to fetch user, but if it fails, set a minimal user object
-        const userData = await refreshUser();
-        if (!userData || !userData.user) {
-          if (data.user) setUser(data.user);
-          else setUser({ email: credentials.email }); // fallback minimal user
+        // Use user data from login response directly
+        if (data.user) {
+          // Normalize user object
+          const userObj = { ...data.user };
+          if (!userObj.phone && userObj.phone_number) {
+            userObj.phone = userObj.phone_number;
+          }
+          if (!userObj.role) {
+            userObj.role = 'user';
+          }
+          console.log('🔐 AuthContext: Setting user state:', userObj);
+          setUser(userObj);
+          setLoading(false);
+          setInitialized(true);
+          console.log('🔐 AuthContext: User data set successfully, name:', userObj.name, 'role:', userObj.role);
+        } else {
+          console.warn('🔐 AuthContext: No user data in login response!');
+          setLoading(false);
         }
         return data;
       } else if (data && data.user) {

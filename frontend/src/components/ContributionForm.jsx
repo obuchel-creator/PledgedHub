@@ -1,5 +1,6 @@
 
 import React, { useState, useRef, useEffect } from 'react';
+import { formatFormErrorMessage } from '../utils/formErrors';
 
 // Error boundary for debugging
 class ErrorBoundary extends React.Component {
@@ -41,7 +42,28 @@ function ContributionFormInner(props) {
     e.preventDefault();
     setSubmitError('');
     setSuccessMsg('');
+    const amountValue = parseFloat(amount);
+    if (!amount || Number.isNaN(amountValue) || amountValue <= 0) {
+      setSubmitError('Please enter a valid amount.');
+      amountInputRef.current?.focus();
+      return;
+    }
+    if (!donorName.trim()) {
+      setSubmitError('Please enter your name.');
+      return;
+    }
+    if (!donorPhone.trim()) {
+      setSubmitError('Please enter a phone number.');
+      return;
+    }
+    const phoneClean = donorPhone.replace(/[\s\-\(\)]/g, '');
+    const phoneRegex = /^256\d{9}$/;
+    if (!phoneRegex.test(phoneClean)) {
+      setSubmitError('Please enter a valid phone number (e.g., 256771234567).');
+      return;
+    }
     // TODO: Add real submission logic here
+    setSuccessMsg('Contribution received. Thank you!');
   };
 
   return (
@@ -99,7 +121,7 @@ function ContributionFormInner(props) {
       </div>
       {/* Show error/success messages above the button, always visible */}
       <div style={{ minHeight: 32, marginBottom: 8 }}>
-        {submitError && <div className="form-error" style={{ color: '#dc2626', fontWeight: 600 }}>{submitError}</div>}
+        {submitError && <div className="form-error" style={{ color: '#dc2626', fontWeight: 600 }}>{formatFormErrorMessage(submitError)}</div>}
         {successMsg && <div className="alert alert-success" style={{ color: '#059669', fontWeight: 600 }}>{successMsg}</div>}
       </div>
       <button type="submit" className="btn btn-primary btn-block" disabled={isSubmitting} style={{ marginTop: 10, borderRadius: 8, fontWeight: 700, fontSize: '1.08rem' }}>

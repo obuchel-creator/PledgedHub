@@ -99,7 +99,9 @@ async function getPayment(req, res) {
 }
 
 async function listPayments(req, res) {
-    const { userId, pledgeId } = req.query || {};
+    // Parse ALL parameters as integers to avoid type mismatch
+    const userId = req.query.userId ? parseInt(req.query.userId, 10) : null;
+    const pledgeId = req.query.pledgeId ? parseInt(req.query.pledgeId, 10) : null;
     const limit = Math.min(1000, Math.max(1, parseInt(req.query.limit, 10) || 100));
     const offset = Math.max(0, parseInt(req.query.offset, 10) || 0);
 

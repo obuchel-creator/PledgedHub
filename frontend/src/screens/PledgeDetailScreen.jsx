@@ -72,6 +72,26 @@ export default function PledgeDetailScreen(props) {
         });
   };
 
+  const formatDateTime = (value) => {
+    if (!value) return '--';
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return '--';
+    
+    const dateStr = date.toLocaleDateString('en-UG', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
+    
+    const timeStr = date.toLocaleTimeString('en-UG', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+    });
+    
+    return `${dateStr} at ${timeStr}`;
+  };
+
   useEffect(() => {
     let canceled = false;
 
@@ -143,6 +163,11 @@ export default function PledgeDetailScreen(props) {
     event.preventDefault();
     setDonationFeedback({ type: '', text: '' });
 
+    if (!user || !user.id) {
+      setDonationFeedback({ type: 'error', text: 'Please sign in to record a payment.' });
+      return;
+    }
+
     if (!id) {
       setDonationFeedback({ type: 'error', text: 'Unable to determine pledge id.' });
       return;
@@ -161,11 +186,17 @@ export default function PledgeDetailScreen(props) {
         throw new Error('createPayment is not available.');
       }
 
-      await api.createPayment({
+      const result = await api.createPayment({
+        userId: user?.id,
         pledgeId: id,
         amount,
-        donorName: donorName.trim() || 'Anonymous',
+        paymentMethod: 'cash', // Default to cash for manual payment recording
       });
+
+      // Check if API returned an error (handleRequest returns { success: false } instead of throwing)
+      if (result && result.success === false) {
+        throw new Error(result.error || 'Failed to record payment');
+      }
 
       setDonationFeedback({ type: 'success', text: 'Thank you! The donation has been recorded.' });
       setDonationAmount('');
@@ -291,7 +322,20 @@ export default function PledgeDetailScreen(props) {
       ]);
       setPledge(updatedPledge || null);
       setPayments(Array.isArray(updatedPayments) ? updatedPayments : []);
-      setDonationFeedback({ type: 'success', text: 'Payment recorded successfully!' });
+      setDonationFeedback({ type: 'success', text: '✅ Payment recorded successfully! Check Payment History below.' });
+      
+      // Close the modal first
+      setShowPaymentModal(false);
+      
+      // Scroll to top so user sees the success message and payment history
+      setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }, 200);
+      
+      // Clear feedback after 10 seconds
+      setTimeout(() => {
+        setDonationFeedback({ type: '', text: '' });
+      }, 10000);
     } catch (err) {
       console.error('Failed to refresh data:', err);
     }
@@ -375,6 +419,57 @@ export default function PledgeDetailScreen(props) {
 
   return (
     <main className="page page--narrow" aria-labelledby="pledge-title" style={{ background: 'var(--bg-base)', backgroundImage: 'var(--gradient-1), var(--gradient-2), var(--gradient-3)', backgroundAttachment: 'fixed', minHeight: '100vh' }}>
+      {/* Success/Error Banner - Always visible at top */}
+      {donationFeedback.text && (
+        <div
+          style={{
+            position: 'sticky',
+            top: 0,
+            zIndex: 100,
+            margin: '-1rem -1rem 1.5rem -1rem',
+            padding: '1rem 1.5rem',
+            borderRadius: '12px',
+            background: donationFeedback.type === 'success' 
+              ? 'linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%)' 
+              : 'linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)',
+            border: `2px solid ${donationFeedback.type === 'success' ? '#10b981' : '#ef4444'}`,
+            color: donationFeedback.type === 'success' ? '#065f46' : '#991b1b',
+            fontSize: '1rem',
+            fontWeight: '600',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '1rem',
+          }}
+          role="alert"
+          aria-live="polite"
+        >
+          <span style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <span style={{ fontSize: '1.5rem' }}>
+              {donationFeedback.type === 'success' ? '✅' : '❌'}
+            </span>
+            {donationFeedback.text}
+          </span>
+          <button
+            onClick={() => setDonationFeedback({ type: '', text: '' })}
+            style={{
+              background: 'rgba(0, 0, 0, 0.1)',
+              border: 'none',
+              borderRadius: '6px',
+              padding: '0.25rem 0.75rem',
+              cursor: 'pointer',
+              fontSize: '0.875rem',
+              fontWeight: '600',
+              color: 'inherit',
+            }}
+            aria-label="Dismiss message"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+
       {/* Custom Notification Modal */}
       {showNotificationModal && (
         <div
@@ -1254,7 +1349,7 @@ export default function PledgeDetailScreen(props) {
             {payments.map((payment, index) => {
               const key = payment?.id || payment?._id || `${payment?.amount || 'amount'}-${index}`;
               const amount = formatCurrency(payment?.amount);
-              const paymentDate = formatDate(payment?.payment_date || payment?.date || payment?.createdAt);
+              const paymentDateTime = formatDateTime(payment?.payment_date || payment?.date || payment?.createdAt);
               const method = payment?.payment_method || payment?.method || 'Cash';
               const status = payment?.verification_status || payment?.status || 'Pending';
               const reference = payment?.reference_number || payment?.receipt_number || '';
@@ -1266,7 +1361,7 @@ export default function PledgeDetailScreen(props) {
                       {amount} - {method}
                     </span>
                     <span className="list-item__subtitle">
-                      {paymentDate}
+                      {paymentDateTime}
                       {reference && ` • Ref: ${reference}`}
                     </span>
                     <span 

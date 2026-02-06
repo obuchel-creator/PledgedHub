@@ -48,14 +48,11 @@ async function createHttpClient() {
       const url = buildUrl(path, config.params);
       const headers = { 'Content-Type': 'application/json', ...(config.headers || {}) };
       
-      // Add auth token if available
       const token = localStorage.getItem('pledgehub_token');
-      console.debug('[API] GET Token:', token ? `${token.substring(0, 20)}...` : 'NOT FOUND');
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
       }
 
-      console.debug('🌐 [API] GET Request:', url, { headers });
       try {
         const res = await fetch(url, { method: 'GET', headers });
         const text = await res.text();
@@ -69,10 +66,11 @@ async function createHttpClient() {
           const msg = data?.error || data?.message || res.statusText;
           throw new Error(`${res.status}: ${msg || 'Error'}`);
         }
-        console.log('✅ [API] GET Response:', data);
         return { data };
       } catch (err) {
-        console.error('❌ [API] GET Error:', err);
+        if (import.meta.env.DEV) {
+          console.error('GET Error:', err);
+        }
         throw err;
       }
     },
@@ -81,29 +79,18 @@ async function createHttpClient() {
       const url = buildUrl(path, config.params);
       const headers = { 'Content-Type': 'application/json', ...(config.headers || {}) };
       
-      // Add auth token if available
       const token = localStorage.getItem('pledgehub_token');
-      console.debug('[API] POST Token:', token ? `${token.substring(0, 20)}...` : 'NOT FOUND');
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
       }
-
-      console.log('🌐 [API] POST Request starting:', url);
-      console.log('🌐 [API] POST body:', body);
-      console.log('🌐 [API] POST headers:', headers);
       
       try {
-        console.log('🌐 [API] Calling fetch...');
         const res = await fetch(url, {
           method: 'POST',
           headers,
           body: body ? JSON.stringify(body) : undefined
         });
-        console.log('🌐 [API] Fetch returned, status:', res.status);
-        
         const text = await res.text();
-        console.log('🌐 [API] Response text:', text);
-        
         let data;
         try {
           data = text ? JSON.parse(text) : null;
@@ -111,17 +98,15 @@ async function createHttpClient() {
           data = text;
         }
         
-        console.log('🌐 [API] Parsed data:', data);
-        
         if (!res.ok) {
           const msg = data?.error || data?.message || res.statusText;
-          console.error('❌ [API] POST Error Response:', { status: res.status, msg, data });
           throw new Error(`${res.status}: ${msg || 'Error'}`);
         }
-        console.log('✅ [API] POST Response:', data);
         return { data };
       } catch (err) {
-        console.error('❌ [API] POST Error:', err);
+        if (import.meta.env.DEV) {
+          console.error('POST Error:', err);
+        }
         throw err;
       }
     },
@@ -212,33 +197,38 @@ async function getClient() {
 }
 
 function handleRequest(promise) {
-  console.log('[API] handleRequest: called');
   return promise
     .then((res) => {
-      console.log('[API] handleRequest: response', res);
       return res && res.data !== undefined ? res.data : res;
     })
     .catch((err) => {
-      console.error('[API] handleRequest: error', err);
+      // Only log errors in development
+      if (import.meta.env.DEV) {
+        console.error('[API] Error:', err?.message);
+      }
+      
       // axios error shape
       if (err && err.response) {
         const status = err.response.status;
-        // Check for both 'error' and 'message' fields in response data
         const serverMsg =
           err.response.data && (err.response.data.error || err.response.data.message)
             ? (err.response.data.error || err.response.data.message)
             : err.response.statusText || JSON.stringify(err.response.data);
         
-        // Return a structured error object instead of throwing
         return { 
           success: false, 
           error: serverMsg,
           status: status
         };
       }
-      // fetch fallback
+      // fetch fallback - extract original error message
       if (err && err.message) {
-        return { success: false, error: err.message };
+        let errorMsg = err.message;
+        const match = errorMsg.match(/^\d{3}:\s*(.+)$/);
+        if (match) {
+          errorMsg = match[1];
+        }
+        return { success: false, error: errorMsg };
       }
       return { success: false, error: 'An unknown error occurred' };
     });
@@ -399,42 +389,9 @@ export async function resetPassword(token, password) {
 export async function deletePledge(id) {
   if (id === undefined || id === null)
     return Promise.reject(new Error('deletePledge: id is required'));
+
   const client = await getClient();
-
-  // Add delete method to fetch client
-  const url = buildUrl(`pledges/${encodeURIComponent(String(id))}`);
-  const headers = { 'Content-Type': 'application/json' };
-
-  // Get JWT token from localStorage
-  const token = localStorage.getItem('authToken');
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
-
-  try {
-    const res = await fetch(url, {
-      method: 'DELETE',
-      headers,
-    });
-
-    const text = await res.text();
-    let data;
-    try {
-      data = text ? JSON.parse(text) : null;
-    } catch {
-      data = text;
-    }
-
-    if (!res.ok) {
-      const msg = data && typeof data === 'object' && data.message ? data.message : res.statusText;
-      throw new Error(`Request failed: ${res.status} ${msg || 'Error'}`);
-    }
-
-    return data;
-  } catch (err) {
-    console.error('Delete error:', err);
-    throw err;
-  }
+  return handleRequest(client.delete(`pledges/${encodeURIComponent(String(id))}`));
 }
 
 export async function updatePledge(id, data) {
@@ -442,43 +399,8 @@ export async function updatePledge(id, data) {
     return Promise.reject(new Error('updatePledge: id is required'));
   if (!data) return Promise.reject(new Error('updatePledge: data is required'));
 
-  const url = buildUrl(`pledges/${encodeURIComponent(String(id))}`);
-  const headers = { 'Content-Type': 'application/json' };
-
-  // Get JWT token from localStorage
-  const token = localStorage.getItem('authToken');
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
-
-  try {
-    const res = await fetch(url, {
-      method: 'PUT',
-      headers,
-      body: JSON.stringify(data),
-    });
-
-    const text = await res.text();
-    let responseData;
-    try {
-      responseData = text ? JSON.parse(text) : null;
-    } catch {
-      responseData = text;
-    }
-
-    if (!res.ok) {
-      const msg =
-        responseData && typeof responseData === 'object' && responseData.message
-          ? responseData.message
-          : res.statusText;
-      throw new Error(`Request failed: ${res.status} ${msg || 'Error'}`);
-    }
-
-    return responseData;
-  } catch (err) {
-    console.error('Update error:', err);
-    throw err;
-  }
+  const client = await getClient();
+  return handleRequest(client.put(`pledges/${encodeURIComponent(String(id))}`, data));
 }
 
 // Notification functions
@@ -486,73 +408,13 @@ export async function sendPledgeReminder(pledgeId) {
   if (pledgeId === undefined || pledgeId === null)
     return Promise.reject(new Error('sendPledgeReminder: pledgeId is required'));
 
-  const url = buildUrl(`notifications/reminder/${encodeURIComponent(String(pledgeId))}`);
-  const headers = { 'Content-Type': 'application/json' };
-
-  const token = localStorage.getItem('authToken');
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
-
-  try {
-    const res = await fetch(url, {
-      method: 'POST',
-      headers,
-    });
-
-    const text = await res.text();
-    let data;
-    try {
-      data = text ? JSON.parse(text) : null;
-    } catch {
-      data = text;
-    }
-
-    if (!res.ok) {
-      const msg = data && typeof data === 'object' && data.message ? data.message : res.statusText;
-      throw new Error(`Request failed: ${res.status} ${msg || 'Error'}`);
-    }
-
-    return data;
-  } catch (err) {
-    console.error('Send reminder error:', err);
-    throw err;
-  }
+  const client = await getClient();
+  return handleRequest(client.post(`reminders/send/${encodeURIComponent(String(pledgeId))}`, {}));
 }
 
 export async function sendBulkReminders() {
-  const url = buildUrl('notifications/remind-all');
-  const headers = { 'Content-Type': 'application/json' };
-
-  const token = localStorage.getItem('authToken');
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
-
-  try {
-    const res = await fetch(url, {
-      method: 'POST',
-      headers,
-    });
-
-    const text = await res.text();
-    let data;
-    try {
-      data = text ? JSON.parse(text) : null;
-    } catch {
-      data = text;
-    }
-
-    if (!res.ok) {
-      const msg = data && typeof data === 'object' && data.message ? data.message : res.statusText;
-      throw new Error(`Request failed: ${res.status} ${msg || 'Error'}`);
-    }
-
-    return data;
-  } catch (err) {
-    console.error('Send bulk reminders error:', err);
-    throw err;
-  }
+  const client = await getClient();
+  return handleRequest(client.post('notifications/remind-all', {}));
 }
 
 export async function sendCustomNotification(pledgeId, message) {
@@ -560,77 +422,16 @@ export async function sendCustomNotification(pledgeId, message) {
     return Promise.reject(new Error('sendCustomNotification: pledgeId is required'));
   if (!message) return Promise.reject(new Error('sendCustomNotification: message is required'));
 
-  const url = buildUrl(`notifications/custom/${encodeURIComponent(String(pledgeId))}`);
-  const headers = { 'Content-Type': 'application/json' };
-
-  const token = localStorage.getItem('authToken');
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
-
-  try {
-    const res = await fetch(url, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({ message }),
-    });
-
-    const text = await res.text();
-    let data;
-    try {
-      data = text ? JSON.parse(text) : null;
-    } catch {
-      data = text;
-    }
-
-    if (!res.ok) {
-      const msg = data && typeof data === 'object' && data.message ? data.message : res.statusText;
-      throw new Error(`Request failed: ${res.status} ${msg || 'Error'}`);
-    }
-
-    return data;
-  } catch (err) {
-    console.error('Send custom notification error:', err);
-    throw err;
-  }
+  const client = await getClient();
+  return handleRequest(client.post(`notifications/custom/${encodeURIComponent(String(pledgeId))}`, { message }));
 }
 
 export async function sendThankYou(pledgeId) {
   if (pledgeId === undefined || pledgeId === null)
     return Promise.reject(new Error('sendThankYou: pledgeId is required'));
 
-  const url = buildUrl(`notifications/thank-you/${encodeURIComponent(String(pledgeId))}`);
-  const headers = { 'Content-Type': 'application/json' };
-
-  const token = localStorage.getItem('authToken');
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
-
-  try {
-    const res = await fetch(url, {
-      method: 'POST',
-      headers,
-    });
-
-    const text = await res.text();
-    let data;
-    try {
-      data = text ? JSON.parse(text) : null;
-    } catch {
-      data = text;
-    }
-
-    if (!res.ok) {
-      const msg = data && typeof data === 'object' && data.message ? data.message : res.statusText;
-      throw new Error(`Request failed: ${res.status} ${msg || 'Error'}`);
-    }
-
-    return data;
-  } catch (err) {
-    console.error('Send thank you error:', err);
-    throw err;
-  }
+  const client = await getClient();
+  return handleRequest(client.post(`notifications/thank-you/${encodeURIComponent(String(pledgeId))}`, {}));
 }
 
 // ============================================

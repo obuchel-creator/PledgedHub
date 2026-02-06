@@ -96,6 +96,15 @@ function Dashboard() {
     }
   }, [user?.phone, pledgeForm.phone, handlePledgeFieldChange]);
 
+  // Pre-fill name from user profile if available
+  useEffect(() => {
+    if (user?.name && !pledgeForm.fullName) {
+      handlePledgeFieldChange({
+        target: { name: 'fullName', value: user.name },
+      });
+    }
+  }, [user?.name, pledgeForm.fullName, handlePledgeFieldChange]);
+
   if (loading) {
     return (
       <div className="campaigns-container">

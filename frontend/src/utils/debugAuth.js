@@ -9,9 +9,8 @@ export function checkAuth() {
 
   // Check localStorage
   console.log('📦 localStorage keys:', Object.keys(localStorage));
-  console.log('🔑 authToken:', localStorage.getItem('authToken'));
+  console.log('� pledgehub_token:', localStorage.getItem('pledgehub_token'));
   console.log('👤 user:', localStorage.getItem('user'));
-  console.log('🔐 pledgehub_token:', localStorage.getItem('pledgehub_token'));
 
   // Parse and display user
   try {
@@ -22,7 +21,7 @@ export function checkAuth() {
   }
 
   // Test API call
-  const token = localStorage.getItem('authToken');
+  const token = localStorage.getItem('pledgehub_token');
   if (token) {
     console.log('✅ Token exists, testing API call...');
     const API_URL = getViteEnv().API_URL || 'http://localhost:5001/api';

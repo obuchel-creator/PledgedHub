@@ -30,7 +30,10 @@ export default function LoginScreen() {
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
-    setError('');
+    // Clear error when user starts typing again
+    if (error) {
+      setError('');
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -50,51 +53,43 @@ export default function LoginScreen() {
     setError('');
 
     try {
-      console.log('[LoginScreen] 🔐 Attempting login with:', { email: form.email });
       const result = await login({ email: form.email, password: form.password });
       
-      console.log('[LoginScreen] 🔐 Login result received:', result);
-      
-      // Check if login was successful
-      if (result && result.success === false && result.error) {
-        // Error response from handleRequest
-        console.error('[LoginScreen] 🔐 Login API error:', result.error);
-        let errorMsg = result.error;
-        // Make error messages more user-friendly
+      if (result && result.success === false) {
+        const errorMsg = result.error || result.message || 'Login failed. Please check your credentials.';
+        
+        let displayMsg = errorMsg;
         if (typeof errorMsg === 'string') {
           if (errorMsg.toLowerCase().includes('invalid credentials') || 
               errorMsg.toLowerCase().includes('invalid password')) {
-            errorMsg = '❌ Incorrect phone number or password. Please try again.';
+            displayMsg = '❌ Incorrect email/phone or password. Please try again.';
           } else if (errorMsg.toLowerCase().includes('user not found')) {
-            errorMsg = '❌ No account found with this phone number. Please sign up first.';
+            displayMsg = '❌ No account found. Please sign up first.';
           } else if (errorMsg.toLowerCase().includes('too many failed')) {
-            errorMsg = '⏱️ Too many failed attempts. Please try again in 15 minutes.';
+            displayMsg = '⏱️ Too many failed attempts. Please try again in 15 minutes.';
+          } else if (!errorMsg.startsWith('❌') && !errorMsg.startsWith('⏱️')) {
+            displayMsg = '❌ ' + errorMsg;
           }
         }
-        setError(errorMsg);
+        setError(displayMsg);
         setSuccess('');
       } else if (result && result.token) {
-        console.log('[LoginScreen] ✅ Login successful, token received, showing success and redirecting');
         setSuccess('Login successful! Redirecting to dashboard...');
         setError('');
         setTimeout(() => {
           navigate('/dashboard');
-        }, 800); // Show success for 0.8s before redirect
+        }, 800);
       } else if (result && result.user && !result.token) {
-        console.error('[LoginScreen] 🔐 User received but no token');
         setError('Login failed: No authentication token received');
         setSuccess('');
       } else if (!result) {
-        console.error('[LoginScreen] 🔐 No response from login');
         setError('No response from server. Please check your connection.');
         setSuccess('');
       } else {
-        console.error('[LoginScreen] 🔐 Unexpected login response:', result);
         setError(result?.error || 'Login failed. Please check your credentials.');
         setSuccess('');
       }
     } catch (err) {
-      console.error('[LoginScreen] 🔐 Login exception:', err);
       const errorMsg = err?.response?.data?.error || err?.message || 'Login failed. Please try again.';
       setError(errorMsg);
       setSuccess('');

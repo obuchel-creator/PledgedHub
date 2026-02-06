@@ -51,8 +51,13 @@ export default function PaymentModal({ pledge, onClose, onSuccess }) {
         },
       );
 
-      onSuccess?.();
-      onClose();
+      // Call success handler and close after a brief delay to show success state
+      await onSuccess?.();
+      
+      // Close modal after a short delay so user sees the success feedback
+      setTimeout(() => {
+        onClose();
+      }, 100);
     } catch (err) {
       // Try to extract error message from axios, fetch, or plain error
       let backendError = 'Failed to record payment';

@@ -27,7 +27,7 @@ async function recordPayment(pledgeId, amount, paymentMethod = 'cash', userId = 
 
         // Get current pledge info
         const [pledges] = await pool.execute(
-            'SELECT * FROM pledges WHERE id = ? AND deleted_at IS NULL',
+            'SELECT * FROM pledges WHERE id = ? AND deleted = 0',
             [pledgeId]
         );
         
@@ -62,8 +62,8 @@ async function recordPayment(pledgeId, amount, paymentMethod = 'cash', userId = 
         // Record the payment in payments table if it exists
         try {
             await pool.execute(`
-                INSERT INTO payments (user_id, pledge_id, amount, payment_method, status, created_at)
-                VALUES (?, ?, ?, ?, 'completed', NOW())
+                INSERT INTO payments (user_id, pledge_id, amount, payment_method, payment_date, status, created_at)
+                VALUES (?, ?, ?, ?, NOW(), 'completed', NOW())
             `, [userId || pledge.ownerId, pledgeId, amount, paymentMethod]);
         } catch (paymentError) {
             console.warn('Note: Could not record in payments table:', paymentError.message);
@@ -71,7 +71,7 @@ async function recordPayment(pledgeId, amount, paymentMethod = 'cash', userId = 
         
         // Get updated pledge
         const [updated] = await pool.execute(
-            'SELECT * FROM pledges WHERE id = ? AND deleted_at IS NULL',
+            'SELECT * FROM pledges WHERE id = ? AND deleted = 0',
             [pledgeId]
         );
         
@@ -127,7 +127,7 @@ async function sendBalanceReminder(pledgeId, isPaymentConfirmation = false) {
             SELECT p.*, u.username, u.email, u.phone_number
             FROM pledges p
             LEFT JOIN users u ON p.ownerId = u.id
-            WHERE p.id = ? AND p.deleted_at IS NULL
+            WHERE p.id = ? AND p.deleted = 0
         `, [pledgeId]);
         
         if (!pledges || pledges.length === 0) {
@@ -212,7 +212,7 @@ async function sendPaymentConfirmation(pledgeId, amount, remainingBalance) {
             SELECT p.*, u.username, u.email, u.phone_number
             FROM pledges p
             LEFT JOIN users u ON p.ownerId = u.id
-            WHERE p.id = ? AND p.deleted_at IS NULL
+            WHERE p.id = ? AND p.deleted = 0
         `, [pledgeId]);
         
         if (!pledges || pledges.length === 0) {
@@ -358,7 +358,7 @@ async function getPledgesNeedingBalanceReminders(daysSinceLastReminder = 7) {
             LEFT JOIN users u ON p.ownerId = u.id
             WHERE p.balance_remaining > 0
             AND p.status IN ('active', 'pending')
-            AND p.deleted_at IS NULL
+            AND p.deleted = 0
             AND (
                 p.last_balance_reminder IS NULL
                 OR DATEDIFF(NOW(), p.last_balance_reminder) >= ?

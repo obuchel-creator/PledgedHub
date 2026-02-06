@@ -127,6 +127,7 @@ async function protect(req, res, next) {
       id: user.id,
       email: user.email,
       name: user.name || user.username,
+      phone: user.phone,  // Include phone for pledge form auto-population
       role: user.role || 'donor',
       tenant_id: user.tenant_id || decoded.tenant_id  // SaaS: Include tenant context
     };
@@ -184,6 +185,7 @@ async function authenticateToken(req, res, next) {
             id: user.id,
             email: user.email,
             name: user.name || user.username,
+            phone: user.phone,  // Include phone for pledge form auto-population
             role: user.role || user.user_role || 'donor',
             tenant_id: user.tenant_id || decoded.tenant_id  // SaaS: Include tenant context
         };

@@ -75,7 +75,7 @@ function RecentPayments({ payments = [], error = '' }) {
               `Pledge #${payment?.pledge_id || 'N/A'}`;
             const paymentMethod = formatPaymentMethod(payment?.payment_method);
             const date = formatDateTime(
-              payment?.created_at || payment?.createdAt || payment?.date
+              payment?.payment_date || payment?.created_at || payment?.createdAt || payment?.date
             );
 
             return (

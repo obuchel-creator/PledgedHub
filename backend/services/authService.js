@@ -52,6 +52,7 @@ async function login({ email, password }) {
         id: user.id, 
         role: user.role, 
         email: user.email,
+        phone: user.phone,  // Include phone for auto-population in pledge forms
         tenant_id: user.tenant_id  // SaaS: Include tenant context in token
       },
       JWT_SECRET,

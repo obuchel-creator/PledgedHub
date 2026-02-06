@@ -113,11 +113,28 @@ export default function PledgesScreen() {
   };
 
   const formatDate = (dateString) => {
+    if (!dateString) return '-';
     return new Date(dateString).toLocaleDateString('en-UG', {
       year: 'numeric',
       month: 'short',
       day: 'numeric'
     });
+  };
+
+  const formatDateTime = (dateString) => {
+    if (!dateString) return '-';
+    const date = new Date(dateString);
+    const dateStr = date.toLocaleDateString('en-UG', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+    const timeStr = date.toLocaleTimeString('en-UG', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
+    });
+    return `${dateStr} at ${timeStr}`;
   };
 
   const handleRefresh = () => {
@@ -265,6 +282,7 @@ export default function PledgesScreen() {
                   <th>Purpose</th>
                   <th>Status</th>
                   <th>Collection Date</th>
+                  <th>Last Payment</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -282,6 +300,15 @@ export default function PledgesScreen() {
                       </span>
                     </td>
                     <td>{formatDate(pledge.collection_date)}</td>
+                    <td>
+                      {pledge.last_payment_date ? (
+                        <span style={{ fontSize: '13px', color: '#10b981' }}>
+                          {formatDateTime(pledge.last_payment_date)}
+                        </span>
+                      ) : (
+                        <span style={{ fontSize: '13px', color: '#6b7280' }}>-</span>
+                      )}
+                    </td>
                     <td>
                       <div className="pledge-actions">
                         <button 
@@ -342,6 +369,15 @@ export default function PledgesScreen() {
                 <div className="pledge-card-date">
                   📅 Due: {formatDate(pledge.collection_date)}
                 </div>
+
+                {pledge.last_payment_date && (
+                  <div style={{ marginBottom: '12px', padding: '8px', background: 'rgba(16, 185, 129, 0.1)', borderRadius: '6px', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
+                    <div className="pledge-card-label" style={{ color: '#10b981', marginBottom: '4px' }}>💰 Last Payment</div>
+                    <div style={{ fontSize: '13px', fontWeight: '600', color: '#10b981' }}>
+                      {formatDateTime(pledge.last_payment_date)}
+                    </div>
+                  </div>
+                )}
 
                 <div className="pledge-card-actions">
                   <button 

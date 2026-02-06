@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { createPledge, getCampaigns } from '../services/api';
+import { AuthContext } from '../context/AuthContext';
 import './FormScreens.css';
 
 export default function FundraisePledgeScreen() {
+  const { user } = useContext(AuthContext);
   const [campaigns, setCampaigns] = useState([]);
   const [campaignId, setCampaignId] = useState('');
   const [donor_name, setDonorName] = useState('');
@@ -20,6 +22,16 @@ export default function FundraisePledgeScreen() {
   useEffect(() => {
     loadCampaigns();
   }, []);
+  
+  // Auto-populate name and phone from logged-in user
+  useEffect(() => {
+    if (user?.name && !donor_name) {
+      setDonorName(user.name);
+    }
+    if (user?.phone && !donorPhone) {
+      setDonorPhone(user.phone);
+    }
+  }, [user?.name, user?.phone, donor_name, donorPhone]);
 
   const loadCampaigns = async () => {
     setLoadingCampaigns(true);
@@ -106,6 +118,7 @@ export default function FundraisePledgeScreen() {
     try {
       await createPledge({
         campaign_id: campaignId || null,
+        donor_name: donor_name.trim(),
         donor_email: donorEmail.trim().toLowerCase(),
         donor_phone: donorPhone.trim() || null,
         purpose: purpose.trim() || 'General donation',
@@ -252,10 +265,20 @@ export default function FundraisePledgeScreen() {
                   className="input"
                   required
                   aria-required="true"
-                  disabled={loading}
-                  placeholder="Enter your full name"
-                  style={{ fontSize: '1rem', padding: '12px 16px' }}
+                  disabled={true}
+                  placeholder="Your registered name will appear here"
+                  style={{ 
+                    fontSize: '1rem', 
+                    padding: '12px 16px',
+                    backgroundColor: '#f3f4f6',
+                    color: '#1f2937',
+                    cursor: 'not-allowed',
+                    opacity: 1
+                  }}
                 />
+                <p className="form-hint" style={{ marginTop: '0.5rem', fontSize: '0.875rem', color: '#64748b' }}>
+                  🔒 Your registered account name is used for data integrity and accountability.
+                </p>
               </div>
 
               <div className="form-field">
@@ -292,15 +315,22 @@ export default function FundraisePledgeScreen() {
                   className="input"
                   required
                   aria-required="true"
-                  disabled={loading}
-                  placeholder="+256 700 123456"
-                  style={{ fontSize: '1rem', padding: '12px 16px' }}
+                  disabled={true}
+                  placeholder="Your registered phone will appear here"
+                  style={{ 
+                    fontSize: '1rem', 
+                    padding: '12px 16px',
+                    backgroundColor: '#f3f4f6',
+                    color: '#1f2937',
+                    cursor: 'not-allowed',
+                    opacity: 1
+                  }}
                 />
                 <p
                   className="form-hint"
                   style={{ marginTop: '0.5rem', fontSize: '0.85rem', color: '#64748b' }}
                 >
-                  Required for tracking and SMS reminders
+                  🔒 Your registered phone number is used for SMS notifications and security verification.
                 </p>
               </div>
 

@@ -101,11 +101,12 @@ router.post('/login', async (req, res) => {
   }
   const result = await authService.login({ email, password });
   if (result.success) {
-    console.log('[LOGIN] Login successful for:', email);
+    console.log('[LOGIN] ✅ Login successful for:', email);
     res.json(result.data); // Only send { token, user }
   } else {
-    console.warn('[LOGIN] Login failed for:', email, '| Reason:', result.error);
-    res.status(401).json({ success: false, error: result.error });
+    console.warn('[LOGIN] ❌ Login failed for:', email, '| Reason:', result.error);
+    console.warn('[LOGIN] ❌ Sending 401 response with error:', result.error);
+    return res.status(401).json({ success: false, error: result.error, message: result.error });
   }
 });
 

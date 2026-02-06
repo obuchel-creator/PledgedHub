@@ -129,13 +129,22 @@ function PledgeFormSection({
               id="pledge-fullName"
               name="fullName"
               type="text"
-              style={darkInputStyle}
+              style={{
+                ...darkInputStyle,
+                backgroundColor: '#f3f4f6',
+                color: '#1f2937',
+                cursor: 'not-allowed',
+                opacity: 1
+              }}
               value={pledgeForm.fullName}
               onChange={onFieldChange}
-              placeholder="Your name"
-              disabled={isSubmitting}
+              placeholder="Your registered name will appear here"
+              disabled={true}
               required
             />
+            <p style={{ marginTop: '0.5rem', fontSize: '0.85rem', color: '#64748b' }}>
+              🔒 Your registered account name is used for data integrity and accountability.
+            </p>
           </div>
 
           <div className="form-field">
@@ -146,13 +155,22 @@ function PledgeFormSection({
               id="pledge-phone"
               name="phone"
               type="tel"
-              style={darkInputStyle}
+              style={{
+                ...darkInputStyle,
+                backgroundColor: '#f3f4f6',
+                color: '#1f2937',
+                cursor: 'not-allowed',
+                opacity: 1
+              }}
               value={pledgeForm.phone}
               onChange={onFieldChange}
-              placeholder="e.g. 256771234567"
-              disabled={isSubmitting}
+              placeholder="Your registered phone will appear here"
+              disabled={true}
               required
             />
+            <p style={{ marginTop: '0.5rem', fontSize: '0.85rem', color: '#64748b' }}>
+              🔒 Your registered phone number is used for SMS notifications and security verification.
+            </p>
           </div>
 
           <div className="form-field">

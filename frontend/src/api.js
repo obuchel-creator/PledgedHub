@@ -5,7 +5,7 @@ const API = axios.create({
 });
 
 API.interceptors.request.use((config) => {
-  const token = localStorage.getItem('authToken');
+  const token = localStorage.getItem('pledgehub_token');
   if (token) {
     config.headers['Authorization'] = `Bearer ${token}`;
   }
@@ -28,7 +28,7 @@ export const getCampaigns = async () => {
 };
 
 export const logoutUser = () => {
-  localStorage.removeItem('authToken');
+  localStorage.removeItem('pledgehub_token');
   localStorage.removeItem('user');
 };
 

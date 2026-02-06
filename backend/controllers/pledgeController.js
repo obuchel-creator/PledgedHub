@@ -166,6 +166,62 @@ async function createPledge(req, res) {
             });
         }
         
+        // SECURITY: Fetch user data from database for validation
+        const { pool } = require('../config/db');
+        const [userRows] = await pool.execute(
+            'SELECT name, phone FROM users WHERE id = ? LIMIT 1',
+            [userId]
+        );
+        
+        if (!userRows || userRows.length === 0) {
+            return res.status(400).json({
+                success: false,
+                error: 'User account not found. Please log out and log back in.'
+            });
+        }
+        
+        const loggedInUser = userRows[0];
+        
+        // SECURITY: Validate donor_name matches logged-in user's registered name
+        if (!loggedInUser.name) {
+            return res.status(400).json({
+                success: false,
+                error: 'Your account is missing a registered name. Please contact support.'
+            });
+        }
+        
+        const submittedName = typeof donor_name === 'string' ? donor_name.trim() : '';
+        if (submittedName.toLowerCase() !== loggedInUser.name.trim().toLowerCase()) {
+            return res.status(400).json({
+                success: false,
+                error: `Pledge name must match your registered name (${loggedInUser.name}). Individual pledges can only be created under your own account for data integrity and accountability.`
+            });
+        }
+        
+        // SECURITY: Validate donor_phone matches logged-in user's registered phone
+        if (!loggedInUser.phone) {
+            return res.status(400).json({
+                success: false,
+                error: 'Your account is missing a registered phone number. Please update your profile.'
+            });
+        }
+        
+        // Normalize both phones for comparison (remove spaces, dashes, etc.)
+        const normalizePhone = (phone) => {
+            if (!phone) return '';
+            return phone.replace(/[\s\-\(\)\+]/g, '').trim();
+        };
+        
+        const submittedPhone = normalizePhone(donor_phone);
+        const registeredPhone = normalizePhone(loggedInUser.phone);
+        
+        if (submittedPhone !== registeredPhone) {
+            return res.status(400).json({
+                success: false,
+                error: `Phone number must match your registered number (${loggedInUser.phone}). Individual pledges can only be created with your verified contact information for security and SMS notifications.`
+            });
+        }
+        
         const payload = {
             tenant_id: tenantId,  // SaaS: Always include tenant_id
             created_by: userId,   // Privacy: Track ownership

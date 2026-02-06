@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
-import { formatCurrency, formatDateShort } from '../utils/formatters';
+import { formatCurrency, formatDateShort, formatDateTime } from '../utils/formatters';
 import { parsePledgeMessage } from '../utils/pledgeHelpers';
 
 /**
@@ -50,6 +50,11 @@ function PledgeListItem({ pledge }) {
               Due: {collectionDateDisplay}
             </span>
           )}
+          {pledge?.last_payment_date && (
+            <span className="pledge-list-item__date" style={{ color: '#10b981', fontWeight: '600' }}>
+              💰 Paid: {formatDateTime(pledge.last_payment_date)}
+            </span>
+          )}
         </div>
       </div>
       <div className="pledge-list-item__actions">
@@ -94,6 +99,7 @@ PledgeListItem.propTypes = {
     date: PropTypes.string,
     created_at: PropTypes.string,
     collection_date: PropTypes.string,
+    last_payment_date: PropTypes.string,
   }).isRequired,
 };
 

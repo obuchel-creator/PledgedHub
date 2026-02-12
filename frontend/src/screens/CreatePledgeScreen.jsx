@@ -62,15 +62,11 @@ export default function FundraisePledgeScreen() {
   };
 
   const validate = () => {
-    // Validate in visual order: Email → Phone → Amount → Collection Date
-    // (Donor name and phone are auto-filled, but we still validate them)
+    // Validate in CHRONOLOGICAL ORDER as user enters fields
+    // Email → Amount → Collection Date
+    // (Name and Phone are auto-populated/locked, so skip validation order for those)
 
-    if (!donor_name.trim()) {
-      setError('⚠️ Donor name is required.');
-      return false;
-    }
-
-    // 1. EMAIL - First required field users see
+    // 1. EMAIL - First field user enters
     if (!donorEmail.trim()) {
       setError('📧 Email address is required.');
       return false;
@@ -78,33 +74,39 @@ export default function FundraisePledgeScreen() {
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(donorEmail.trim())) {
-      setError('📧 Please enter a valid email address (e.g., name@example.com).');
+      setError('📧 Please enter a valid email address.');
       return false;
     }
 
-    // 2. PHONE - Next required field
+    // 2. AMOUNT - Second field user enters
+    const amountNum = Number(amount);
+    if (amount === '' || Number.isNaN(amountNum) || amountNum <= 0) {
+      setError('💵 Pledge amount is required and must be greater than zero.');
+      return false;
+    }
+
+    // 3. COLLECTION DATE - Third field user enters
+    if (!collectionDate) {
+      setError('📅 Collection date is required.');
+      return false;
+    }
+
+    // Auto-populated validator (name)
+    if (!donor_name.trim()) {
+      setError('⚠️ Donor name is required.');
+      return false;
+    }
+
+    // Auto-populated validator (phone)
     if (!donorPhone.trim()) {
-      setError('📱 Phone number is required for donor tracking.');
+      setError('📱 Phone number is required.');
       return false;
     }
     
     const phoneClean = donorPhone.replace(/[\s\-\(\)]/g, '');
     const ugandaPhoneRegex = /^(\+?256|0)?[7][0-9]{8}$/;
     if (!ugandaPhoneRegex.test(phoneClean)) {
-      setError('📱 Please enter a valid Uganda phone number (e.g., +256 700 123456 or 0700 123456).');
-      return false;
-    }
-
-    // 3. AMOUNT - Third required field
-    const amountNum = Number(amount);
-    if (amount === '' || Number.isNaN(amountNum) || amountNum <= 0) {
-      setError('💵 Pledge amount must be greater than zero.');
-      return false;
-    }
-
-    // 4. COLLECTION DATE - Last required field
-    if (!collectionDate) {
-      setError('📅 Collection date is required.');
+      setError('📱 Please enter a valid Uganda phone number.');
       return false;
     }
 

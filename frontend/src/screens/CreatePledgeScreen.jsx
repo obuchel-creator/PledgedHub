@@ -62,45 +62,49 @@ export default function FundraisePledgeScreen() {
   };
 
   const validate = () => {
+    // Validate in visual order: Email → Phone → Amount → Collection Date
+    // (Donor name and phone are auto-filled, but we still validate them)
+
     if (!donor_name.trim()) {
       setError('⚠️ Donor name is required.');
       return false;
     }
 
+    // 1. EMAIL - First required field users see
     if (!donorEmail.trim()) {
-      setError('⚠️ Email address is required.');
+      setError('📧 Email address is required.');
       return false;
     }
 
-    // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(donorEmail.trim())) {
-      setError('⚠️ Please enter a valid email address.');
+      setError('📧 Please enter a valid email address (e.g., name@example.com).');
       return false;
     }
 
-    // Phone validation - NOW MANDATORY
+    // 2. PHONE - Next required field
     if (!donorPhone.trim()) {
-      setError('⚠️ Phone number is required for donor tracking.');
+      setError('📱 Phone number is required for donor tracking.');
       return false;
     }
     
-    // Uganda phone format validation
     const phoneClean = donorPhone.replace(/[\s\-\(\)]/g, '');
     const ugandaPhoneRegex = /^(\+?256|0)?[7][0-9]{8}$/;
     if (!ugandaPhoneRegex.test(phoneClean)) {
-      setError('⚠️ Please enter a valid Uganda phone number (e.g., +256 700 123456 or 0700 123456).');
+      setError('📱 Please enter a valid Uganda phone number (e.g., +256 700 123456 or 0700 123456).');
       return false;
     }
 
+    // 3. AMOUNT - Third required field
     const amountNum = Number(amount);
     if (amount === '' || Number.isNaN(amountNum) || amountNum <= 0) {
-      setError('⚠️ Pledge amount must be greater than zero.');
+      setError('💵 Pledge amount must be greater than zero.');
       return false;
     }
 
+    // 4. COLLECTION DATE - Last required field
     if (!collectionDate) {
-      setError('⚠️ Collection date is required.');
+      setError('📅 Collection date is required.');
       return false;
     }
 

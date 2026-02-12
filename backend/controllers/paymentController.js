@@ -1,5 +1,6 @@
 const db = require('../config/db');
 const paymentTrackingService = require('../services/paymentTrackingService');
+const accountingService = require('../services/accountingService');
 
 let Payment;
 let sendEmail;
@@ -45,6 +46,56 @@ async function createPayment(req, res) {
             }
         } catch (e) {
             console.error('[PaymentController] Failed to update raised total:', e);
+        }
+
+        // 📊 ACCOUNTING: Record journal entry for payment
+        try {
+            const paymentMethodMap = {
+                'cash': 1000,           // Cash account
+                'mobile_money': 1100,   // Mobile Money account
+                'mtn': 1100,            // MTN Mobile Money
+                'airtel': 1100,         // Airtel Money
+                'bank_transfer': 1050,  // Bank account
+                'cheque': 1050,         // Bank account
+                'other': 1000           // Default to cash
+            };
+
+            const cashAccountId = paymentMethodMap[paymentMethod?.toLowerCase()] || 1000;
+            const receivablesAccountId = 1200; // Pledges Receivable
+
+            const accountingEntry = {
+                date: new Date(),
+                description: `Pledge #${pledgeId} Payment - ${paymentMethod}`,
+                reference: `PMT-${result.payment.id}-PLEDGE-${pledgeId}`,
+                userId,
+                lines: [
+                    {
+                        accountId: cashAccountId,
+                        type: 'debit',
+                        amount: parseFloat(amount),
+                        description: `Cash received via ${paymentMethod}`
+                    },
+                    {
+                        accountId: receivablesAccountId,
+                        type: 'credit',
+                        amount: parseFloat(amount),
+                        description: `Pledges Receivable reduced - Pledge #${pledgeId}`
+                    }
+                ]
+            };
+
+            const accountingResult = await accountingService.createJournalEntry(accountingEntry);
+            if (accountingResult.success) {
+                // Link payment to accounting entry
+                await db.execute(
+                    'UPDATE payments SET accounting_entry_id = ? WHERE id = ?',
+                    [accountingResult.data.entryId, result.payment.id]
+                );
+                console.log('✅ [ACCOUNTING] Payment journal entry recorded:', accountingResult.data.entryNumber);
+            }
+        } catch (accountingError) {
+            console.error('⚠️ [ACCOUNTING] Warning - Failed to record accounting entry:', accountingError.message);
+            // Don't fail the payment if accounting fails - log but continue
         }
 
         // Payment tracking service handles email/SMS notifications automatically
@@ -99,55 +150,73 @@ async function getPayment(req, res) {
 }
 
 async function listPayments(req, res) {
-    // Parse ALL parameters as integers to avoid type mismatch
-    const userId = req.query.userId ? parseInt(req.query.userId, 10) : null;
+    // Get current user from auth middleware
+    const currentUserId = req.user?.id;
+    const currentUserEmail = req.user?.email;
+    const currentUserRole = req.user?.role;
     const pledgeId = req.query.pledgeId ? parseInt(req.query.pledgeId, 10) : null;
-    const limit = Math.min(1000, Math.max(1, parseInt(req.query.limit, 10) || 100));
-    const offset = Math.max(0, parseInt(req.query.offset, 10) || 0);
 
-    // Enhanced debug logging
-    console.log('[PaymentController] listPayments called with:', { userId, pledgeId, limit, offset, query: req.query });
+    console.log('[PaymentController] listPayments called for user:', currentUserId, currentUserEmail, 'Role:', currentUserRole);
 
     try {
         const { pool } = require('../config/db');
+        
         let sql = `SELECT 
-            id, 
-            pledge_id,
-            pledge_id AS pledgeId,
-            amount, 
-            payment_method AS method,
-            payment_method,
-            payment_date,
-            payment_date AS date,
-            reference_number,
-            reference_number AS referenceNumber,
-            notes,
-            verification_status AS status,
-            verification_status,
-            receipt_number,
-            receipt_photo_url,
-            created_at AS createdAt,
-            created_at AS dateCreated
-         FROM payments WHERE deleted = 0`;
+            p.id, 
+            p.pledge_id,
+            p.amount, 
+            p.payment_method,
+            p.verification_status as status,
+            p.payment_date as created_at,
+            pl.donor_name,
+            pl.donor_email,
+            pl.donor_phone,
+            pl.purpose,
+            pl.amount as pledge_amount,
+            pl.created_by
+         FROM payments p
+         JOIN pledges pl ON p.pledge_id = pl.id
+         WHERE p.deleted = 0`;
+
         const params = [];
+        
+        // Admins see ALL payments
+        // Non-admins only see their own pledges
+        if (currentUserRole !== 'super_admin' && currentUserRole !== 'finance_admin') {
+            console.log('[PaymentController] Non-admin user - filtering by created_by or donor_email');
+            sql += ` AND (pl.created_by = ? OR pl.donor_email = ?)`;
+            params.push(currentUserId, currentUserEmail);
+        } else {
+            console.log('[PaymentController] Admin user - showing ALL payments');
+        }
+        
         if (pledgeId) {
-            sql += ` AND pledge_id = ?`;
+            sql += ` AND p.pledge_id = ?`;
             params.push(pledgeId);
         }
-        if (userId) {
-            sql += ` AND recorded_by = ?`;
-            params.push(userId);
-        }
-        sql += ` ORDER BY payment_date DESC, created_at DESC LIMIT ? OFFSET ?`;
-        params.push(limit, offset);
-        // Add debug log for SQL and params
-        console.log('[PaymentController] listPayments SQL:', sql, 'Params:', params);
+        
+        sql += ` ORDER BY p.payment_date DESC LIMIT 50`;
+        
+        console.log('[PaymentController] listPayments SQL:', sql);
+        console.log('[PaymentController] listPayments Params:', params);
+        
         const [payments] = await pool.execute(sql, params);
-        console.log('[PaymentController] listPayments DB rows:', payments && payments.length);
-        return res.status(200).json({ success: true, payments: payments || [], data: payments || [] });
+        
+        console.log('[PaymentController] listPayments found:', payments ? payments.length : 0, 'payments');
+        
+        return res.status(200).json({ 
+            success: true, 
+            payments: payments || [], 
+            data: payments || [],
+            count: payments ? payments.length : 0
+        });
     } catch (err) {
         console.error('[PaymentController] listPayments error:', err);
-        return res.status(500).json({ success: false, error: 'Internal Server Error', details: err.message });
+        return res.status(500).json({ 
+            success: false, 
+            error: 'Internal Server Error', 
+            details: err.message 
+        });
     }
 }
 

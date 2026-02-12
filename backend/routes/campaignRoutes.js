@@ -12,7 +12,7 @@ router.post('/', authenticateToken, requireRole(['creator', 'super_admin']), asy
         console.log('🔵 [CAMPAIGN CREATE] Received request');
         console.log('🔵 [CAMPAIGN CREATE] Body:', JSON.stringify(req.body, null, 2));
 
-        const { title, description, goalAmount, suggestedAmount } = req.body;
+        const { title, description, goalAmount, suggestedAmount, startDate, endDate } = req.body;
 
         // Validation
         if (!title || !title.trim()) {
@@ -39,13 +39,40 @@ router.post('/', authenticateToken, requireRole(['creator', 'super_admin']), asy
             });
         }
 
+        if (!startDate || !endDate) {
+            console.log('❌ [CAMPAIGN CREATE] Validation failed: Missing start/end date');
+            return res.status(400).json({
+                success: false,
+                error: 'Start date and end date are required'
+            });
+        }
+
+        const parsedStart = new Date(startDate);
+        const parsedEnd = new Date(endDate);
+
+        if (Number.isNaN(parsedStart.getTime()) || Number.isNaN(parsedEnd.getTime())) {
+            return res.status(400).json({
+                success: false,
+                error: 'Invalid start date or end date'
+            });
+        }
+
+        if (parsedEnd < parsedStart) {
+            return res.status(400).json({
+                success: false,
+                error: 'End date must be after the start date'
+            });
+        }
+
         console.log('✅ [CAMPAIGN CREATE] Validation passed');
 
         const result = await campaignService.createCampaign({
             title: title.trim(),
             description: description?.trim(),
             goalAmount: Number(goalAmount),
-            suggestedAmount: suggestedAmount ? Number(suggestedAmount) : null
+            suggestedAmount: suggestedAmount ? Number(suggestedAmount) : null,
+            startDate,
+            endDate
         });
 
         if (!result.success) {

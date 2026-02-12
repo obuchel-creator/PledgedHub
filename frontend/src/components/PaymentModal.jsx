@@ -3,9 +3,11 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import { getViteEnv } from '../utils/getViteEnv';
+import QRCodeScannerModal from './QRCodeScannerModal';
 
 export default function PaymentModal({ pledge, onClose, onSuccess }) {
   const { user } = useAuth();
+  const [showQRScanner, setShowQRScanner] = useState(false);
   const [formData, setFormData] = useState({
     amount: pledge?.amount || '',
     paymentDate: new Date().toISOString().split('T')[0],
@@ -17,8 +19,9 @@ export default function PaymentModal({ pledge, onClose, onSuccess }) {
   const [error, setError] = useState('');
 
   const paymentMethods = [
-    { value: 'cash', label: '💵 Cash' },
+    { value: 'qr_scan', label: '📱 Scan QR Code' },
     { value: 'mobile_money', label: '📱 Mobile Money' },
+    { value: 'cash', label: '💵 Cash' },
     { value: 'bank_transfer', label: '🏦 Bank Transfer' },
     { value: 'cheque', label: '📝 Cheque' },
     { value: 'other', label: '💳 Other' },
@@ -26,6 +29,13 @@ export default function PaymentModal({ pledge, onClose, onSuccess }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Handle QR scan request
+    if (formData.paymentMethod === 'qr_scan') {
+      setShowQRScanner(true);
+      return;
+    }
+
     setError('');
     setLoading(true);
 
@@ -75,30 +85,46 @@ export default function PaymentModal({ pledge, onClose, onSuccess }) {
   };
 
   return (
-    <div
-      style={{
-        position: 'fixed',
-        inset: 0,
-        background: 'rgba(15, 23, 42, 0.6)',
-        backdropFilter: 'blur(4px)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 1000,
-        padding: '1rem',
-      }}
-    >
+    <>
+      {showQRScanner && (
+        <QRCodeScannerModal
+          pledgeId={pledge.id}
+          pledge={pledge}
+          onClose={() => setShowQRScanner(false)}
+          onSuccess={() => {
+            setShowQRScanner(false);
+            onSuccess?.();
+            onClose();
+          }}
+          onPaymentInitiated={() => {
+            setFormData({ ...formData, paymentMethod: 'mobile_money' });
+          }}
+        />
+      )}
       <div
         style={{
-          background: '#fff',
-          borderRadius: '16px',
-          maxWidth: '500px',
-          width: '100%',
-          maxHeight: '90vh',
-          overflowY: 'auto',
-          boxShadow: '0 20px 60px -20px rgba(15, 23, 42, 0.4)',
+          position: 'fixed',
+          inset: 0,
+          background: 'rgba(15, 23, 42, 0.6)',
+          backdropFilter: 'blur(4px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000,
+          padding: '1rem',
         }}
       >
+        <div
+          style={{
+            background: '#fff',
+            borderRadius: '16px',
+            maxWidth: '500px',
+            width: '100%',
+            maxHeight: '90vh',
+            overflowY: 'auto',
+            boxShadow: '0 20px 60px -20px rgba(15, 23, 42, 0.4)',
+          }}
+        >
         <div
           style={{
             padding: '1.5rem',
@@ -380,6 +406,7 @@ export default function PaymentModal({ pledge, onClose, onSuccess }) {
         </form>
       </div>
     </div>
+    </>
   );
 }
 

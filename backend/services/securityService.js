@@ -390,7 +390,7 @@ function intrusionDetection(req, res, next) {
         // Path traversal
         /\.\.\//g,
         // Command injection
-        /;|\||&|`|\$\(/g,
+        /;|\||`|\$\(/g,
         // File inclusion
         /\bfile:\/\//gi,
         // LDAP injection

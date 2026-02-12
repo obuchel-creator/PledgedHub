@@ -50,12 +50,26 @@ export default function useDashboardData() {
           pledgesArr = pledgesResult.pledges;
         }
       }
-      console.log('📊 [Dashboard] Loaded pledges:', pledgesArr.length, pledgesArr.map(p => ({ id: p.id, donor: p.donor_name || p.donorName })));
+      // minimal logging for diagnostics
+      console.log('📊 [Dashboard] Loaded pledges:', pledgesArr.length);
+
+      // Handle various response shapes for payments
+      let paymentsArr = [];
+      if (Array.isArray(paymentsResult)) {
+        paymentsArr = paymentsResult;
+      } else if (paymentsResult?.success && Array.isArray(paymentsResult.payment)) {
+        paymentsArr = paymentsResult.payment;
+      } else if (paymentsResult?.payments && Array.isArray(paymentsResult.payments)) {
+        paymentsArr = paymentsResult.payments;
+      }
+      
+      // processed payments count
+      console.log('💳 [Dashboard] payments count:', paymentsArr.length);
 
       setState((prev) => ({
         ...prev,
         pledges: pledgesArr,
-        payments: Array.isArray(paymentsResult) ? paymentsResult : [],
+        payments: paymentsArr,
         paymentsError,
         loading: false,
       }));

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Link, useNavigate } from 'react-router-dom';
-import '../authOutlook.css';
+import '../styles/quickbooks-auth.css';
 import Logo from '../components/Logo';
 import { useAuth } from '../context/AuthContext';
 
@@ -144,37 +144,23 @@ function RegisterScreen({ disableRequired = false }) {
 
   return (
     <div className="auth-bg">
-      <div style={{
-        position: 'fixed',
-        top: '10px',
-        right: '10px',
-        background: '#10b981',
-        color: 'white',
-        padding: '10px 15px',
-        borderRadius: '4px',
-        zIndex: 10000,
-        fontSize: '12px',
-        fontFamily: 'monospace'
-      }}>
-        ✓ RegisterScreen LOADED
-      </div>
       <main>
         <section className="auth-center-card">
-          <div style={{ width: '100%', textAlign: 'center', marginBottom: '32px' }}>
+          <div>
             <Logo size="large" showText={false} />
           </div>
 
           <h2>Create your PledgeHub account</h2>
-          <p className="subtitle">Sign up</p>
+          <p className="subtitle">Join thousands of successful pledge managers</p>
 
-          {error && <div className="error-message" style={{ marginBottom: '16px', padding: '12px', background: '#fee2e2', color: '#991b1b', borderRadius: '4px', fontSize: '14px' }}>{error}</div>}
-          {status && <div style={{ marginBottom: '16px', padding: '12px', background: '#e0f2fe', color: '#0c4a6e', borderRadius: '4px', fontSize: '14px', fontWeight: '500' }}>{status}</div>}
+          {error && <div className="error-message">{error}</div>}
+          {status && <div className="success-message">{status}</div>}
 
-          <form onSubmit={handleSubmit} style={{ width: '100%' }}>
-            <div style={{ display: 'flex', gap: '12px' }}>
-              <div style={{ flex: 1 }}>
+          <form onSubmit={handleSubmit}>
+            <div className="form-row">
+              <div className="form-group">
                 <label htmlFor="firstName">
-                  First Name <span style={{ color: 'var(--error)' }}>*</span>
+                  First Name <span className="required">*</span>
                 </label>
                 <input
                   id="firstName"
@@ -183,14 +169,14 @@ function RegisterScreen({ disableRequired = false }) {
                   value={form.firstName}
                   onChange={handleChange}
                   autoComplete="given-name"
-                  placeholder="First Name"
+                  placeholder="John"
                   disabled={loading}
                   required={!disableRequired}
                 />
               </div>
-              <div style={{ flex: 1 }}>
+              <div className="form-group">
                 <label htmlFor="lastName">
-                  Last Name <span style={{ color: 'var(--error)' }}>*</span>
+                  Last Name <span className="required">*</span>
                 </label>
                 <input
                   id="lastName"
@@ -199,16 +185,16 @@ function RegisterScreen({ disableRequired = false }) {
                   value={form.lastName}
                   onChange={handleChange}
                   autoComplete="family-name"
-                  placeholder="Last Name"
+                  placeholder="Doe"
                   disabled={loading}
                   required={!disableRequired}
                 />
               </div>
             </div>
 
-            <div>
+            <div className="form-group">
               <label htmlFor="phone">
-                Phone Number <span style={{ color: 'var(--error)' }}>*</span>
+                Phone Number <span className="required">*</span>
               </label>
               <input
                 id="phone"
@@ -217,13 +203,13 @@ function RegisterScreen({ disableRequired = false }) {
                 value={form.phone}
                 onChange={handleChange}
                 autoComplete="tel"
-                placeholder="e.g. +256771234567"
+                placeholder="+256 771 234567"
                 disabled={loading}
                 required={!disableRequired}
               />
             </div>
 
-            <div>
+            <div className="form-group">
               <label htmlFor="email">Email (optional)</label>
               <input
                 id="email"
@@ -232,16 +218,16 @@ function RegisterScreen({ disableRequired = false }) {
                 value={form.email}
                 onChange={handleChange}
                 autoComplete="email"
-                placeholder="Email address"
+                placeholder="john@example.com"
                 disabled={loading}
               />
             </div>
 
-            <div>
+            <div className="form-group">
               <label htmlFor="password">
-                Password <span style={{ color: 'var(--error)' }}>*</span>
+                Password <span className="required">*</span>
               </label>
-              <div style={{ position: 'relative', marginBottom: '20px' }}>
+              <div className="password-input-wrapper">
                 <input
                   id="password"
                   name="password"
@@ -249,46 +235,28 @@ function RegisterScreen({ disableRequired = false }) {
                   value={form.password}
                   onChange={handleChange}
                   autoComplete="new-password"
-                  placeholder="Password"
-                  aria-label="Password"
+                  placeholder="••••••••"
                   disabled={loading}
                   required={!disableRequired}
-                  style={{ paddingRight: '90px !important', marginBottom: '0' }}
                 />
                 <button
                   type="button"
+                  className="password-toggle-btn"
                   onClick={() => setShowPassword((v) => !v)}
                   disabled={loading}
-                  style={{
-                    position: 'absolute',
-                    right: '12px',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    background: 'transparent',
-                    border: 'none',
-                    color: '#3498db',
-                    cursor: 'pointer',
-                    fontSize: '13px',
-                    fontWeight: '600',
-                    padding: '6px 8px',
-                    whiteSpace: 'nowrap',
-                    zIndex: 1000,
-                    lineHeight: 1,
-                    height: 'auto',
-                    width: 'auto',
-                    margin: '0'
-                  }}
+                  tabIndex="-1"
+                  title={showPassword ? 'Hide password' : 'Show password'}
                 >
-                  {showPassword ? '??? Hide' : '??? Show'}
+                  👁️
                 </button>
               </div>
             </div>
 
-            <div>
+            <div className="form-group">
               <label htmlFor="confirmPassword">
-                Confirm Password <span style={{ color: 'var(--error)' }}>*</span>
+                Confirm Password <span className="required">*</span>
               </label>
-              <div style={{ position: 'relative', marginBottom: '20px' }}>
+              <div className="password-input-wrapper">
                 <input
                   id="confirmPassword"
                   name="confirmPassword"
@@ -296,36 +264,19 @@ function RegisterScreen({ disableRequired = false }) {
                   value={form.confirmPassword}
                   onChange={handleChange}
                   autoComplete="new-password"
-                  placeholder="Confirm Password"
+                  placeholder="••••••••"
                   disabled={loading}
                   required={!disableRequired}
-                  style={{ paddingRight: '90px !important', marginBottom: '0' }}
                 />
                 <button
                   type="button"
+                  className="password-toggle-btn"
                   onClick={() => setShowConfirmPassword((v) => !v)}
                   disabled={loading}
-                  style={{
-                    position: 'absolute',
-                    right: '12px',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    background: 'transparent',
-                    border: 'none',
-                    color: '#3498db',
-                    cursor: 'pointer',
-                    fontSize: '13px',
-                    fontWeight: '600',
-                    padding: '6px 8px',
-                    whiteSpace: 'nowrap',
-                    zIndex: 1000,
-                    lineHeight: 1,
-                    height: 'auto',
-                    width: 'auto',
-                    margin: '0'
-                  }}
+                  tabIndex="-1"
+                  title={showConfirmPassword ? 'Hide password' : 'Show password'}
                 >
-                  {showConfirmPassword ? '??? Hide' : '??? Show'}
+                  👁️
                 </button>
               </div>
             </div>
@@ -333,26 +284,24 @@ function RegisterScreen({ disableRequired = false }) {
             <button
               type="submit"
               disabled={loading}
-              aria-label="Register"
-              onClick={(e) => {
-                console.log('🔴 Button onClick fired!');
-                handleSubmit(e);
-              }}
-              style={{
-                cursor: loading ? 'not-allowed' : 'pointer',
-                opacity: loading ? 0.6 : 1,
-              }}
+              aria-busy={loading}
             >
-              {loading ? 'Creating account...' : 'Register'}
+              <span className="btn-icon">✓</span>
+              {loading ? 'Creating account...' : 'Create account'}
             </button>
           </form>
 
-          <div style={{ textAlign: 'center', marginTop: '24px', fontSize: '15px', color: '#475569', fontWeight: '500' }}>
+          <p className="form-footer-text">
             Already have an account?{' '}
-            <Link to="/login" style={{ color: '#3498db', fontWeight: '600', textDecoration: 'none', borderBottom: '1px solid #3498db' }}>
-              Sign in
-            </Link>
-          </div>
+            <Link to="/login">Sign in</Link>
+          </p>
+
+          <p className="auth-footer">
+            By signing up, you agree to our{' '}
+            <Link to="/terms">Terms of Service</Link>
+            {' and '}
+            <Link to="/privacy">Privacy Policy</Link>
+          </p>
         </section>
       </main>
     </div>

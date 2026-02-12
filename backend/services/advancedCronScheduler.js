@@ -181,6 +181,28 @@ function initializeJobs() {
         job: balanceReminderJob
     });
 
+    // 8. Campaign closure notifications - Daily at 6:30 AM
+    const campaignClosureJob = cron.schedule('30 6 * * *', async () => {
+        console.log('\n[INFO] ===== Campaign Closure Job Triggered =====');
+        console.log('[INFO] Time:', new Date().toLocaleString('en-US', { timeZone: 'Africa/Kampala' }));
+        try {
+            const result = await advancedReminderService.processCampaignClosures();
+            console.log('[OK] Campaign closure job complete:', result);
+        } catch (error) {
+            console.error('[ERROR] Campaign closure job failed:', error);
+        }
+    }, {
+        scheduled: false,
+        timezone: 'Africa/Kampala'
+    });
+
+    jobs.push({
+        name: 'Campaign Closures',
+        schedule: 'Daily at 6:30 AM',
+        description: 'Send closing messages for campaigns that ended and stop reminders',
+        job: campaignClosureJob
+    });
+
     // 8. Monthly payout processing - 1st of every month at 6:00 AM
     const monthlyPayoutJob = cron.schedule('0 6 1 * *', async () => {
         console.log('\n[INFO] ===== Monthly Payout Processing Job Triggered =====');

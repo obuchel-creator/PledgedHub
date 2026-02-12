@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const reminderService = require('../services/reminderService');
 const cronScheduler = require('../services/cronScheduler');
+const advancedReminderService = require('../services/advancedReminderService');
 const { authenticateToken, requireAdmin } = require('../middleware/authMiddleware');
 
 /**
@@ -46,6 +47,37 @@ router.get('/status', authenticateToken, requireAdmin, (req, res) => {
             message: 'Failed to get status',
             error: error.message
         });
+    }
+});
+
+/**
+ * @route   GET /api/reminders/closures/preview
+ * @desc    Preview campaign closures (dry-run) - shows intended recipients
+ * @access  Protected - Admin
+ */
+router.get('/closures/preview', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const result = await advancedReminderService.processCampaignClosures({ dryRun: true });
+        res.json({ success: true, preview: result });
+    } catch (error) {
+        console.error('Error previewing campaign closures:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+/**
+ * @route   POST /api/reminders/closures/run
+ * @desc    Run campaign closures (optionally dry-run=false)
+ * @access  Protected - Admin
+ */
+router.post('/closures/run', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const { dryRun } = req.body || {};
+        const result = await advancedReminderService.processCampaignClosures({ dryRun: Boolean(dryRun) });
+        res.json({ success: true, result });
+    } catch (error) {
+        console.error('Error running campaign closures:', error);
+        res.status(500).json({ success: false, error: error.message });
     }
 });
 

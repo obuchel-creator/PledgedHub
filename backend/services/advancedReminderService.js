@@ -2,6 +2,7 @@ const { pool } = require('../config/db');
 const smsService = require('./smsService');
 const emailService = require('./emailService');
 const messageGenerator = require('./messageGenerator');
+const campaignService = require('./campaignService');
 
 /**
  * Advanced Reminder Service with Intelligent Scheduling
@@ -25,6 +26,7 @@ async function getPledgesNeedingWeeklyReminder() {
                 p.*,
                 DATEDIFF(p.collection_date, CURDATE()) as days_until_due
             FROM pledges p
+            LEFT JOIN campaigns c ON p.campaign_id = c.id
             WHERE p.collection_date > DATE_ADD(CURDATE(), INTERVAL 60 DAY)
             AND p.status != 'paid'
             AND p.status != 'cancelled'
@@ -32,6 +34,11 @@ async function getPledgesNeedingWeeklyReminder() {
             AND (
                 p.last_reminder_sent IS NULL 
                 OR DATEDIFF(CURDATE(), p.last_reminder_sent) >= 7
+            )
+            AND (
+                p.campaign_id IS NULL
+                OR c.end_date IS NULL
+                OR c.end_date >= CURDATE()
             )
         `;
         
@@ -54,6 +61,7 @@ async function getPledgesNeedingBiWeeklyReminder() {
                 p.*,
                 DATEDIFF(p.collection_date, CURDATE()) as days_until_due
             FROM pledges p
+            LEFT JOIN campaigns c ON p.campaign_id = c.id
             WHERE p.collection_date BETWEEN DATE_ADD(CURDATE(), INTERVAL 30 DAY) 
             AND DATE_ADD(CURDATE(), INTERVAL 60 DAY)
             AND p.status != 'paid'
@@ -62,6 +70,11 @@ async function getPledgesNeedingBiWeeklyReminder() {
             AND (
                 p.last_reminder_sent IS NULL 
                 OR DATEDIFF(CURDATE(), p.last_reminder_sent) >= 3
+            )
+            AND (
+                p.campaign_id IS NULL
+                OR c.end_date IS NULL
+                OR c.end_date >= CURDATE()
             )
         `;
         
@@ -84,11 +97,17 @@ async function getPledgesInFinalMonth() {
                 p.*,
                 DATEDIFF(p.collection_date, CURDATE()) as days_until_due
             FROM pledges p
+            LEFT JOIN campaigns c ON p.campaign_id = c.id
             WHERE p.collection_date BETWEEN CURDATE() 
             AND DATE_ADD(CURDATE(), INTERVAL 30 DAY)
             AND p.status != 'paid'
             AND p.status != 'cancelled'
             AND p.deleted = 0
+            AND (
+                p.campaign_id IS NULL
+                OR c.end_date IS NULL
+                OR c.end_date >= CURDATE()
+            )
         `;
         
         const [pledges] = await pool.execute(query);
@@ -110,6 +129,7 @@ async function getPledgesInFinalWeek() {
                 p.*,
                 DATEDIFF(p.collection_date, CURDATE()) as days_until_due
             FROM pledges p
+            LEFT JOIN campaigns c ON p.campaign_id = c.id
             WHERE p.collection_date BETWEEN CURDATE() 
             AND DATE_ADD(CURDATE(), INTERVAL 7 DAY)
             AND p.status != 'paid'
@@ -118,6 +138,11 @@ async function getPledgesInFinalWeek() {
             AND (
                 p.last_reminder_sent IS NULL 
                 OR DATE(p.last_reminder_sent) != CURDATE()
+            )
+            AND (
+                p.campaign_id IS NULL
+                OR c.end_date IS NULL
+                OR c.end_date >= CURDATE()
             )
         `;
         
@@ -140,6 +165,7 @@ async function getPledgesDueToday() {
                 p.*,
                 0 as days_until_due
             FROM pledges p
+            LEFT JOIN campaigns c ON p.campaign_id = c.id
             WHERE DATE(p.collection_date) = CURDATE()
             AND p.status != 'paid'
             AND p.status != 'cancelled'
@@ -147,6 +173,11 @@ async function getPledgesDueToday() {
             AND (
                 p.last_reminder_sent IS NULL 
                 OR DATE(p.last_reminder_sent) != CURDATE()
+            )
+            AND (
+                p.campaign_id IS NULL
+                OR c.end_date IS NULL
+                OR c.end_date >= CURDATE()
             )
         `;
         
@@ -169,12 +200,18 @@ async function getOverduePledges() {
                 p.*,
                 DATEDIFF(CURDATE(), p.collection_date) as days_overdue
             FROM pledges p
+            LEFT JOIN campaigns c ON p.campaign_id = c.id
             WHERE p.collection_date < CURDATE()
             AND p.status = 'pending'
             AND p.deleted = 0
             AND (
                 p.last_reminder_sent IS NULL 
                 OR DATE(p.last_reminder_sent) != CURDATE()
+            )
+            AND (
+                p.campaign_id IS NULL
+                OR c.end_date IS NULL
+                OR c.end_date >= CURDATE()
             )
         `;
         
@@ -555,4 +592,110 @@ module.exports = {
     getPledgesInFinalWeek,
     getPledgesDueToday,
     getOverduePledges
+    ,
+    processCampaignClosures
 };
+
+/**
+ * Process campaigns that have reached their end date.
+ * - Sends a short closing message (SMS + email where available) to all donors
+ * - Marks campaign as completed
+ * - Stops future reminders by updating `last_reminder_sent` for associated pledges
+ */
+async function processCampaignClosures(options = {}) {
+    const dryRunFlag = Boolean(options.dryRun);
+    const sendEnabledEnv = process.env.SEND_CLOSURE_MESSAGES !== 'false';
+    const sendEnabled = sendEnabledEnv && !dryRunFlag;
+
+    console.log(`\n[STEP] Processing Campaign Closures (end_date <= today)... dryRun=${dryRunFlag}, sendEnabled=${sendEnabled}`);
+    try {
+        const [campaigns] = await pool.execute(
+            `SELECT id, title, end_date FROM campaigns WHERE DATE(end_date) <= CURDATE() AND status = 'active' AND deleted = 0`
+        );
+
+        if (!campaigns || campaigns.length === 0) {
+            console.log('[INFO] No campaigns to close today.');
+            return { processed: 0 };
+        }
+
+        let processed = 0;
+        let messagesSent = 0;
+        let errors = 0;
+
+        for (const c of campaigns) {
+            console.log(`[INFO] Closing campaign: ${c.title} (ID: ${c.id})`);
+
+            const [pledges] = await pool.execute(
+                `SELECT id, donor_name, donor_email, donor_phone, phone_number, email, amount, status FROM pledges WHERE campaign_id = ? AND deleted = 0`,
+                [c.id]
+            );
+
+            const endDateStr = c.end_date ? new Date(c.end_date).toLocaleDateString() : 'today';
+            const smsText = `The fundraising drive "${c.title}" ended on ${endDateStr}. The organising committee is grateful for your support — thank you. To those who did not honor their pledges, we appreciate your interest and hope you'll consider supporting future drives.`;
+            const emailHtml = `
+                <div style="font-family: Arial, sans-serif; max-width:600px;">
+                    <p>Dear supporter,</p>
+                    <p>The fundraising drive "<strong>${c.title}</strong>" ended on <strong>${endDateStr}</strong>.</p>
+                    <p>The organising committee is very grateful for your support. To those who did not honor their pledges, we appreciate your interest and hope you'll consider supporting future drives.</p>
+                    <p>With gratitude,<br/>The organising committee</p>
+                </div>
+            `;
+
+            const intendedSms = [];
+            const intendedEmails = [];
+
+            for (const p of pledges) {
+                const phone = p.phone_number || p.donor_phone;
+                const toEmail = p.donor_email || p.email;
+
+                if (phone) intendedSms.push({ pledgeId: p.id, phone, donor: p.donor_name });
+                if (toEmail) intendedEmails.push({ pledgeId: p.id, email: toEmail, donor: p.donor_name });
+
+                if (sendEnabled) {
+                    try {
+                        if (phone) {
+                            await smsService.sendSMS(phone, smsText);
+                            messagesSent++;
+                        }
+                    } catch (smsErr) {
+                        console.error(`[ERROR] SMS to ${phone} failed:`, smsErr.message || smsErr);
+                        errors++;
+                    }
+
+                    try {
+                        if (toEmail) {
+                            await emailService.sendEmail({ to: toEmail, subject: `${c.title} - Fundraising Completed`, html: emailHtml });
+                            messagesSent++;
+                        }
+                    } catch (emailErr) {
+                        console.error(`[ERROR] Email to ${toEmail} failed:`, emailErr.message || emailErr);
+                        errors++;
+                    }
+                }
+            }
+
+            if (!sendEnabled) {
+                console.log(`[DRY-RUN] Would send ${intendedSms.length} SMS and ${intendedEmails.length} emails for campaign ID ${c.id}`);
+                if (intendedSms.length > 0) console.log('  SMS recipients:', intendedSms.slice(0, 10));
+                if (intendedEmails.length > 0) console.log('  Email recipients:', intendedEmails.slice(0, 10));
+            }
+
+            // Mark campaign completed and stop reminders for its pledges
+            try {
+                await campaignService.updateCampaignStatus(c.id, 'completed');
+                await pool.execute('UPDATE pledges SET last_reminder_sent = NOW() WHERE campaign_id = ?', [c.id]);
+            } catch (updateErr) {
+                console.error('[ERROR] Updating campaign/pledges after closure:', updateErr.message || updateErr);
+                errors++;
+            }
+
+            processed++;
+        }
+
+        console.log(`[OK] Campaign closure processing complete: ${processed} campaigns closed, ${messagesSent} messages attempted, ${errors} errors`);
+        return { processed, messagesSent, errors };
+    } catch (error) {
+        console.error('[ERROR] Processing campaign closures:', error.message || error);
+        return { processed: 0, error: error.message || String(error) };
+    }
+}

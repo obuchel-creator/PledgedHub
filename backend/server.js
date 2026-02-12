@@ -47,7 +47,10 @@ const publicRoutes = require('./routes/publicRoutes');
 const bankSettingsRoutes = require('./routes/bankSettingsRoutes');
 const payoutRoutes = require('./routes/payoutRoutes');
 const cashPaymentRoutes = require('./routes/cashPaymentRoutes');
+const qrCodeRoutes = require('./routes/qrCodeRoutes');
 const deploymentRoutes = require('./routes/deploymentRoutes');
+const mtnCallbackRoutes = require('./routes/mtnCallbackRoutes');
+const airtelCallbackRoutes = require('./routes/airtelCallbackRoutes');
 
 // Import middleware
 const { authenticateToken, requireAdmin, requireStaff } = require('./middleware/authMiddleware');
@@ -188,6 +191,11 @@ app.use('/api/simple-payment', securityService.rateLimiters.payment, simplePayme
 app.use('/api/public', publicRoutes); // Guest fundraising routes (NO AUTH)
 app.use('/api/deployment', deploymentRoutes); // Monetization phase info (PUBLIC)
 
+// Mobile money payment webhook callbacks (PUBLIC - must be BEFORE authenticated /api/payments routes)
+// Webhook endpoints that receive callbacks from MTN and Airtel servers
+app.use('/api/payments/mtn/callback', mtnCallbackRoutes);
+app.use('/api/payments/airtel/callback', airtelCallbackRoutes);
+
 // Protected routes (authentication required)
 app.use('/api/pledges', pledgeRoutes);
 app.use('/pledges', pledgeRoutes); // Legacy alias
@@ -287,6 +295,11 @@ app.use('/api/payouts',
 app.use('/api/cash-payments',
   authenticateToken,
   cashPaymentRoutes
+);
+
+app.use('/api/qr', 
+  securityService.rateLimiters.api,
+  qrCodeRoutes
 );
 
 // Campaigns routes

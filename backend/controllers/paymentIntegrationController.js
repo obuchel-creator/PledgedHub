@@ -3,6 +3,8 @@ const mtnService = require('../services/mtnService');
 const airtelService = require('../services/airtelService');
 const Payment = require('../models/Payment');
 const Pledge = require('../models/Pledge');
+const QRCodeModel = require('../models/QRCode');
+const { pool } = require('../config/db');
 
 /**
  * Get available payment methods

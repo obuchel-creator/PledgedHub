@@ -1,17 +1,10 @@
 
-console.log('[API] api.js loaded - version 2025-12-16');
 import { getViteEnv } from '../utils/getViteEnv';
 const viteEnv = getViteEnv();
 // Force using proxy - always use /api to go through Vite dev server proxy
 const BASE_URL = '/api';
 
-console.log('API Configuration:', {
-  API_URL: viteEnv.API_URL,
-  APP_NAME: viteEnv.APP_NAME,
-  APP_VERSION: viteEnv.APP_VERSION,
-  NODE_ENV: viteEnv.NODE_ENV,
-  BASE_URL: BASE_URL,
-});
+// API configuration loaded from Vite env
 
 function withLeadingSlash(path) {
   const value = String(path || '');
@@ -23,7 +16,6 @@ function buildUrl(path, params) {
   const p = path ? String(path).replace(/^\/+/, '') : '';
   const urlBase = BASE_URL ? `${BASE_URL}/${p}` : `/${p}`;
   if (!params || Object.keys(params).length === 0) {
-    console.log('Requesting URL:', urlBase);
     return urlBase;
   }
   const qs = new URLSearchParams(
@@ -35,7 +27,6 @@ function buildUrl(path, params) {
     }, []),
   ).toString();
   const fullUrl = urlBase + (urlBase.includes('?') ? '&' : '?') + qs;
-  console.log('Requesting URL:', fullUrl);
   return fullUrl;
 }
 
@@ -184,14 +175,12 @@ async function createHttpClient() {
 async function getClient() {
   try {
     if (!clientPromise) {
-      console.log('[API] getClient: Creating new HTTP client');
       clientPromise = createHttpClient();
     } else {
-      console.log('[API] getClient: Returning cached HTTP client');
     }
     return clientPromise;
   } catch (err) {
-    console.error('[API] getClient error:', err);
+    console.error('[API] getClient error:', err?.message || err);
     throw err;
   }
 }
@@ -315,21 +304,70 @@ export async function getPayments(query = {}) {
   }
   
   const response = await handleRequest(client.get('payments', { params }));
-  
+
   // Handle both { payments: [...] } and { data: [...] } response formats
   if (response && typeof response === 'object') {
-    if (Array.isArray(response.payments)) {
-      return response.payments;
-    }
-    if (Array.isArray(response.data)) {
-      return response.data;
-    }
-    if (Array.isArray(response)) {
-      return response;
-    }
+    if (Array.isArray(response.payments)) return response.payments;
+    if (Array.isArray(response.data)) return response.data;
+    if (Array.isArray(response)) return response;
   }
-  
+
   return [];
+}
+
+export async function getQRCodeDashboardStats(params = {}) {
+  const client = await getClient();
+  const response = await handleRequest(client.get('qr/dashboard', { params }));
+  if (response && response.success === true && response.data) {
+    return response.data;
+  }
+  return response;
+}
+
+export async function getQRCodeAnalytics(params = {}) {
+  const client = await getClient();
+  const response = await handleRequest(client.get('qr/analytics', { params }));
+  if (response && response.success === true && response.data) {
+    return response.data;
+  }
+  return response;
+}
+
+export async function getActiveQRCodes(pledgeId) {
+  if (pledgeId === undefined || pledgeId === null)
+    return Promise.reject(new Error('getActiveQRCodes: pledgeId is required'));
+  const client = await getClient();
+  const response = await handleRequest(client.get(`qr/pledges/${encodeURIComponent(String(pledgeId))}/active`));
+  if (response && response.success === true && response.data) {
+    return response.data;
+  }
+  return response;
+}
+
+export async function getQRCodeScanHistory(qrCodeId, limit = 50) {
+  if (qrCodeId === undefined || qrCodeId === null)
+    return Promise.reject(new Error('getQRCodeScanHistory: qrCodeId is required'));
+  const client = await getClient();
+  const response = await handleRequest(
+    client.get(`qr/${encodeURIComponent(String(qrCodeId))}/scans`, { params: { limit } })
+  );
+  if (response && response.success === true && response.data) {
+    return response.data;
+  }
+  return response;
+}
+
+export async function getQRCodePaymentHistory(qrCodeId) {
+  if (qrCodeId === undefined || qrCodeId === null)
+    return Promise.reject(new Error('getQRCodePaymentHistory: qrCodeId is required'));
+  const client = await getClient();
+  const response = await handleRequest(
+    client.get(`qr/${encodeURIComponent(String(qrCodeId))}/payments`)
+  );
+  if (response && response.success === true && response.data) {
+    return response.data;
+  }
+  return response;
 }
 
 export async function loginUser(credentials) {

@@ -9,6 +9,8 @@ export default function CreateCampaignScreen() {
   const [description, setDescription] = useState('');
   const [goalAmount, setGoalAmount] = useState('');
   const [suggestedAmount, setSuggestedAmount] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
   const [error, setError] = useState(null);
@@ -19,6 +21,8 @@ export default function CreateCampaignScreen() {
     setDescription('');
     setGoalAmount('');
     setSuggestedAmount('');
+    setStartDate('');
+    setEndDate('');
   };
 
   const validate = () => {
@@ -41,6 +45,22 @@ export default function CreateCampaignScreen() {
       }
     }
 
+    if (!startDate || !endDate) {
+      setError('Start date and end date are required.');
+      return false;
+    }
+
+    const parsedStart = new Date(startDate);
+    const parsedEnd = new Date(endDate);
+    if (Number.isNaN(parsedStart.getTime()) || Number.isNaN(parsedEnd.getTime())) {
+      setError('Start date and end date must be valid dates.');
+      return false;
+    }
+    if (parsedEnd < parsedStart) {
+      setError('End date must be after the start date.');
+      return false;
+    }
+
       setNewCampaignId(result?.data?.id);
     setError(null);
     return true;
@@ -59,6 +79,8 @@ export default function CreateCampaignScreen() {
         description: description.trim(),
         goalAmount: Number(goalAmount),
         suggestedAmount: suggestedAmount ? Number(suggestedAmount) : null,
+        startDate,
+        endDate
       });
 
       setMessage('Campaign created successfully!');
@@ -259,6 +281,41 @@ export default function CreateCampaignScreen() {
                 >
                   Recommended contribution for each individual donor (optional)
                 </p>
+              </div>
+            </div>
+
+            <div className="form-grid form-grid--two">
+              <div className="form-field">
+                <label htmlFor="startDate" className="form-label">
+                  Start date *
+                </label>
+                <input
+                  id="startDate"
+                  name="startDate"
+                  type="date"
+                  value={startDate}
+                  onChange={(event) => setStartDate(event.target.value)}
+                  className="input"
+                  required
+                  aria-required="true"
+                  disabled={loading}
+                />
+              </div>
+              <div className="form-field">
+                <label htmlFor="endDate" className="form-label">
+                  End date *
+                </label>
+                <input
+                  id="endDate"
+                  name="endDate"
+                  type="date"
+                  value={endDate}
+                  onChange={(event) => setEndDate(event.target.value)}
+                  className="input"
+                  required
+                  aria-required="true"
+                  disabled={loading}
+                />
               </div>
             </div>
 

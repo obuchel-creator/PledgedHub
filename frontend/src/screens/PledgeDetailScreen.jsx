@@ -3,6 +3,10 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import {
   getPledge,
   getPayments,
+  getQRCodeDashboardStats,
+  getActiveQRCodes,
+  getQRCodeScanHistory,
+  getQRCodePaymentHistory,
   deletePledge,
   updatePledge,
   sendPledgeReminder,
@@ -48,6 +52,14 @@ export default function PledgeDetailScreen(props) {
   const [showNotificationModal, setShowNotificationModal] = useState(false);
   const [customMessage, setCustomMessage] = useState('');
   const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [qrStats, setQrStats] = useState(null);
+  const [qrActiveCodes, setQrActiveCodes] = useState([]);
+  const [qrLoading, setQrLoading] = useState(false);
+  const [qrError, setQrError] = useState('');
+  const [qrExpandedId, setQrExpandedId] = useState(null);
+  const [qrScanHistory, setQrScanHistory] = useState({});
+  const [qrPaymentHistory, setQrPaymentHistory] = useState({});
+  const [qrDetailLoading, setQrDetailLoading] = useState({});
 
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -130,6 +142,39 @@ export default function PledgeDetailScreen(props) {
 
         if (canceled) return;
         setPayments(Array.isArray(fetchedPayments) ? fetchedPayments : []);
+
+        if (user) {
+          setQrLoading(true);
+          setQrError('');
+          try {
+            const [stats, activeCodes] = await Promise.all([
+              getQRCodeDashboardStats({ pledgeId: id }),
+              getActiveQRCodes(id)
+            ]);
+
+            if (canceled) return;
+
+            if (stats && stats.success === false) {
+              setQrError(stats.error || 'Failed to load QR analytics');
+              setQrStats(null);
+            } else {
+              setQrStats(stats || null);
+            }
+
+            if (activeCodes && activeCodes.success === false) {
+              setQrError(activeCodes.error || 'Failed to load active QR codes');
+              setQrActiveCodes([]);
+            } else {
+              setQrActiveCodes(Array.isArray(activeCodes) ? activeCodes : []);
+            }
+          } catch (qrErr) {
+            if (canceled) return;
+            setQrError(qrErr?.message || 'Failed to load QR analytics');
+          } finally {
+            if (canceled) return;
+            setQrLoading(false);
+          }
+        }
       } catch (err) {
         if (canceled) return;
         console.error('❌ [PledgeDetailScreen] Error fetching pledge:', err);
@@ -145,7 +190,31 @@ export default function PledgeDetailScreen(props) {
     return () => {
       canceled = true;
     };
-  }, [id]);
+  }, [id, user]);
+
+  const loadQrDetails = async (qrCodeId) => {
+    setQrDetailLoading((prev) => ({ ...prev, [qrCodeId]: true }));
+    try {
+      const [scans, payments] = await Promise.all([
+        getQRCodeScanHistory(qrCodeId, 50),
+        getQRCodePaymentHistory(qrCodeId)
+      ]);
+
+      setQrScanHistory((prev) => ({
+        ...prev,
+        [qrCodeId]: Array.isArray(scans) ? scans : []
+      }));
+      setQrPaymentHistory((prev) => ({
+        ...prev,
+        [qrCodeId]: Array.isArray(payments) ? payments : []
+      }));
+    } catch (err) {
+      setQrScanHistory((prev) => ({ ...prev, [qrCodeId]: [] }));
+      setQrPaymentHistory((prev) => ({ ...prev, [qrCodeId]: [] }));
+    } finally {
+      setQrDetailLoading((prev) => ({ ...prev, [qrCodeId]: false }));
+    }
+  };
 
   const totalRaised = useMemo(() => {
     if (pledge && (typeof pledge.amountRaised === 'number' || pledge?.amountRaised)) {
@@ -1392,6 +1461,195 @@ export default function PledgeDetailScreen(props) {
           onClose={() => setShowPaymentModal(false)}
           onSuccess={handlePaymentSuccess}
         />
+      )}
+
+      {user && (
+        <section className="card" aria-labelledby="qr-tracking-heading">
+          <h2 id="qr-tracking-heading" className="card__title">
+            QR Payment Tracking
+          </h2>
+          <p className="card__subtitle">
+            Monitor QR usage, scans, and conversions for this pledge.
+          </p>
+
+          {qrLoading && (
+            <div className="section__body" style={{ color: 'var(--text-subtle)' }}>
+              Loading QR analytics...
+            </div>
+          )}
+
+          {!qrLoading && qrError && (
+            <div
+              className="section__body"
+              style={{
+                background: '#fee2e2',
+                border: '1px solid #fecaca',
+                color: '#b91c1c',
+                padding: '0.75rem 1rem',
+                borderRadius: '8px',
+                marginBottom: '1rem',
+              }}
+            >
+              {qrError}
+            </div>
+          )}
+
+          {!qrLoading && !qrError && qrStats && (
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
+                gap: '1rem',
+                marginBottom: '1.5rem',
+              }}
+            >
+              <div style={{ padding: '1rem', background: '#f8fafc', borderRadius: '10px' }}>
+                <div style={{ fontSize: '0.8rem', color: '#64748b' }}>QR Codes</div>
+                <div style={{ fontSize: '1.4rem', fontWeight: '700' }}>
+                  {qrStats.total_qr_codes || 0}
+                </div>
+              </div>
+              <div style={{ padding: '1rem', background: '#f8fafc', borderRadius: '10px' }}>
+                <div style={{ fontSize: '0.8rem', color: '#64748b' }}>Total Scans</div>
+                <div style={{ fontSize: '1.4rem', fontWeight: '700' }}>
+                  {qrStats.total_scans || 0}
+                </div>
+              </div>
+              <div style={{ padding: '1rem', background: '#f8fafc', borderRadius: '10px' }}>
+                <div style={{ fontSize: '0.8rem', color: '#64748b' }}>Paid via QR</div>
+                <div style={{ fontSize: '1.4rem', fontWeight: '700' }}>
+                  {qrStats.paid_qr_codes || 0}
+                </div>
+              </div>
+              <div style={{ padding: '1rem', background: '#f8fafc', borderRadius: '10px' }}>
+                <div style={{ fontSize: '0.8rem', color: '#64748b' }}>QR Revenue</div>
+                <div style={{ fontSize: '1.2rem', fontWeight: '700' }}>
+                  {formatCurrency(qrStats.amount_from_qr || 0)}
+                </div>
+              </div>
+              <div style={{ padding: '1rem', background: '#f8fafc', borderRadius: '10px' }}>
+                <div style={{ fontSize: '0.8rem', color: '#64748b' }}>Conversion Rate</div>
+                <div style={{ fontSize: '1.2rem', fontWeight: '700' }}>
+                  {qrStats.conversion_rate_percent || 0}%
+                </div>
+              </div>
+            </div>
+          )}
+
+          {!qrLoading && !qrError && (
+            <div>
+              <h3 style={{ margin: '0 0 0.75rem', fontSize: '1rem' }}>Active QR Codes</h3>
+              {qrActiveCodes.length === 0 ? (
+                <div className="empty-state" aria-live="polite">
+                  <p>No active QR codes yet.</p>
+                </div>
+              ) : (
+                <ul className="list list--divided" aria-live="polite">
+                  {qrActiveCodes.map((qr) => (
+                    <li key={qr.id} className="list-item">
+                      <div className="list-item__meta">
+                        <span className="list-item__title">
+                          {qr.provider?.toUpperCase()} • {qr.status}
+                        </span>
+                        <span className="list-item__subtitle">
+                          Scans: {qr.scan_count || 0} • Created: {formatDateTime(qr.created_at)}
+                        </span>
+                        <span className="section__body" style={{ fontSize: '0.9rem' }}>
+                          Reference: {qr.qr_reference}
+                        </span>
+                        <button
+                          type="button"
+                          className="btn btn-secondary"
+                          style={{ marginTop: '0.75rem', alignSelf: 'flex-start' }}
+                          onClick={() => {
+                            const nextId = qrExpandedId === qr.id ? null : qr.id;
+                            setQrExpandedId(nextId);
+                            if (nextId) {
+                              loadQrDetails(qr.id);
+                            }
+                          }}
+                        >
+                          {qrExpandedId === qr.id ? 'Hide Details' : 'View Details'}
+                        </button>
+
+                        {qrExpandedId === qr.id && (
+                          <div
+                            style={{
+                              marginTop: '1rem',
+                              padding: '1rem',
+                              borderRadius: '10px',
+                              background: '#f8fafc',
+                              border: '1px solid #e2e8f0',
+                              width: '100%'
+                            }}
+                          >
+                            {qrDetailLoading[qr.id] ? (
+                              <div className="section__body" style={{ color: 'var(--text-subtle)' }}>
+                                Loading QR activity...
+                              </div>
+                            ) : (
+                              <>
+                                <div style={{ marginBottom: '1rem' }}>
+                                  <h4 style={{ margin: 0, fontSize: '0.95rem' }}>Scan History</h4>
+                                  {(qrScanHistory[qr.id] || []).length === 0 ? (
+                                    <div className="section__body" style={{ marginTop: '0.5rem' }}>
+                                      No scans recorded yet.
+                                    </div>
+                                  ) : (
+                                    <ul className="list list--divided" style={{ marginTop: '0.5rem' }}>
+                                      {qrScanHistory[qr.id].map((scan) => (
+                                        <li key={scan.id} className="list-item">
+                                          <div className="list-item__meta">
+                                            <span className="list-item__title">
+                                              {scan.phone_number || 'Unknown phone'}
+                                            </span>
+                                            <span className="list-item__subtitle">
+                                              {formatDateTime(scan.scanned_at)}
+                                            </span>
+                                          </div>
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  )}
+                                </div>
+                                <div>
+                                  <h4 style={{ margin: 0, fontSize: '0.95rem' }}>Payment History</h4>
+                                  {(qrPaymentHistory[qr.id] || []).length === 0 ? (
+                                    <div className="section__body" style={{ marginTop: '0.5rem' }}>
+                                      No payments linked yet.
+                                    </div>
+                                  ) : (
+                                    <ul className="list list--divided" style={{ marginTop: '0.5rem' }}>
+                                      {qrPaymentHistory[qr.id].map((payment) => (
+                                        <li key={payment.id} className="list-item">
+                                          <div className="list-item__meta">
+                                            <span className="list-item__title">
+                                              {formatCurrency(payment.amount || 0)} • {payment.payment_method || 'unknown'}
+                                            </span>
+                                            <span className="list-item__subtitle">
+                                              {formatDateTime(payment.completed_at || payment.created_at || payment.payment_date)}
+                                            </span>
+                                            <span className="list-item__subtitle">
+                                              Status: {payment.status}
+                                            </span>
+                                          </div>
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  )}
+                                </div>
+                              </>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
+        </section>
       )}
 
       <footer className="section__body" style={{ marginTop: '2rem', color: 'var(--text-subtle)' }}>

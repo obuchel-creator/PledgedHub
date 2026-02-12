@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import PINDialog from '../components/PINDialog';
 import Toast from '../components/Toast';
+import QRPaymentScreen from './QRPaymentScreen';
 import './PaymentInitiationScreen.css';
 
 export default function PaymentInitiationScreen({ pledgeId, pledgeAmount, onSuccess, onCancel }) {
@@ -15,7 +16,8 @@ export default function PaymentInitiationScreen({ pledgeId, pledgeAmount, onSucc
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
-    const [step, setStep] = useState('method'); // method, phone, confirm, pin
+    const [step, setStep] = useState('method'); // method, phone, confirm, pin, qr
+    const [showQRScreen, setShowQRScreen] = useState(false);
     
     // PIN dialog state
     const [showPINDialog, setShowPINDialog] = useState(false);
@@ -25,6 +27,13 @@ export default function PaymentInitiationScreen({ pledgeId, pledgeAmount, onSucc
 
     // Payment methods config
     const paymentMethods = [
+        {
+            id: 'qr',
+            name: 'QR Code Payment',
+            icon: '📲',
+            color: '#667eea',
+            description: 'Scan QR code to pay with MTN or Airtel'
+        },
         {
             id: 'mtn',
             name: 'MTN Mobile Money',
@@ -95,7 +104,10 @@ export default function PaymentInitiationScreen({ pledgeId, pledgeAmount, onSucc
         setError('');
         setPinError('');
         
-        if (methodId === 'paypal') {
+        if (methodId === 'qr') {
+            // Show QR code payment screen
+            setShowQRScreen(true);
+        } else if (methodId === 'paypal') {
             // PayPal doesn't need phone number
             setStep('confirm');
         } else {
@@ -213,6 +225,27 @@ export default function PaymentInitiationScreen({ pledgeId, pledgeAmount, onSucc
     };
 
     const getMethodConfig = (id) => paymentMethods.find(m => m.id === id);
+
+    // Show QR code payment screen if selected
+    if (showQRScreen) {
+        return (
+            <QRPaymentScreen 
+                pledgeId={pledgeId} 
+                pledgeAmount={pledgeAmount}
+                donorName={getMethodConfig(selectedPaymentMethod)?.name || 'Donor'}
+                onSuccess={(result) => {
+                    setSuccess('Payment initiated! Check your phone for the payment prompt.');
+                    setShowQRScreen(false);
+                    if (onSuccess) onSuccess(result);
+                }}
+                onCancel={() => {
+                    setShowQRScreen(false);
+                    setSelectedPaymentMethod('');
+                    setStep('method');
+                }}
+            />
+        );
+    }
 
     return (
         <div className="payment-initiation-screen">

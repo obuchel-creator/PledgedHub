@@ -30,6 +30,7 @@ import AboutScreen from './screens/AboutScreen';
 import PledgeDetailScreen from './screens/PledgeDetailScreen';
 import PledgesScreen from './screens/PledgesScreen';
 import AdvancedAnalyticsScreen from './screens/AdvancedAnalyticsScreen';
+import QRAnalyticsScreen from './screens/QRAnalyticsScreen';
 import FundraisingScreen from './screens/FundraisingScreen';
 import AccountingScreen from './screens/AccountingScreen';
 import { AccountingDashboardScreen } from './screens/AccountingDashboardScreen';
@@ -113,6 +114,14 @@ function App() {
           element={
             <ProtectedRoute>
               <AdvancedAnalyticsScreen />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/analytics/qr"
+          element={
+            <ProtectedRoute>
+              <QRAnalyticsScreen />
             </ProtectedRoute>
           }
         />

@@ -12,9 +12,10 @@ const CampaignsScreen = () => {
   const [error, setError] = useState('');
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [formData, setFormData] = useState({
-    name: '',
+    title: '',
     description: '',
-    targetAmount: '',
+    goalAmount: '',
+    suggestedAmount: '',
     startDate: '',
     endDate: ''
   });
@@ -53,10 +54,24 @@ const CampaignsScreen = () => {
     setError('');
 
     try {
-      const result = await createCampaign(formData);
+      const result = await createCampaign({
+        title: formData.title?.trim(),
+        description: formData.description?.trim(),
+        goalAmount: formData.goalAmount ? Number(formData.goalAmount) : null,
+        suggestedAmount: formData.suggestedAmount ? Number(formData.suggestedAmount) : null,
+        startDate: formData.startDate,
+        endDate: formData.endDate
+      });
       if (result.success) {
         setShowCreateForm(false);
-        setFormData({ name: '', description: '', targetAmount: '', startDate: '', endDate: '' });
+        setFormData({
+          title: '',
+          description: '',
+          goalAmount: '',
+          suggestedAmount: '',
+          startDate: '',
+          endDate: ''
+        });
         fetchCampaigns();
       } else {
         setError(result.error || 'Failed to create campaign');
@@ -111,12 +126,12 @@ const CampaignsScreen = () => {
           <h2>Create New Campaign</h2>
           <form onSubmit={handleSubmit}>
             <div className="form-group">
-              <label htmlFor="name">Campaign Name *</label>
+              <label htmlFor="title">Campaign Name *</label>
               <input
                 type="text"
-                id="name"
-                name="name"
-                value={formData.name}
+                id="title"
+                name="title"
+                value={formData.title}
                 onChange={handleChange}
                 required
               />
@@ -134,12 +149,25 @@ const CampaignsScreen = () => {
             </div>
 
             <div className="form-group">
-              <label htmlFor="targetAmount">Target Amount (UGX)</label>
+              <label htmlFor="goalAmount">Target Amount (UGX)</label>
               <input
                 type="number"
-                id="targetAmount"
-                name="targetAmount"
-                value={formData.targetAmount}
+                id="goalAmount"
+                name="goalAmount"
+                value={formData.goalAmount}
+                onChange={handleChange}
+                min="0"
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="suggestedAmount">Suggested Amount (UGX)</label>
+              <input
+                type="number"
+                id="suggestedAmount"
+                name="suggestedAmount"
+                value={formData.suggestedAmount}
                 onChange={handleChange}
                 min="0"
               />
@@ -147,24 +175,26 @@ const CampaignsScreen = () => {
 
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="startDate">Start Date</label>
+                <label htmlFor="startDate">Start Date *</label>
                 <input
                   type="date"
                   id="startDate"
                   name="startDate"
                   value={formData.startDate}
                   onChange={handleChange}
+                  required
                 />
               </div>
 
               <div className="form-group">
-                <label htmlFor="endDate">End Date</label>
+                <label htmlFor="endDate">End Date *</label>
                 <input
                   type="date"
                   id="endDate"
                   name="endDate"
                   value={formData.endDate}
                   onChange={handleChange}
+                  required
                 />
               </div>
             </div>
@@ -183,13 +213,13 @@ const CampaignsScreen = () => {
         ) : (
           campaigns.map((campaign) => {
             const slug = campaign.slug || campaign.event_code || campaign.id;
-            const goal = parseInt(campaign.targetAmount || campaign.goal) || 0;
-            const raised = parseInt(campaign.currentAmount || campaign.raised) || 0;
+            const goal = parseInt(campaign.goal_amount || campaign.goalAmount || campaign.goal) || 0;
+            const raised = parseInt(campaign.current_amount || campaign.currentAmount || campaign.raised) || 0;
             const progress = goal > 0 ? Math.min(raised / goal, 1) : 0;
             return (
               <div key={campaign.id} className="campaign-card polished-card">
                 <div className="campaign-header">
-                  <h3>{campaign.name}</h3>
+                  <h3>{campaign.title || campaign.name}</h3>
                   {campaign.status && (
                     <span className={`campaign-status ${campaign.status}`}>{campaign.status}</span>
                   )}

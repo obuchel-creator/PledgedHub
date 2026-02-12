@@ -114,7 +114,7 @@ async function getAirtelToken() {
  */
 async function requestMTNPayment(paymentData) {
     try {
-        const { phoneNumber, amount, pledgeId, currency = 'UGX' } = paymentData;
+        const { phoneNumber, amount, pledgeId, currency = 'UGX', reference } = paymentData;
         
         // Validate phone number (MTN Uganda format: 256XXXXXXXXX)
         const cleanPhone = phoneNumber.replace(/\D/g, '');
@@ -124,11 +124,12 @@ async function requestMTNPayment(paymentData) {
         
         const token = await getMTNToken();
         const referenceId = generateTransactionRef();
+        const externalId = reference || `PLEDGE_${pledgeId}_${Date.now()}`;
         
         const requestData = {
             amount: amount.toString(),
             currency: currency,
-            externalId: `PLEDGE_${pledgeId}_${Date.now()}`,
+            externalId: externalId,
             payer: {
                 partyIdType: 'MSISDN',
                 partyId: cleanPhone
@@ -159,7 +160,7 @@ async function requestMTNPayment(paymentData) {
             success: true,
             provider: 'MTN',
             referenceId: referenceId,
-            transactionId: requestData.externalId,
+            transactionId: externalId,
             status: 'PENDING',
             message: 'Payment request sent. Please approve on your phone.',
             data: {
@@ -224,7 +225,7 @@ async function checkMTNPaymentStatus(referenceId) {
  */
 async function requestAirtelPayment(paymentData) {
     try {
-        const { phoneNumber, amount, pledgeId, currency = 'UGX' } = paymentData;
+        const { phoneNumber, amount, pledgeId, currency = 'UGX', reference } = paymentData;
         
         // Validate phone number (Airtel Uganda format: 256XXXXXXXXX)
         const cleanPhone = phoneNumber.replace(/\D/g, '');
@@ -233,7 +234,7 @@ async function requestAirtelPayment(paymentData) {
         }
         
         const token = await getAirtelToken();
-        const transactionId = `PLEDGE_${pledgeId}_${Date.now()}`;
+        const transactionId = reference || `PLEDGE_${pledgeId}_${Date.now()}`;
         
         const requestData = {
             reference: transactionId,

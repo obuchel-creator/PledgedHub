@@ -64,6 +64,7 @@ const { validationResult } = require('express-validator');
 const Pledge = require('../models/Pledge');  // Using database-connected model
 const campaignService = require('../services/campaignService');
 const pledgeVerificationService = require('../services/pledgeVerificationService');
+const accountingService = require('../services/accountingService');
 
 async function createPledge(req, res) {
     try {
@@ -259,6 +260,48 @@ async function createPledge(req, res) {
         if (payload.campaign_id) {
             await campaignService.updateCampaignAmount(payload.campaign_id);
         }
+
+        // 📊 ACCOUNTING: Record journal entry for new pledge (Receivable)
+        try {
+            const pledgeAmount = parseFloat(payload.amount);
+            const receivablesAccountId = 1200; // Pledges Receivable
+            const unearnedRevenueAccountId = 2000; // Unearned Revenue
+
+            const accountingEntry = {
+                date: new Date(),
+                description: `New Pledge - ${payload.donor_name}`,
+                reference: `PLEDGE-${result.id}-NEW`,
+                userId: userId,
+                lines: [
+                    {
+                        accountId: receivablesAccountId,
+                        type: 'debit',
+                        amount: pledgeAmount,
+                        description: `Pledges Receivable - Pledge #${result.id}`
+                    },
+                    {
+                        accountId: unearnedRevenueAccountId,
+                        type: 'credit',
+                        amount: pledgeAmount,
+                        description: `Unearned Revenue - ${payload.purpose || 'General'}`
+                    }
+                ]
+            };
+
+            const accountingResult = await accountingService.createJournalEntry(accountingEntry);
+            if (accountingResult.success) {
+                // Link pledge to accounting entry
+                await pool.execute(
+                    'UPDATE pledges SET accounting_entry_id = ? WHERE id = ?',
+                    [accountingResult.data.entryId, result.id]
+                );
+                console.log('✅ [ACCOUNTING] Pledge journal entry recorded:', accountingResult.data.entryNumber);
+            }
+        } catch (accountingError) {
+            console.error('⚠️ [ACCOUNTING] Warning - Failed to record accounting entry:', accountingError.message);
+            // Don't fail the pledge if accounting fails - log but continue
+        }
+
         return res.status(201).json({
             success: true,
             pledge: result,

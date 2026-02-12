@@ -1,10 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
-import '../authOutlook.css';
+import '../styles/quickbooks-auth.css';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Logo from '../components/Logo';
-import { socialLogos } from '../assets/social-logos';
 
 export default function LoginScreen() {
   const { login, user } = useAuth();
@@ -111,20 +110,21 @@ export default function LoginScreen() {
     <div className="auth-bg">
       <main>
         <section className="auth-center-card">
-          <div style={{ width: '100%', textAlign: 'center', marginBottom: '32px' }}>
+          <div>
             <Logo size="medium" showText={false} />
           </div>
 
-          <h2>Sign in to PledgeHub</h2>
+          <h2>Let's get you in to PledgeHub</h2>
+          <p className="subtitle">Access your account securely</p>
           
           {error && <div className="error-message">{error}</div>}
           {success && <div className="success-message">{success}</div>}
           
-          <form onSubmit={handleSubmit} noValidate style={{ width: '100%' }}>
+          <form onSubmit={handleSubmit} noValidate>
             {/* Email/Username/Phone field */}
-            <div>
+            <div className="form-group">
               <label htmlFor="email">
-Email, Username, or Phone <span style={{ color: 'var(--error)' }}>*</span>
+                Email, Username, or Phone <span className="required">*</span>
               </label>
               <input
                 id="email"
@@ -141,50 +141,46 @@ Email, Username, or Phone <span style={{ color: 'var(--error)' }}>*</span>
 
             {/* Password field only appears after email step */}
             {step >= 2 && (
-              <div>
+              <div className="form-group">
                 <label htmlFor="password">
-                  Password <span style={{ color: 'var(--error)' }}>*</span>
+                  Password <span className="required">*</span>
                 </label>
-                <div style={{ position: 'relative', marginBottom: '20px' }}>
+                <div className="password-input-wrapper">
                   <input
                     id="password"
                     name="password"
                     type={showPassword ? 'text' : 'password'}
                     value={form.password}
                     onChange={handleChange}
-                    placeholder="Enter your password"
+                    placeholder="••••••••"
                     autoComplete="current-password"
                     disabled={loading}
                     required
-                    style={{ paddingRight: '90px !important', marginBottom: '0' }}
                   />
                   <button
                     type="button"
+                    className="password-toggle-btn"
                     onClick={() => setShowPassword((v) => !v)}
                     disabled={loading}
-                    style={{ 
-                      position: 'absolute',
-                      right: '12px',
-                      top: '50%',
-                      transform: 'translateY(-50%)',
-                      background: 'transparent',
-                      border: 'none',
-                      color: '#3498db',
-                      cursor: 'pointer',
-                      fontSize: '13px',
-                      fontWeight: '600',
-                      padding: '6px 8px',
-                      whiteSpace: 'nowrap',
-                      zIndex: 1000,
-                      lineHeight: 1,
-                      height: 'auto',
-                      width: 'auto',
-                      margin: '0'
-                    }}
+                    tabIndex="-1"
+                    title={showPassword ? 'Hide password' : 'Show password'}
                   >
-                    {showPassword ? '👁️ Hide' : '👁️ Show'}
+                    👁️
                   </button>
                 </div>
+              </div>
+            )}
+
+            {/* Remember Me */}
+            {step >= 2 && (
+              <div className="form-checkbox">
+                <input
+                  id="remember"
+                  type="checkbox"
+                  checked={step === 2}
+                  onChange={() => {}}
+                />
+                <label htmlFor="remember">Remember me</label>
               </div>
             )}
 
@@ -195,17 +191,28 @@ Email, Username, or Phone <span style={{ color: 'var(--error)' }}>*</span>
               disabled={loading}
               aria-busy={loading}
             >
-              {step === 1 ? 'Next' : loading ? 'Signing in...' : 'Login'}
+              <span className="btn-icon">
+                {step === 1 ? '→' : '🔒'}
+              </span>
+              {step === 1 ? 'Next' : loading ? 'Signing in...' : 'Sign in'}
             </button>
 
-            <div style={{ textAlign: 'center', marginTop: '16px' }}>
+            <p className="form-footer-text">
               <Link to="/forgot-password">Forgot password?</Link>
-            </div>
+            </p>
           </form>
 
-          <div style={{ textAlign: 'center', marginTop: '24px' }}>
+          <p className="form-footer-text">
+            New to PledgeHub?{' '}
             <Link to="/register">Create an account</Link>
-          </div>
+          </p>
+
+          <p className="auth-footer">
+            By signing in, you agree to our{' '}
+            <Link to="/terms">Terms of Service</Link>
+            {' and '}
+            <Link to="/privacy">Privacy Policy</Link>
+          </p>
         </section>
       </main>
     </div>

@@ -28,10 +28,16 @@ async function getPledgesNeedingReminder(daysUntilDue) {
             SELECT 
                 p.*
             FROM pledges p
+            LEFT JOIN campaigns c ON p.campaign_id = c.id
             WHERE DATE(p.collection_date) = ?
             AND p.status != 'paid'
             AND p.status != 'cancelled'
             AND (p.last_reminder_sent IS NULL OR DATE(p.last_reminder_sent) != CURDATE())
+            AND (
+                p.campaign_id IS NULL
+                OR c.end_date IS NULL
+                OR c.end_date >= CURDATE()
+            )
         `;
         
         const [pledges] = await pool.execute(query, [targetDateStr]);
@@ -53,9 +59,15 @@ async function getOverduePledges() {
                 p.*,
                 DATEDIFF(CURDATE(), p.collection_date) as days_overdue
             FROM pledges p
+            LEFT JOIN campaigns c ON p.campaign_id = c.id
             WHERE p.collection_date < CURDATE()
             AND p.status = 'pending'
             AND (p.last_reminder_sent IS NULL OR DATE(p.last_reminder_sent) != CURDATE())
+            AND (
+                p.campaign_id IS NULL
+                OR c.end_date IS NULL
+                OR c.end_date >= CURDATE()
+            )
         `;
         
         const [pledges] = await pool.execute(query);

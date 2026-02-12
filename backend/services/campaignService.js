@@ -9,18 +9,20 @@ const { pool } = require('../config/db');
  * @param {number} params.suggestedAmount - Suggested amount per donor
  * @returns {Promise<{success: boolean, data?: any, error?: string}>}
  */
-async function createCampaign({ title, description, goalAmount, suggestedAmount }) {
+async function createCampaign({ title, description, goalAmount, suggestedAmount, startDate, endDate }) {
     try {
         const sql = `
-            INSERT INTO campaigns (title, description, goal_amount, suggested_amount, current_amount, status)
-            VALUES (?, ?, ?, ?, 0, 'active')
+            INSERT INTO campaigns (title, description, goal_amount, suggested_amount, start_date, end_date, current_amount, status)
+            VALUES (?, ?, ?, ?, ?, ?, 0, 'active')
         `;
         
         const [result] = await pool.execute(sql, [
             title,
             description || null,
             goalAmount,
-            suggestedAmount || null
+            suggestedAmount || null,
+            startDate,
+            endDate
         ]);
 
         console.log(`✅ Campaign created: "${title}" (ID: ${result.insertId}, Goal: ${goalAmount} UGX)`);
@@ -33,6 +35,8 @@ async function createCampaign({ title, description, goalAmount, suggestedAmount 
                 description,
                 goalAmount,
                 suggestedAmount,
+                startDate,
+                endDate,
                 status: 'active'
             } 
         };
@@ -58,7 +62,7 @@ async function getAllCampaigns({ status } = {}) {
                 c.id,
                 c.title as title,
                 c.description,
-                c.target_amount as goal_amount,
+                c.goal_amount as goal_amount,
                 c.suggested_amount as suggested_amount,
                 COALESCE(SUM(p.amount), 0) as current_amount,
                 c.status,
@@ -70,7 +74,7 @@ async function getAllCampaigns({ status } = {}) {
                 COALESCE(SUM(p.amount), 0) as total_pledged,
                 COALESCE(SUM(CASE WHEN p.status = 'paid' THEN p.amount ELSE 0 END), 0) as total_paid,
                 COALESCE(SUM(CASE WHEN p.status = 'pending' THEN p.amount ELSE 0 END), 0) as total_pending,
-                ROUND((COALESCE(SUM(p.amount), 0) / c.target_amount) * 100, 2) as progress_percentage
+                ROUND((COALESCE(SUM(p.amount), 0) / c.goal_amount) * 100, 2) as progress_percentage
             FROM campaigns c
             LEFT JOIN pledges p ON c.id = p.campaign_id
             WHERE c.deleted = 0
@@ -169,6 +173,8 @@ async function getCampaignWithPledges(campaignId) {
                 suggested_amount: campaign.suggested_amount ? parseFloat(campaign.suggested_amount) : null,
                 current_amount: parseFloat(campaign.current_amount),
                 status: campaign.status,
+                start_date: campaign.start_date,
+                end_date: campaign.end_date,
                 created_at: campaign.created_at,
                 updated_at: campaign.updated_at,
                 pledges: pledges.map(p => ({

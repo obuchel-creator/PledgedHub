@@ -70,13 +70,13 @@ DashboardMetrics.propTypes = {
   pledges: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-      amount: PropTypes.number,
+      amount: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
       status: PropTypes.string,
     })
   ).isRequired,
   payments: PropTypes.arrayOf(
     PropTypes.shape({
-      amount: PropTypes.number,
+      amount: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
       status: PropTypes.string,
     })
   ).isRequired,

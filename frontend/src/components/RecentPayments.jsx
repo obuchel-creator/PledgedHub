@@ -114,7 +114,7 @@ RecentPayments.propTypes = {
       pledge_id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
       amount: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
       payment_method: PropTypes.string,
-      status: PropTypes.oneOf(['pending', 'completed', 'success', 'failed']),
+      status: PropTypes.oneOf(['pending', 'completed', 'success', 'failed', 'rejected']),
       pledgeTitle: PropTypes.string,
       pledgeName: PropTypes.string,
       pledgeDonor: PropTypes.string,

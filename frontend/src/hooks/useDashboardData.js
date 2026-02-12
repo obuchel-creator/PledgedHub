@@ -98,6 +98,39 @@ export default function useDashboardData() {
 
     try {
       const form = state.pledgeForm;
+      
+      // Validation: Check email first (editable field)
+      if (!form.email || form.email.trim() === '') {
+        throw new Error('Email is required');
+      }
+      
+      // Validation: Check email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(form.email)) {
+        throw new Error('Please enter a valid email address');
+      }
+
+      // Validation: Check amount next (editable field)
+      const amount = Number(form.amount);
+      if (!form.amount || form.amount === '' || amount <= 0) {
+        throw new Error('Amount is required and must be greater than 0');
+      }
+
+      // Validation: Check collection date (editable field)
+      if (!form.collectionDate || form.collectionDate.trim() === '') {
+        throw new Error('Collection date is required');
+      }
+
+      // Validation: Check purpose
+      if (!form.purpose || form.purpose.trim() === '') {
+        throw new Error('Purpose is required');
+      }
+
+      // If purpose is "Other", custom purpose must be filled
+      if (form.purpose === 'Other' && (!form.customPurpose || form.customPurpose.trim() === '')) {
+        throw new Error('Please describe what you\'re pledging for');
+      }
+
       const finalPurpose = form.purpose === 'Other' ? form.customPurpose : form.purpose;
 
       console.log('📝 [PLEDGE CREATE] Submitting pledge:', {

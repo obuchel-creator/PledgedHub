@@ -7,7 +7,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import './PaymentSettingsScreen.css';
-import { uiDebug } from '../utils/debug';
 
 const PaymentSettingsScreen = () => {
   const { token } = useAuth();
@@ -52,7 +51,7 @@ const PaymentSettingsScreen = () => {
         if (!response.ok) throw new Error('Failed to fetch settings');
 
         const result = await response.json();
-        uiDebug('[PaymentSettings] Loaded settings:', result);
+        console.log('📥 Loaded payment settings:', result);
 
         // Load each provider if configured
         if (result.data?.mtn?.subscriptionKey) {
@@ -103,7 +102,7 @@ const PaymentSettingsScreen = () => {
       }
 
       showMessage('success', `✅ ${provider.toUpperCase()} settings saved successfully`);
-      uiDebug(`[PaymentSettings] Saved ${provider} settings`);
+      console.log(`✅ Saved ${provider} settings`);
     } catch (error) {
       console.error(`❌ Error saving ${provider} settings:`, error);
       showMessage('error', `❌ Error: ${error.message}`);
@@ -129,7 +128,7 @@ const PaymentSettingsScreen = () => {
       }
 
       showMessage('success', `✅ ${provider.toUpperCase()} connection successful!`);
-      uiDebug(`[PaymentSettings] ${provider} test passed:`, result.data);
+      console.log(`✅ ${provider} test passed:`, result.data);
     } catch (error) {
       console.error(`❌ Error testing ${provider}:`, error);
       showMessage('error', `❌ Test failed: ${error.message}`);

@@ -1,4 +1,4 @@
-# Payment Integration Complete - PledgeHub System
+﻿# Payment Integration Complete - PledgeHub System
 
 ## ✅ Implementation Status: COMPLETE
 

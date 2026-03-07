@@ -1,4 +1,4 @@
-const router = require('express').Router();
+﻿const router = require('express').Router();
 const speakeasy = require('speakeasy');
 const qrcode = require('qrcode');
 const { authenticateToken } = require('../middleware/authMiddleware');

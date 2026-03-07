@@ -11,11 +11,16 @@ import { parsePledgeMessage } from '../utils/pledgeHelpers';
 function PledgeListItem({ pledge }) {
   // More robust ID extraction - check all possible ID fields
   const id = pledge?.id || pledge?._id || pledge?.pledgeId || pledge?.pledge_id;
-
+  
+  // Log for debugging if ID is missing
+  if (!id) {
+    console.warn('⚠️ [PledgeListItem] Pledge missing ID field:', pledge);
+  }
+  
+  console.log('🔍 [PledgeListItem] Rendering pledge:', { id, hasId: !!id, pledge });
   const details = parsePledgeMessage(pledge?.message);
   const purposeDisplay = details.purpose || pledge?.title || pledge?.name || pledge?.purpose || 'Pledge';
   const donorName = pledge?.donor_name || pledge?.fullName || 'Anonymous';
-  const donorContact = pledge?.phone || pledge?.phone_number || pledge?.email || 'No contact provided';
   const pledgeDateDisplay = formatDateShort(details.pledgeDate || pledge?.date || pledge?.created_at);
   const collectionDateDisplay = formatDateShort(details.collectionDate || pledge?.collection_date);
   const amountDisplay = formatCurrency(pledge?.amount ?? pledge?.goal) || 'Amount unavailable';
@@ -35,7 +40,6 @@ function PledgeListItem({ pledge }) {
         <div className="pledge-list-item__details">
           <p className="pledge-list-item__purpose">{purposeDisplay}</p>
           <p className="pledge-list-item__donor">From: {donorName}</p>
-          <p className="pledge-list-item__contact">Contact: {donorContact}</p>
         </div>
         <div className="pledge-list-item__dates">
           <span className="pledge-list-item__date">
@@ -46,29 +50,16 @@ function PledgeListItem({ pledge }) {
               Due: {collectionDateDisplay}
             </span>
           )}
-          {id && (
-            <span className="pledge-list-item__date pledge-list-item__date--muted">
-              Ref: #{id}
-            </span>
-          )}
         </div>
       </div>
       <div className="pledge-list-item__actions">
         {id ? (
-          <>
-            <Link
-              to={`/pledges/${id}?action=pay`}
-              className="btn btn-primary btn--small"
-            >
-              Pay Now
-            </Link>
-            <Link
-              to={`/pledges/${id}`}
-              className="btn btn--secondary btn--small"
-            >
-              View Details
-            </Link>
-          </>
+          <Link
+            to={`/pledges/${id}`}
+            className="btn btn--secondary btn--small"
+          >
+            View Details
+          </Link>
         ) : (
           <button
             disabled
@@ -96,9 +87,6 @@ PledgeListItem.propTypes = {
     donorName: PropTypes.string,
     donor_name: PropTypes.string,
     fullName: PropTypes.string,
-    phone: PropTypes.string,
-    phone_number: PropTypes.string,
-    email: PropTypes.string,
     amount: PropTypes.number,
     goal: PropTypes.number,
     status: PropTypes.string,

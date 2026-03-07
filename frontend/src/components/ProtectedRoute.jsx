@@ -49,6 +49,7 @@ const ProtectedRoute = ({
   
   // After loading is complete, check if user has token
   if (!token) {
+    console.log('🔐 ProtectedRoute: No token, redirecting to login');
     return <Navigate to="/login" replace />;
   }
 
@@ -89,6 +90,7 @@ const ProtectedRoute = ({
   }
 
   // All checks passed, render protected content
+  console.log(`✅ ProtectedRoute: Access granted for ${user?.email} (${user?.role || 'donor'})`);
   return children;
 };
 

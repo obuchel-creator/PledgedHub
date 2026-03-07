@@ -311,16 +311,16 @@ function requirePermission(permission) {
  * Maps to new role hierarchy for existing code
  */
 function requireStaff(req, res, next) {
-    // Support both old role names (staff, admin, superadmin) and new RBAC names
-    return requireRole(['staff', 'admin', 'superadmin', 'support_staff', 'finance_admin', 'super_admin'])(req, res, next);
+    // Old "staff" role = new "support_staff" or "finance_admin"
+    return requireRole(['support_staff', 'finance_admin', 'super_admin'])(req, res, next);
 }
 
 /**
  * LEGACY: Require admin role (backward compatible)
- * Maps to new super_admin role and supports old admin/superadmin role names
+ * Maps to new super_admin role
  */
 function requireAdmin(req, res, next) {
-    return requireRole(['admin', 'superadmin', 'super_admin'])(req, res, next);
+    return requireRole('super_admin')(req, res, next);
 }
 
 /**

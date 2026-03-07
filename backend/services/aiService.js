@@ -87,7 +87,7 @@ Requirements:
 - ${includeMotivation ? 'Include brief motivation/appreciation emphasizing community support' : 'Keep it brief and factual'}
 - Use appropriate emojis sparingly (🙏 for respect, 💙 for unity)
 - Reference community/family values and collective mission
-- Include subtle mention of 'PledgedHub' (unity) values
+- Include subtle mention of 'PledgeHub' (unity) values
 - Do NOT include quotes or extra formatting
 - Make it personal and warm
 
@@ -249,7 +249,7 @@ Requirements:
 - ${includeImpact ? 'Mention positive community impact and collective progress' : 'Keep focused on gratitude and community appreciation'}
 - Use 1-2 appropriate emojis (🙏 for gratitude, 💙 for community love)
 - Reference community spirit, unity, or collective mission
-- Include subtle reference to 'PledgedHub' (unity) values
+- Include subtle reference to 'PledgeHub' (unity) values
 - Make it personal, heartfelt, and community-focused
 - Do NOT include quotes
 
@@ -336,7 +336,7 @@ async function generateChatResponse(userMessage, context = '', dataContext = '')
         const systemContext = context ? `\nUser is currently on: ${context}` : '';
         const additionalContext = dataContext || '';
         
-        const prompt = `You are a helpful AI assistant for the PledgedHub Pledge Management System, a platform used in Uganda for managing church and community donations/pledges.
+        const prompt = `You are a helpful AI assistant for the PledgeHub Pledge Management System, a platform used in Uganda for managing church and community donations/pledges.
 
 Key system features:
 - Create and manage pledges with donor information
@@ -352,7 +352,7 @@ User question: "${userMessage}"
 
 Provide a helpful, friendly response that:
 1. Directly answers their question
-2. Relates to the PledgedHub system when relevant
+2. Relates to the PledgeHub system when relevant
 3. Offers practical next steps or suggestions
 4. Uses a warm, professional tone suitable for Ugandan users
 5. Keeps responses concise but informative (2-3 sentences max)

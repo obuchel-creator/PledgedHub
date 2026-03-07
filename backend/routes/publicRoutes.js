@@ -3,55 +3,6 @@ const router = express.Router();
 const { pool } = require('../config/db');
 const { mobileMoneyService } = require('../services/mobileMoneyService');
 const paymentTrackingService = require('../services/paymentTrackingService');
-const { encryptValue, decryptFields } = require('../services/dataEncryptionService');
-const { rejectSensitivePaymentData } = require('../middleware/pciDssMiddleware');
-const pciComplianceService = require('../services/pciComplianceService');
-
-const pciGuard = rejectSensitivePaymentData(pciComplianceService);
-
-let pledgeColumnsCache = null;
-
-async function getPledgesSchema() {
-  if (pledgeColumnsCache) return pledgeColumnsCache;
-
-  const [columns] = await pool.execute(`
-    SELECT COLUMN_NAME, DATA_TYPE, CHARACTER_MAXIMUM_LENGTH
-    FROM INFORMATION_SCHEMA.COLUMNS
-    WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'pledges'
-  `);
-
-  const byName = new Map();
-  for (const col of columns) {
-    byName.set(col.COLUMN_NAME, {
-      dataType: (col.DATA_TYPE || '').toLowerCase(),
-      maxLen: col.CHARACTER_MAXIMUM_LENGTH,
-    });
-  }
-
-  pledgeColumnsCache = byName;
-  return pledgeColumnsCache;
-}
-
-function maybeEncryptForColumn(value, columnInfo) {
-  if (value == null || value === '') return value;
-  if (!columnInfo) return value;
-
-  // Keep numeric and date columns untouched.
-  if (!['varchar', 'char', 'text', 'tinytext', 'mediumtext', 'longtext'].includes(columnInfo.dataType)) {
-    return value;
-  }
-
-  const encrypted = encryptValue(value);
-  if (!encrypted) return value;
-
-  // Older schemas may still have short VARCHAR columns (e.g. 20/50).
-  // If encrypted payload cannot fit, fallback to plain value to avoid hard 500s.
-  if (columnInfo.maxLen && encrypted.length > columnInfo.maxLen) {
-    return value;
-  }
-
-  return encrypted;
-}
 
 /**
  * PUBLIC: Get campaign by numeric ID (no auth required)
@@ -274,7 +225,6 @@ router.get('/campaigns/code/:code', async (req, res) => {
 router.post('/pledges', async (req, res) => {
   try {
     const { campaign_id, campaign_slug, amount, donor_name, donor_phone, donor_email } = req.body;
-    const schema = await getPledgesSchema();
 
     // Validate inputs
     if (!amount || amount <= 0) {
@@ -317,56 +267,37 @@ router.post('/pledges', async (req, res) => {
       });
     }
 
-    // Build insert payload based on columns that actually exist in current DB schema.
-    const insertData = {
-      campaign_id: pledgeCampaignId,
-      donor_name: donor_name || 'Anonymous',
-      donor_email: donor_email ? maybeEncryptForColumn(donor_email, schema.get('donor_email')) : null,
-      donor_phone: maybeEncryptForColumn(donor_phone, schema.get('donor_phone')),
+    // Create pledge record
+    const [result] = await pool.execute(`
+      INSERT INTO pledges (
+        campaign_id,
+        donor_name,
+        donor_email,
+        donor_phone,
+        amount,
+        balance,
+        status,
+        payment_status,
+        created_at
+      ) VALUES (?, ?, ?, ?, ?, ?, 'pending', 'unpaid', NOW())
+    `, [
+      pledgeCampaignId,
+      donor_name || 'Anonymous',
+      donor_email || null,
+      donor_phone,
       amount,
-      status: 'pending',
-    };
-
-    if (schema.has('payment_status')) {
-      insertData.payment_status = 'unpaid';
-    }
-
-    // Different installations may use either balance or balance_remaining.
-    if (schema.has('balance')) {
-      insertData.balance = amount;
-    }
-    if (schema.has('balance_remaining')) {
-      insertData.balance_remaining = amount;
-    }
-
-    if (schema.has('created_at')) {
-      insertData.created_at = new Date();
-    }
-    if (schema.has('deleted')) {
-      insertData.deleted = 0;
-    }
-
-    const fields = Object.keys(insertData);
-    const placeholders = fields.map(() => '?');
-    const values = fields.map((f) => insertData[f]);
-
-    const [result] = await pool.execute(
-      `INSERT INTO pledges (${fields.join(', ')}) VALUES (${placeholders.join(', ')})`,
-      values,
-    );
+      amount // balance = remaining amount to pay
+    ]);
 
     const pledgeId = result.insertId;
 
     // Generate pledge receipt number
     const receiptNumber = `PLG-${pledgeId}-${Date.now().toString().slice(-6)}`;
 
-    // Update with receipt number when schema supports it.
-    if (schema.has('receipt_number')) {
-      await pool.execute(
-        'UPDATE pledges SET receipt_number = ? WHERE id = ?',
-        [receiptNumber, pledgeId],
-      );
-    }
+    // Update with receipt number
+    await pool.execute(`
+      UPDATE pledges SET receipt_number = ? WHERE id = ?
+    `, [receiptNumber, pledgeId]);
 
     // Log this guest pledge
     console.log(`✅ Guest pledge created: ID=${pledgeId}, Phone=${donor_phone}, Amount=${amount}`);
@@ -384,20 +315,9 @@ router.post('/pledges', async (req, res) => {
 
   } catch (error) {
     console.error('❌ Error creating guest pledge:', error.message);
-    const includeDebug = process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test';
     res.status(500).json({
       success: false,
-      error: 'Failed to create pledge',
-      ...(includeDebug
-        ? {
-            debug: {
-              message: error.message,
-              code: error.code || null,
-              errno: error.errno || null,
-              sqlState: error.sqlState || null,
-            },
-          }
-        : {}),
+      error: 'Failed to create pledge'
     });
   }
 });
@@ -412,7 +332,7 @@ router.post('/pledges', async (req, res) => {
  *   donor_phone: string (for MTN/Airtel)
  * }
  */
-router.post('/pledges/:pledgeId/pay', pciGuard, async (req, res) => {
+router.post('/pledges/:pledgeId/pay', async (req, res) => {
   try {
     const { pledgeId } = req.params;
     const { payment_method, donor_phone } = req.body;
@@ -429,7 +349,7 @@ router.post('/pledges/:pledgeId/pay', pciGuard, async (req, res) => {
       });
     }
 
-    const pledge = decryptFields(pledges[0], ['donor_email', 'donor_phone', 'payment_reference']);
+    const pledge = pledges[0];
     const amount = pledge.balance || pledge.amount;
 
     if (amount <= 0) {

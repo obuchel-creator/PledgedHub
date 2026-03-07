@@ -1,4 +1,4 @@
-const path = require('path');
+﻿const path = require('path');
 const logger = require('./utils/logger');
 const express = require('express');
 const cors = require('cors');
@@ -48,7 +48,6 @@ const bankSettingsRoutes = require('./routes/bankSettingsRoutes');
 const payoutRoutes = require('./routes/payoutRoutes');
 const cashPaymentRoutes = require('./routes/cashPaymentRoutes');
 const deploymentRoutes = require('./routes/deploymentRoutes');
-const { router: monetizationRoutes } = require('./routes/monetizationRoutes');
 
 // Import middleware
 const { authenticateToken, requireAdmin, requireStaff } = require('./middleware/authMiddleware');
@@ -56,8 +55,6 @@ const { authenticateToken, requireAdmin, requireStaff } = require('./middleware/
 // Import services
 const securityService = require('./services/securityService');
 const cronScheduler = require('./services/advancedCronScheduler');
-const billingNotificationService = require('./services/billingNotificationService');
-const cron = require('node-cron');
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -79,7 +76,7 @@ app.use(securityService.preventXSS);
 
 // CORS configuration
 const allowedOrigins = process.env.NODE_ENV === 'production'
-  ? [process.env.FRONTEND_URL || 'https://pledgedhub.com']
+  ? [process.env.FRONTEND_URL || 'https://pledgehub.com']
   : [
       'http://localhost:5173',
       'http://localhost:5174',
@@ -110,7 +107,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Session management (REQUIRED for OAuth)
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'pledgedhub-dev-secret-change-in-production',
+  secret: process.env.SESSION_SECRET || 'pledgehub-dev-secret-change-in-production',
   resave: false,
   saveUninitialized: false,
   cookie: {
@@ -130,7 +127,7 @@ app.use(passport.session());
 // ========================================
 
 app.get('/', (req, res) => res.json({
-  message: 'PledgedHub API Running',
+  message: 'PledgeHub API Running',
   status: 'OK',
   version: '1.0.0',
   timestamp: new Date().toISOString()
@@ -160,7 +157,6 @@ app.use('/api/feedback', feedbackRoutes);
 app.use('/api/simple-payment', securityService.rateLimiters.payment, simplePaymentRoutes);
 app.use('/api/public', publicRoutes); // Guest fundraising routes (NO AUTH)
 app.use('/api/deployment', deploymentRoutes); // Monetization phase info (PUBLIC)
-app.use('/api/monetization', monetizationRoutes); // Pricing, notify, subscription (PUBLIC + AUTH)
 
 // Protected routes (authentication required)
 app.use('/api/pledges', pledgeRoutes);
@@ -272,10 +268,10 @@ app.use('/api/campaigns', campaignRoutes);
 
 app.get('/privacy', (req, res) => {
   res.json({
-    title: 'Privacy Policy - PledgedHub',
+    title: 'Privacy Policy - PledgeHub',
     lastUpdated: '2024-12-16',
     content: {
-      introduction: 'PledgedHub is committed to protecting your privacy and personal information.',
+      introduction: 'PledgeHub is committed to protecting your privacy and personal information.',
       dataCollection: 'We collect only essential information needed for pledge management: name, email, and pledge details.',
       dataUsage: 'Your information is used solely for managing your pledges and sending automated reminders.',
       dataSharing: 'We do not share your personal information with third parties except as required by law.',
@@ -288,11 +284,11 @@ app.get('/privacy', (req, res) => {
 
 app.get('/terms', (req, res) => {
   res.json({
-    title: 'Terms of Service - PledgedHub',
+    title: 'Terms of Service - PledgeHub',
     lastUpdated: '2024-12-16',
     content: {
-      acceptance: 'By using PledgedHub, you agree to these terms of service.',
-      description: 'PledgedHub is a pledge management system for tracking donations and commitments.',
+      acceptance: 'By using PledgeHub, you agree to these terms of service.',
+      description: 'PledgeHub is a pledge management system for tracking donations and commitments.',
       userResponsibilities: 'Users are responsible for providing accurate information and honoring their pledges.',
       serviceAvailability: 'We strive to maintain service availability but cannot guarantee 100% uptime.',
       modifications: 'We reserve the right to modify these terms with appropriate notice to users.',
@@ -346,11 +342,11 @@ if (require.main === module) {
   const server = app.listen(PORT, () => {
     logger.info(`
 ╔════════════════════════════════════════╗
-║     PledgedHub Backend Server Ready     ║
+║     PledgeHub Backend Server Ready     ║
 ╠════════════════════════════════════════╣
 ║ Server: http://localhost:${PORT}
 ║ Node Env: ${process.env.NODE_ENV || 'development'}
-║ Database: ${process.env.DB_NAME || 'pledgedhub'}
+║ Database: ${process.env.DB_NAME || 'pledgehub'}
 ║ Time: ${new Date().toISOString()}
 ╚════════════════════════════════════════╝
     `);
@@ -363,23 +359,10 @@ if (require.main === module) {
     } catch (cronError) {
       logger.error('❌ Failed to initialize cron jobs:', cronError.message);
     }
-
-    // Daily billing notification cron — runs at 08:00 server time every day.
-    // Sends emails to registered users 30 days before their free period ends.
-    cron.schedule('0 8 * * *', async () => {
-      try {
-        logger.info('[billing-cron] Running pre-billing notification check…');
-        const result = await billingNotificationService.sendPreBillingNotifications();
-        logger.info(`[billing-cron] Done — sent: ${result.sent}, skipped: ${result.skipped}, total: ${result.total}`);
-      } catch (err) {
-        logger.error('[billing-cron] Failed:', err.message);
-      }
-    }, { timezone: 'Africa/Kampala' });
-
-    // Initialize WebSocket server for realtime updates
-    const { setupRealtime } = require('./services/realtimeService');
-    const wss = setupRealtime(server);
-    app.set('wss', wss);
+      // Initialize WebSocket server for realtime updates
+      const { setupRealtime } = require('./services/realtimeService');
+      const wss = setupRealtime(server);
+      app.set('wss', wss);
   });
 
   // Graceful shutdown
@@ -390,6 +373,10 @@ if (require.main === module) {
       process.exit(0);
     });
   });
+    // Initialize WebSocket server for realtime updates
+    const { setupRealtime } = require('./services/realtimeService');
+    const wss = setupRealtime(server);
+    app.set('wss', wss);
 
   process.on('SIGINT', () => {
     logger.info('📛 SIGINT received, shutting down gracefully...');

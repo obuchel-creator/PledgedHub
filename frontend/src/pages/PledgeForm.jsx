@@ -1,7 +1,6 @@
 // ...existing code...
 import React, { useState } from 'react';
 import { createPledge } from '../services/api';
-import { uiDebug } from '../utils/debug';
 
 export default function PledgeForm() {
   const [form, setForm] = useState({
@@ -29,8 +28,9 @@ export default function PledgeForm() {
     const goal = form.goal ? Number(form.goal) : null;
     const amount = form.amount ? Number(form.amount) : null;
 
-    uiDebug('[FORM] Validation:', { title, goal, amount, types: [typeof title, typeof goal, typeof amount] });
-    uiDebug('[FORM] Raw form data:', form);
+    console.log('🔵 [FORM] Form validation - title:', title, 'goal:', goal, 'amount:', amount);
+    console.log('🔵 [FORM] Form validation - types:', typeof title, typeof goal, typeof amount);
+    console.log('🔵 [FORM] Raw form data:', form);
 
     if (!title) return setError('Title is required.');
     if (!goal && !amount) return setError('Either campaign goal or suggested amount is required.');
@@ -47,11 +47,11 @@ export default function PledgeForm() {
       donorName: 'Anonymous', // Default donor name
     };
 
-    uiDebug('[FORM] Submitting pledge payload:', payload);
+    console.log('🔵 [FORM] Submitting pledge with payload:', JSON.stringify(payload, null, 2));
     setLoading(true);
     try {
       const res = await createPledge(payload);
-      uiDebug('[FORM] Pledge created successfully:', res);
+      console.log('✅ [FORM] Pledge created successfully:', res);
       // createPledge may return created object or id depending on backend
       setSuccess('Pledge created successfully.');
       setForm({ title: '', description: '', goal: '', amount: '' });

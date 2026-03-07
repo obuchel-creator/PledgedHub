@@ -85,7 +85,7 @@ function AccountingDashboard() {
     <div className="accounting-dashboard">
       <header className="dashboard-header">
         <h1>📊 Financial Dashboard</h1>
-        <p className="subtitle">QuickBooks-style accounting for PledgedHub</p>
+        <p className="subtitle">QuickBooks-style accounting for PledgeHub</p>
         <button onClick={fetchDashboard} className="btn-refresh">
           🔄 Refresh
         </button>

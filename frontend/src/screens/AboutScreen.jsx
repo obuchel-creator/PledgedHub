@@ -15,7 +15,7 @@ export default function AboutScreen() {
             About
           </p>
           <h1 id="about-title" className="page-header__title">
-            PledgedHub Platform
+            PledgeHub Platform
           </h1>
           <p className="page-header__subtitle">
             A community-focused pledge and donation experience.
@@ -31,7 +31,7 @@ export default function AboutScreen() {
             id="about-mission"
             className="section__title"
           >
-            What PledgedHub Does
+            What PledgeHub Does
           </h2>
           <p className="section__lead">
             We give organisations and teams a clear way to capture pledges, track progress, and
@@ -126,7 +126,7 @@ export default function AboutScreen() {
           </h2>
           <p>
             Whether you're organizing a wedding, funding a community project, or running a
-            fundraising campaign, PledgedHub provides the tools you need to manage
+            fundraising campaign, PledgeHub provides the tools you need to manage
             contributions with confidence and transparency.
           </p>
         </section>

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { getAnalyticsOverview, getTopDonors, getAtRiskPledges } from '../services/api';
 import { useAuth } from '../context/AuthContext';
-import { uiDebug, uiWarn } from '../utils/debug';
 
 export default function AnalyticsDashboard() {
   const { token, loading: authLoading } = useAuth();
@@ -14,10 +13,10 @@ export default function AnalyticsDashboard() {
   useEffect(() => {
     // Only load analytics when auth is ready and token exists
     if (!authLoading && token) {
-      uiDebug('[ANALYTICS] Auth ready, loading analytics...');
+      console.log('📊 [ANALYTICS] Auth ready, loading analytics...');
       loadAnalytics();
     } else if (!authLoading && !token) {
-      uiWarn('[ANALYTICS] No token available');
+      console.warn('⚠️ [ANALYTICS] No token available');
       setError('Please log in to view analytics');
       setLoading(false);
     }
@@ -27,8 +26,8 @@ export default function AnalyticsDashboard() {
     setLoading(true);
     setError('');
 
-    uiDebug('[ANALYTICS] Fetching analytics data...');
-    uiDebug('[ANALYTICS] Using token:', token ? `${token.substring(0, 20)}...` : 'NO TOKEN');
+    console.log('🔄 [ANALYTICS] Fetching analytics data...');
+    console.log('🔑 [ANALYTICS] Using token:', token ? `${token.substring(0, 20)}...` : 'NO TOKEN');
 
     try {
       const [overviewData, donorsData, atRiskData] = await Promise.all([
@@ -37,7 +36,7 @@ export default function AnalyticsDashboard() {
         getAtRiskPledges(),
       ]);
 
-      uiDebug('[ANALYTICS] Data loaded successfully');
+      console.log('✅ [ANALYTICS] Data loaded successfully');
       setOverview(overviewData);
       setTopDonors(Array.isArray(donorsData) ? donorsData : []);
       setAtRiskPledges(Array.isArray(atRiskData) ? atRiskData : []);

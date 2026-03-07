@@ -1,4 +1,4 @@
-# PledgeHub
+﻿# PledgeHub
 
 A modern, accessible pledge management platform with AI-powered insights, advanced analytics, and professional accounting tools. Built with React, Node.js, Express, and MySQL.
 

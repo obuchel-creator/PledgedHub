@@ -41,7 +41,7 @@ export function SignInScreen() {
   return (
     <div className="auth-container">
       <div className="auth-branding visible">
-        {/* Removed branding text 'PledgedHub' for cleaner look */}
+        {/* Removed branding text 'PledgeHub' for cleaner look */}
         <div className="auth-branding-tagline">
           Secure API Access for Pledge Management & Financial Services
         </div>
@@ -50,9 +50,9 @@ export function SignInScreen() {
       <div className="auth-form-wrapper">
         <div className="auth-form-container">
           <div className="auth-header">
-            {/* Removed header logo text 'PledgedHub' for cleaner look */}
+            {/* Removed header logo text 'PledgeHub' for cleaner look */}
             <h1 className="auth-header-title">Sign In</h1>
-            <p className="auth-header-subtitle">Access your PledgedHub account</p>
+            <p className="auth-header-subtitle">Access your PledgeHub account</p>
           </div>
 
           {error && (
@@ -188,7 +188,7 @@ export function SignUpScreen() {
   return (
     <div className="auth-container">
       <div className="auth-branding visible">
-        {/* Removed branding text 'PledgedHub' for cleaner look */}
+        {/* Removed branding text 'PledgeHub' for cleaner look */}
         <div className="auth-branding-tagline">
           Create a new API Management account and start managing pledges securely
         </div>
@@ -197,9 +197,9 @@ export function SignUpScreen() {
       <div className="auth-form-wrapper">
         <div className="auth-form-container">
           <div className="auth-header">
-            {/* Removed header logo text 'PledgedHub' for cleaner look */}
+            {/* Removed header logo text 'PledgeHub' for cleaner look */}
             <h1 className="auth-header-title">Create Account</h1>
-            <p className="auth-header-subtitle">Sign up for PledgedHub</p>
+            <p className="auth-header-subtitle">Sign up for PledgeHub</p>
           </div>
 
           {error && (
@@ -352,7 +352,7 @@ export function ForgotPasswordScreen() {
   return (
     <div className="auth-container">
       <div className="auth-branding visible">
-        {/* Removed branding text 'PledgedHub' for cleaner look */}
+        {/* Removed branding text 'PledgeHub' for cleaner look */}
         <div className="auth-branding-tagline">
           Reset your password and regain access to your account
         </div>
@@ -361,7 +361,7 @@ export function ForgotPasswordScreen() {
       <div className="auth-form-wrapper">
         <div className="auth-form-container">
           <div className="auth-header">
-            {/* Removed header logo text 'PledgedHub' for cleaner look */}
+            {/* Removed header logo text 'PledgeHub' for cleaner look */}
             <h1 className="auth-header-title">Reset Password</h1>
             <p className="auth-header-subtitle">Enter your email to receive a password reset link</p>
           </div>

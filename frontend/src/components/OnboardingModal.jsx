@@ -18,11 +18,11 @@ function OnboardingModal({ isOpen, onClose }) {
 
   const steps = [
     {
-      title: `Welcome, ${user?.username || user?.name || user?.email || 'PledgedHub User'}!`,
+      title: `Welcome, ${user?.username || user?.name || user?.email || 'PledgeHub User'}!`,
       content: (
         <>
           <p style={{ marginBottom: 12 }}>
-            Thank you for joining PledgedHub. Here you can manage pledges, campaigns, payments, and more—all in one place.
+            Thank you for joining PledgeHub. Here you can manage pledges, campaigns, payments, and more—all in one place.
           </p>
           <ul style={{ marginBottom: 12, paddingLeft: 18 }}>
             <li>✔️ Track your pledges and payments</li>
@@ -63,7 +63,7 @@ function OnboardingModal({ isOpen, onClose }) {
           <p style={{ marginBottom: 12 }}>
             Explore your dashboard, create pledges, and experience the power of automation and analytics.
           </p>
-          <p style={{ color: '#16a34a', fontWeight: 600 }}>Welcome to the PledgedHub family! 🎉</p>
+          <p style={{ color: '#16a34a', fontWeight: 600 }}>Welcome to the PledgeHub family! 🎉</p>
         </>
       ),
     },

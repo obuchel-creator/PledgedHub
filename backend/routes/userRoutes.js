@@ -1,4 +1,4 @@
-console.log('=== userRoutes.js loaded ===');
+﻿console.log('=== userRoutes.js loaded ===');
 const router = require('express').Router();
 const userController = require('../controllers/userController');
 const authController = require('../controllers/authController');
@@ -136,7 +136,7 @@ router.get(
 
             // Get user's pledges
             const [pledges] = await pool.execute(
-                'SELECT * FROM pledges WHERE user_id = ? AND deleted = 0 ORDER BY created_at DESC',
+                'SELECT * FROM pledges WHERE ownerId = ? AND deleted_at IS NULL ORDER BY created_at DESC',
                 [userId]
             );
 
@@ -253,7 +253,7 @@ router.post(
 router.post(
     '/promote',
     protect,
-    requireRole(['admin', 'superadmin', 'super_admin']),
+    requireRole('admin'),
     asyncHandler(async (req, res, next) => {
         await userController.promoteToAdmin(req, res, next);
     })
@@ -263,7 +263,7 @@ router.post(
 router.post(
     '/:id/reset-password',
     protect,
-    requireRole(['superadmin', 'super_admin']),
+    requireRole('superadmin'),
     asyncHandler(async (req, res, next) => {
         await userController.superadminResetAdminPassword(req, res, next);
     })

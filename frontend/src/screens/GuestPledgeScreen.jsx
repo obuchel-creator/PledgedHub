@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import '../styles/GuestPledgeScreen.css';
-import { getCampaignPledges } from '../services/api';
 
 export default function GuestPledgeScreen() {
   const params = useParams();
@@ -25,10 +24,6 @@ export default function GuestPledgeScreen() {
   // Payment state
   const [pledgeCreated, setPledgeCreated] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState('mtn');
-
-  // Fellow pledgers state
-  const [fellowPledgers, setFellowPledgers] = useState([]);
-  const [pledgersLoading, setPledgersLoading] = useState(false);
 
   // Load campaign
   useEffect(() => {
@@ -68,30 +63,6 @@ export default function GuestPledgeScreen() {
       setLoading(false);
     }
   };
-
-  // Load fellow pledgers for this campaign
-  const loadFellowPledgers = async (campaignId) => {
-    if (!campaignId) return;
-    setPledgersLoading(true);
-    try {
-      const result = await getCampaignPledges(campaignId);
-      if (result && result.success) {
-        setFellowPledgers(result.data || result.pledges || []);
-      }
-    } catch (err) {
-      console.error('Error loading fellow pledgers:', err);
-    } finally {
-      setPledgersLoading(false);
-    }
-  };
-
-  // Load pledgers when campaign is known
-  useEffect(() => {
-    if (campaign?.id) {
-      loadFellowPledgers(campaign.id);
-    }
-    // eslint-disable-next-line
-  }, [campaign?.id]);
 
   const calculateProgress = () => {
     if (!campaign) return 0;
@@ -138,8 +109,7 @@ export default function GuestPledgeScreen() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          ...(slug ? { campaign_slug: slug } : {}),
-          ...(!slug && id ? { campaign_id: Number(id) } : {}),
+          campaign_slug: slug,
           amount: parseFloat(amount),
           donor_name: donor_name || 'Anonymous',
           donor_phone: normalizedPhone,
@@ -156,8 +126,6 @@ export default function GuestPledgeScreen() {
 
       // Pledge created successfully
       setPledgeCreated(data.data);
-      // Refresh the fellow pledgers list to include the new pledge
-      if (campaign?.id) loadFellowPledgers(campaign.id);
     } catch (err) {
       console.error('Error creating pledge:', err);
       setSubmitError('Network error. Please try again.');
@@ -249,7 +217,6 @@ export default function GuestPledgeScreen() {
               <label className="payment-option">
                 <input
                     type="radio"
-                    value="mtn"
                     checked={paymentMethod === 'mtn'}
                     onChange={(e) => setPaymentMethod(e.target.value)}
                   />
@@ -286,6 +253,7 @@ export default function GuestPledgeScreen() {
             >
               {isSubmitting ? '⏳ Processing...' : `Pay ${formatCurrency(pledgeCreated.amount)}`}
             </button>
+                        donor_name: donor_name || 'Anonymous',
             <button
               onClick={() => {
                 setPledgeCreated(null);
@@ -321,7 +289,7 @@ export default function GuestPledgeScreen() {
         <div className="stat-card raised">
           <div className="stat-icon">💰</div>
           <div className="stat-content">
-            <div className="stat-value">{formatCurrency(campaign.raised_amount || 0)}</div>
+                        value={donor_name}
             <div className="stat-label">Raised</div>
           </div>
         </div>
@@ -586,42 +554,6 @@ export default function GuestPledgeScreen() {
             )}
           </div>
         </div>
-
-        {/* Fellow Pledgers Section */}
-        {fellowPledgers.length > 0 && (
-          <div style={{ marginTop: '2rem', padding: '1.5rem', background: 'rgba(255,255,255,0.9)', borderRadius: '16px', boxShadow: '0 4px 12px rgba(0,0,0,0.06)' }}>
-            <h3 style={{ fontSize: '1.1rem', fontWeight: '700', color: '#1e293b', marginBottom: '1rem' }}>
-              People Supporting This Campaign ({fellowPledgers.length})
-            </h3>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '0.75rem' }}>
-              {fellowPledgers.slice(0, 20).map((p, idx) => (
-                <div key={p.id || idx} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem', background: '#f8fafc', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
-                  <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'linear-gradient(135deg, #2563eb, #7c3aed)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: '700', fontSize: '0.9rem', flexShrink: 0 }}>
-                    {(p.donor_name || 'A')[0].toUpperCase()}
-                  </div>
-                  <div style={{ overflow: 'hidden' }}>
-                    <div style={{ fontWeight: '600', fontSize: '0.9rem', color: '#1e293b', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      {p.donor_name || 'Anonymous'}
-                    </div>
-                    <div style={{ fontSize: '0.8rem', color: '#64748b' }}>
-                      {formatCurrency(p.amount)}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-            {fellowPledgers.length > 20 && (
-              <p style={{ textAlign: 'center', color: '#64748b', fontSize: '0.875rem', marginTop: '0.75rem' }}>
-                +{fellowPledgers.length - 20} more pledgers
-              </p>
-            )}
-          </div>
-        )}
-        {pledgersLoading && (
-          <div style={{ textAlign: 'center', padding: '1rem', color: '#64748b', fontSize: '0.9rem' }}>
-            Loading pledgers...
-          </div>
-        )}
       </div>
     </div>
   );

@@ -44,7 +44,7 @@ export default function PricingScreen() {
         setMonetizationStatus(statusData.data);
       }
 
-      const token = localStorage.getItem('pledgedhub_token');
+      const token = localStorage.getItem('pledgehub_token');
       if (token) {
         const subRes = await fetch('/api/monetization/subscription', {
           headers: { Authorization: `Bearer ${token}` },

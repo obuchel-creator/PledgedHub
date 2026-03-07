@@ -75,40 +75,13 @@ export async function verifyTwoFactor(code, userId) {
   return handleRequest(client.post(path, { code }));
 }
 
+console.log('[API] api.js loaded - version 2025-12-16');
 import { getViteEnv } from '../utils/getViteEnv';
 const viteEnv = getViteEnv();
 // Force using proxy - always use /api to go through Vite dev server proxy
 const BASE_URL = '/api';
-const DEBUG_AUTH = String(viteEnv.DEBUG_AUTH || '').toLowerCase() === 'true';
-const DEBUG_API = String(viteEnv.DEBUG_API || '').toLowerCase() === 'true' || DEBUG_AUTH;
 
-function apiDebug(...args) {
-  if (DEBUG_API) {
-    console.log(...args);
-  }
-}
-
-function apiDebugError(...args) {
-  if (DEBUG_API) {
-    console.error(...args);
-  }
-}
-
-apiDebug('[API] api.js loaded - version 2025-12-16');
-
-const AUTH_TOKEN_KEYS = ['pledgedhub_token', 'pledgehub_token', 'authToken', 'token'];
-
-export function getStoredAuthToken() {
-  for (const key of AUTH_TOKEN_KEYS) {
-    const value = localStorage.getItem(key);
-    if (value && value !== 'null' && value !== 'undefined') {
-      return value;
-    }
-  }
-  return null;
-}
-
-apiDebug('API Configuration:', {
+console.log('API Configuration:', {
   API_URL: viteEnv.API_URL,
   APP_NAME: viteEnv.APP_NAME,
   APP_VERSION: viteEnv.APP_VERSION,
@@ -126,7 +99,7 @@ function buildUrl(path, params) {
   const p = path ? String(path).replace(/^\/+/, '') : '';
   const urlBase = BASE_URL ? `${BASE_URL}/${p}` : `/${p}`;
   if (!params || Object.keys(params).length === 0) {
-    apiDebug('Requesting URL:', urlBase);
+    console.log('Requesting URL:', urlBase);
     return urlBase;
   }
   const qs = new URLSearchParams(
@@ -138,7 +111,7 @@ function buildUrl(path, params) {
     }, []),
   ).toString();
   const fullUrl = urlBase + (urlBase.includes('?') ? '&' : '?') + qs;
-  apiDebug('Requesting URL:', fullUrl);
+  console.log('Requesting URL:', fullUrl);
   return fullUrl;
 }
 
@@ -152,13 +125,13 @@ async function createHttpClient() {
       const headers = { 'Content-Type': 'application/json', ...(config.headers || {}) };
       
       // Add auth token if available
-      const token = getStoredAuthToken();
-      apiDebug('[API] GET Token:', token ? `${token.substring(0, 20)}...` : 'NOT FOUND');
+      const token = localStorage.getItem('pledgehub_token');
+      console.debug('[API] GET Token:', token ? `${token.substring(0, 20)}...` : 'NOT FOUND');
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
       }
 
-      apiDebug('🌐 [API] GET Request:', url, { headers });
+      console.debug('🌐 [API] GET Request:', url, { headers });
       try {
         const res = await fetch(url, { method: 'GET', headers });
         const text = await res.text();
@@ -172,7 +145,7 @@ async function createHttpClient() {
           const msg = data?.error || data?.message || res.statusText;
           throw new Error(`${res.status}: ${msg || 'Error'}`);
         }
-        apiDebug('✅ [API] GET Response:', data);
+        console.log('✅ [API] GET Response:', data);
         return { data };
       } catch (err) {
         console.error('❌ [API] GET Error:', err);
@@ -185,27 +158,27 @@ async function createHttpClient() {
       const headers = { 'Content-Type': 'application/json', ...(config.headers || {}) };
       
       // Add auth token if available
-      const token = getStoredAuthToken();
-      apiDebug('[API] POST Token:', token ? `${token.substring(0, 20)}...` : 'NOT FOUND');
+      const token = localStorage.getItem('pledgehub_token');
+      console.debug('[API] POST Token:', token ? `${token.substring(0, 20)}...` : 'NOT FOUND');
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
       }
 
-      apiDebug('🌐 [API] POST Request starting:', url);
-      apiDebug('🌐 [API] POST body:', body);
-      apiDebug('🌐 [API] POST headers:', headers);
+      console.log('🌐 [API] POST Request starting:', url);
+      console.log('🌐 [API] POST body:', body);
+      console.log('🌐 [API] POST headers:', headers);
       
       try {
-        apiDebug('🌐 [API] Calling fetch...');
+        console.log('🌐 [API] Calling fetch...');
         const res = await fetch(url, {
           method: 'POST',
           headers,
           body: body ? JSON.stringify(body) : undefined
         });
-        apiDebug('🌐 [API] Fetch returned, status:', res.status);
+        console.log('🌐 [API] Fetch returned, status:', res.status);
         
         const text = await res.text();
-        apiDebug('🌐 [API] Response text:', text);
+        console.log('🌐 [API] Response text:', text);
         
         let data;
         try {
@@ -214,14 +187,14 @@ async function createHttpClient() {
           data = text;
         }
         
-        apiDebug('🌐 [API] Parsed data:', data);
+        console.log('🌐 [API] Parsed data:', data);
         
         if (!res.ok) {
           const msg = data?.error || data?.message || res.statusText;
           console.error('❌ [API] POST Error Response:', { status: res.status, msg, data });
           throw new Error(`${res.status}: ${msg || 'Error'}`);
         }
-        apiDebug('✅ [API] POST Response:', data);
+        console.log('✅ [API] POST Response:', data);
         return { data };
       } catch (err) {
         console.error('❌ [API] POST Error:', err);
@@ -233,12 +206,12 @@ async function createHttpClient() {
       const url = buildUrl(path, config.params);
       const headers = { 'Content-Type': 'application/json', ...(config.headers || {}) };
       
-      const token = getStoredAuthToken();
+      const token = localStorage.getItem('pledgehub_token');
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
       }
 
-      apiDebug('🌐 [API] PUT Request:', url);
+      console.debug('🌐 [API] PUT Request:', url);
       try {
         const res = await fetch(url, {
           method: 'PUT',
@@ -256,7 +229,7 @@ async function createHttpClient() {
           const msg = data?.error || data?.message || res.statusText;
           throw new Error(`${res.status}: ${msg || 'Error'}`);
         }
-        apiDebug('✅ [API] PUT Response:', data);
+        console.log('✅ [API] PUT Response:', data);
         return { data };
       } catch (err) {
         console.error('❌ [API] PUT Error:', err);
@@ -268,12 +241,12 @@ async function createHttpClient() {
       const url = buildUrl(path, config.params);
       const headers = { 'Content-Type': 'application/json', ...(config.headers || {}) };
       
-      const token = getStoredAuthToken();
+      const token = localStorage.getItem('pledgehub_token');
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
       }
 
-      apiDebug('🌐 [API] DELETE Request:', url);
+      console.debug('🌐 [API] DELETE Request:', url);
       try {
         const res = await fetch(url, { method: 'DELETE', headers });
         const text = await res.text();
@@ -287,7 +260,7 @@ async function createHttpClient() {
           const msg = data?.error || data?.message || res.statusText;
           throw new Error(`${res.status}: ${msg || 'Error'}`);
         }
-        apiDebug('✅ [API] DELETE Response:', data);
+        console.log('✅ [API] DELETE Response:', data);
         return { data };
       } catch (err) {
         console.error('❌ [API] DELETE Error:', err);
@@ -302,10 +275,10 @@ async function createHttpClient() {
 async function getClient() {
   try {
     if (!clientPromise) {
-      apiDebug('[API] getClient: Creating new HTTP client');
+      console.log('[API] getClient: Creating new HTTP client');
       clientPromise = createHttpClient();
     } else {
-      apiDebug('[API] getClient: Returning cached HTTP client');
+      console.log('[API] getClient: Returning cached HTTP client');
     }
     return clientPromise;
   } catch (err) {
@@ -315,10 +288,10 @@ async function getClient() {
 }
 
 function handleRequest(promise) {
-  apiDebug('[API] handleRequest: called');
+  console.log('[API] handleRequest: called');
   return promise
     .then((res) => {
-      apiDebug('[API] handleRequest: response', res);
+      console.log('[API] handleRequest: response', res);
       return res && res.data !== undefined ? res.data : res;
     })
     .catch((err) => {
@@ -349,29 +322,23 @@ function handleRequest(promise) {
 
 export async function getPledges() {
   const client = await getClient();
-  apiDebug('BASE_URL:', BASE_URL);
-  apiDebug('Calling getPledges...');
+  console.log('BASE_URL:', BASE_URL);
+  console.log('Calling getPledges...');
   return handleRequest(client.get('pledges'));
-}
-
-export async function getCampaignPledges(campaignId) {
-  if (campaignId == null) return Promise.reject(new Error('getCampaignPledges: campaignId is required'));
-  const client = await getClient();
-  return handleRequest(client.get('pledges', { params: { campaign_id: campaignId } }));
 }
 
 export async function getPledge(id) {
   if (id === undefined || id === null)
     return Promise.reject(new Error('getPledge: id is required'));
   const client = await getClient();
-  apiDebug('[API] getPledge: Requesting pledge with id:', id);
+  console.log('[API] getPledge: Requesting pledge with id:', id);
   try {
     // Try with token (if available)
     const result = await handleRequest(client.get(`pledges/${encodeURIComponent(String(id))}`));
-    apiDebug('[API] getPledge: Got result:', result);
+    console.log('[API] getPledge: Got result:', result);
     // If result is { success: true, data: pledge }, return just the pledge
     if (result && result.success === true && result.data) {
-      apiDebug('[API] getPledge: Unwrapping data:', result.data);
+      console.log('[API] getPledge: Unwrapping data:', result.data);
       return result.data;
     }
     // If API returned a structured error, bubble it up so callers can show a proper message
@@ -388,7 +355,7 @@ export async function getPledge(id) {
       .then(async res => {
         if (!res.ok) throw new Error('Pledge not found');
         const data = await res.json();
-        apiDebug('[API] getPledge: Public endpoint returned:', data);
+        console.log('[API] getPledge: Public endpoint returned:', data);
         // Return just the pledge data
         if (data && data.data) return data.data;
         if (data && data.success === false) throw new Error(data.error || 'Pledge not found');
@@ -476,8 +443,8 @@ export async function registerUser(userData) {
       password: userData.password,
     };
     
-    apiDebug('🔵 [API] Registering user with payload:', payload);
-    apiDebug('🔵 [API] Calling POST to /api/register...');
+    console.debug('🔵 [API] Registering user with payload:', payload);
+    console.log('🔵 [API] Calling POST to /api/register...');
     
     // Create a timeout promise
     const timeoutPromise = new Promise((_, reject) =>
@@ -492,17 +459,17 @@ export async function registerUser(userData) {
       timeoutPromise
     ]);
     
-    apiDebug('🔵 [API] Registration response received:', res);
+    console.log('🔵 [API] Registration response received:', res);
     
     // Expect { token, user } or { data: { token, user } }
     if (res && res.data) {
       if (res.data.token) {
-        apiDebug('✅ [API] Registration successful, token:', res.data.token.substring(0, 20) + '...');
+        console.log('✅ [API] Registration successful, token:', res.data.token.substring(0, 20) + '...');
         return { token: res.data.token, user: res.data.user };
       }
       // Handle nested response
       if (res.data.data && res.data.data.token) {
-        apiDebug('✅ [API] Registration successful (nested), token:', res.data.data.token.substring(0, 20) + '...');
+        console.log('✅ [API] Registration successful (nested), token:', res.data.data.token.substring(0, 20) + '...');
         return { token: res.data.data.token, user: res.data.data.user };
       }
     }
@@ -532,13 +499,11 @@ export async function getCurrentUser() {
  * @param {string} phone - Phone number (optional)
  * @returns {Promise<Object>}
  */
-export async function forgotPassword(email, phone, code, password) {
+export async function forgotPassword(email, phone) {
   const client = await getClient();
   const payload = {};
   if (email) payload.email = email;
   if (phone) payload.phone = phone;
-  if (code) payload.code = code;
-  if (password) payload.password = password;
   return handleRequest(client.post('auth/forgot-password', payload));
 }
 
@@ -557,7 +522,7 @@ export async function deletePledge(id) {
   const headers = { 'Content-Type': 'application/json' };
 
   // Get JWT token from localStorage
-  const token = getStoredAuthToken();
+  const token = localStorage.getItem('authToken');
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
   }
@@ -597,7 +562,7 @@ export async function updatePledge(id, data) {
   const headers = { 'Content-Type': 'application/json' };
 
   // Get JWT token from localStorage
-  const token = getStoredAuthToken();
+  const token = localStorage.getItem('authToken');
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
   }
@@ -640,7 +605,7 @@ export async function sendPledgeReminder(pledgeId) {
   const url = buildUrl(`notifications/reminder/${encodeURIComponent(String(pledgeId))}`);
   const headers = { 'Content-Type': 'application/json' };
 
-  const token = getStoredAuthToken();
+  const token = localStorage.getItem('authToken');
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
   }
@@ -675,7 +640,7 @@ export async function sendBulkReminders() {
   const url = buildUrl('notifications/remind-all');
   const headers = { 'Content-Type': 'application/json' };
 
-  const token = getStoredAuthToken();
+  const token = localStorage.getItem('authToken');
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
   }
@@ -714,7 +679,7 @@ export async function sendCustomNotification(pledgeId, message) {
   const url = buildUrl(`notifications/custom/${encodeURIComponent(String(pledgeId))}`);
   const headers = { 'Content-Type': 'application/json' };
 
-  const token = getStoredAuthToken();
+  const token = localStorage.getItem('authToken');
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
   }
@@ -753,7 +718,7 @@ export async function sendThankYou(pledgeId) {
   const url = buildUrl(`notifications/thank-you/${encodeURIComponent(String(pledgeId))}`);
   const headers = { 'Content-Type': 'application/json' };
 
-  const token = getStoredAuthToken();
+  const token = localStorage.getItem('authToken');
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
   }

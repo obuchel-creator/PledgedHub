@@ -4,7 +4,7 @@ import './HeroBanner.css';
 const slides = [
   {
     image: '/Rwenzori-mountains-scaled.jpg',
-    title: 'Welcome to PledgedHub',
+    title: 'Welcome to PledgeHub',
     subtitle: 'Smart Pledge Management for Africa',
     description: 'Automate, track, and grow your fundraising with AI, mobile money, and analytics.',
     cta: { text: 'Get Started', link: '/register' }

@@ -1,10 +1,9 @@
 {
-    "$schema": "https://json.schemastore.org/package.json",
-    "name": "pledgedhub-frontend",
+    "name": "pledgehub-frontend",
     "version": "0.1.0",
     "private": true,
     "type": "module",
-    "description": "Frontend for PledgedHub built with Vite and React",
+    "description": "Frontend for PledgeHub built with Vite and React",
     "engines": {
         "node": ">=14"
     },
@@ -22,7 +21,7 @@
         "release": "standard-version"
     },
     "dependencies": {
-        "jspdf": "^4.2.0",
+        "jspdf": "^4.0.0",
         "jspdf-autotable": "^5.0.7",
         "react": "^18.2.0",
         "react-dom": "^18.2.0",

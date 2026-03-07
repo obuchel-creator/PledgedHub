@@ -1,7 +1,6 @@
 import { getViteEnv } from '../utils/getViteEnv';
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { uiDebug } from '../utils/debug';
 
 /**
  * OAuth Callback Handler Component
@@ -37,13 +36,13 @@ const AuthCallback = () => {
           return;
         }
 
-        uiDebug(
+        console.log(
           `🔄 Processing ${provider} OAuth callback with token:`,
           token.substring(0, 20) + '...',
         );
 
         // Save token to localStorage
-        localStorage.setItem('pledgedhub_token', token);
+        localStorage.setItem('pledgehub_token', token);
         localStorage.setItem('authProvider', provider || 'unknown');
 
         // Verify token with backend
@@ -60,7 +59,7 @@ const AuthCallback = () => {
         const data = await response.json();
 
         if (response.ok && data.success) {
-          uiDebug(`✅ Authentication successful via ${provider}:`, data.user);
+          console.log(`✅ Authentication successful via ${provider}:`, data.user);
 
           // Store user info
           localStorage.setItem('user', JSON.stringify(data.user));
@@ -78,7 +77,7 @@ const AuthCallback = () => {
           setMessage(data.message || 'Token verification failed');
 
           // Clear invalid token
-          localStorage.removeItem('pledgedhub_token');
+          localStorage.removeItem('pledgehub_token');
           localStorage.removeItem('authProvider');
 
           setTimeout(() => navigate('/login?error=verification_failed'), 3000);
@@ -89,7 +88,7 @@ const AuthCallback = () => {
         setMessage('An error occurred during authentication');
 
         // Clear potentially invalid token
-        localStorage.removeItem('pledgedhub_token');
+        localStorage.removeItem('pledgehub_token');
         localStorage.removeItem('authProvider');
 
         setTimeout(() => navigate('/login?error=callback_error'), 3000);

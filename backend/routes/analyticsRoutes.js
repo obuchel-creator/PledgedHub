@@ -4,7 +4,7 @@ const router = express.Router();
 const analyticsService = require('../services/analyticsService');
 const { requireStaff } = require('../middleware/authMiddleware');
 const { authenticateToken } = require('../middleware/authMiddleware');
-const { pool } = require('../config/db');
+const db = require('../config/db');
 
 // DRILL-DOWN ANALYTICS ENDPOINTS
 // GET /api/analytics/drilldown/by-purpose
@@ -156,10 +156,77 @@ const simpleAuth = (req, res, next) => {
 router.get('/overview', simpleAuth, async (req, res) => {
     try {
         const stats = await analyticsService.getOverallStats();
-        res.json({ success: true, data: stats });
+        
+        res.json({
+            success: true,
+            data: stats
+        });
     } catch (error) {
         console.error('Overview stats failed:', error);
-        res.status(500).json({ success: false, error: 'Failed to get overview statistics', details: error.message });
+        res.status(500).json({
+            success: false,
+            error: 'Failed to get overview statistics',
+            details: error.message
+        });
+    }
+});
+
+/**
+ * GET /api/analytics/trends
+ * Get pledge trends over time
+ * Query params: period ('week'|'month'|'year')
+ */
+router.get('/trends', simpleAuth, async (req, res) => {
+    try {
+        const { period = 'month' } = req.query;
+        
+        if (!['week', 'month', 'year'].includes(period)) {
+            return res.status(400).json({
+                success: false,
+                error: 'Invalid period. Use: week, month, or year'
+            });
+        }
+        
+        const trends = await analyticsService.getPledgeTrends(period);
+        
+        res.json({
+            success: true,
+            period,
+            data: trends
+        });
+    } catch (error) {
+        console.error('Trends failed:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to get trends',
+            details: error.message
+        });
+    }
+});
+
+/**
+ * GET /api/analytics/top-donors
+ * Get top donors by contribution
+ * Query params: limit (number, default 10)
+ */
+router.get('/top-donors', simpleAuth, async (req, res) => {
+    try {
+        const limit = parseInt(req.query.limit) || 10;
+        
+        const donors = await analyticsService.getTopDonors(limit);
+        
+        res.json({
+            success: true,
+            limit,
+            data: donors
+        });
+    } catch (error) {
+        console.error('Top donors failed:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to get top donors',
+            details: error.message
+        });
     }
 });
 
@@ -225,6 +292,41 @@ router.get('/upcoming', simpleAuth, async (req, res) => {
         res.status(500).json({
             success: false,
             error: 'Failed to get upcoming collections',
+            details: error.message
+        });
+    }
+});
+
+/**
+ * GET /api/analytics/at-risk
+ * Get at-risk pledges (overdue or approaching deadline)
+ */
+router.get('/at-risk', simpleAuth, async (req, res) => {
+    try {
+        const pledges = await analyticsService.getAtRiskPledges();
+        
+        // Group by risk level
+        const byRisk = {
+            high: pledges.filter(p => p.riskLevel === 'high'),
+            medium: pledges.filter(p => p.riskLevel === 'medium'),
+            low: pledges.filter(p => p.riskLevel === 'low')
+        };
+        
+        res.json({
+            success: true,
+            total: pledges.length,
+            byRiskLevel: {
+                high: byRisk.high.length,
+                medium: byRisk.medium.length,
+                low: byRisk.low.length
+            },
+            data: pledges
+        });
+    } catch (error) {
+        console.error('At-risk pledges failed:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to get at-risk pledges',
             details: error.message
         });
     }
@@ -299,7 +401,7 @@ router.post('/track-share', authenticateToken, async (req, res) => {
       VALUES (?, ?, ?, ?, ?)
     `;
 
-    await pool.query(query, [
+    await db.query(query, [
       userId,
       contentType,
       contentId || null,
@@ -342,7 +444,7 @@ router.get('/share-stats', authenticateToken, async (req, res) => {
       ORDER BY shared_at DESC
     `;
 
-    const [results] = await pool.query(query, [userId, parseInt(period)]);
+    const [results] = await db.query(query, [userId, parseInt(period)]);
 
     const byChannel = {};
     results.forEach(row => {
@@ -383,7 +485,7 @@ router.get('/referrals/stats', authenticateToken, async (req, res) => {
       FROM share_events
       WHERE user_id = ? AND content_type = 'referral'
     `;
-    const [shareResults] = await pool.query(shareQuery, [userId]);
+    const [shareResults] = await db.query(shareQuery, [userId]);
 
     // Get signups from this user's referral code (if referred_by column exists)
     const signupQuery = `
@@ -391,7 +493,7 @@ router.get('/referrals/stats', authenticateToken, async (req, res) => {
       FROM users
       WHERE referred_by = ?
     `;
-    const [signupResults] = await pool.query(signupQuery, [userId]).catch(() => [[{ signup_count: 0 }]]);
+    const [signupResults] = await db.query(signupQuery, [userId]).catch(() => [[{ signup_count: 0 }]]);
 
     // Get active users
     const activeQuery = `
@@ -400,7 +502,7 @@ router.get('/referrals/stats', authenticateToken, async (req, res) => {
       INNER JOIN pledges p ON u.id = p.user_id
       WHERE u.referred_by = ?
     `;
-    const [activeResults] = await pool.query(activeQuery, [userId]).catch(() => [[{ active_count: 0 }]]);
+    const [activeResults] = await db.query(activeQuery, [userId]).catch(() => [[{ active_count: 0 }]]);
 
     res.json({
       success: true,

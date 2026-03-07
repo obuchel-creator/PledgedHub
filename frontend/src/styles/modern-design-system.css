@@ -1,66 +1,230 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Open+Sans:wght@300;400;500;600;700&display=swap');
+/* Branding: Print Styles */
+@media print {
+  body {
+    background: #fff !important;
+    color: #000 !important;
+    font-size: 12pt !important;
+  }
+  .explore-table, .card, .bulk-action-bar, .alert, .btn, button {
+    box-shadow: none !important;
+    background: #fff !important;
+    color: #000 !important;
+    border: 1px solid #000 !important;
+  }
+  nav, .navbar, .sidebar, .user-guide-modal, .onboarding-tooltip, .modal, .notification-toast {
+    display: none !important;
+  }
+}
+/* Mobile Experience: Responsive Explore Table & Bulk Actions */
+@media (max-width: 700px) {
+  .explore-table {
+    font-size: var(--font-size-xs);
+    border-radius: 0;
+    box-shadow: none;
+    margin-bottom: 1rem;
+  }
+  .explore-table th, .explore-table td {
+    padding: 0.75rem 0.5rem;
+    font-size: var(--font-size-xs);
+    min-width: 60px;
+    word-break: break-word;
+  }
+  .explore-table th {
+    font-size: var(--font-size-xs);
+    padding: 0.5rem 0.25rem;
+  }
+  .bulk-action-bar {
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+    align-items: stretch !important;
+    padding: 0.75rem 0.5rem !important;
+    font-size: var(--font-size-xs);
+  }
+  .bulk-action-bar button {
+    min-height: 44px;
+    font-size: var(--font-size-xs);
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+}
+/* Dark Mode Variables */
+body.dark-mode {
+  --bg-default: #181c24;
+  --bg-secondary: #23293a;
+  --bg-tertiary: #23293a;
+  --color-primary: #60a5fa;
+  --color-primary-light: #2563eb;
+  --color-primary-dark: #1e3a8a;
+  --color-secondary: #10b981;
+  --color-accent: #fbbf24;
+  --color-accent-light: #fde68a;
+  --color-accent-dark: #b45309;
+  --color-success: #34d399;
+  --color-error: #f87171;
+  --color-warning: #fbbf24;
+  --color-info: #38bdf8;
+  --color-white: #23293a;
+  --color-gray-50: #23293a;
+  --color-gray-100: #23293a;
+  --color-gray-200: #23293a;
+  --color-gray-300: #23293a;
+  --color-gray-400: #6b7280;
+  --color-gray-500: #9ca3af;
+  --color-gray-600: #d1d5db;
+  --color-gray-700: #f3f4f6;
+  --color-gray-800: #f9fafb;
+  --color-gray-900: #fff;
+  --text-primary: #f3f4f6;
+  --text-secondary: #d1d5db;
+  --text-tertiary: #9ca3af;
+  --text-muted: #6b7280;
+  --text-inverse: #fff;
+  --border-default: #374151;
+  --border-light: #23293a;
+  background: var(--bg-default) !important;
+  color: var(--text-primary) !important;
+}
+/* Explore Table Responsive & UI Polish */
+.explore-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--bg-default);
+  font-size: var(--font-size-sm);
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 12px #0001;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.explore-table th, .explore-table td {
+  padding: 0.75rem 1.25rem;
+  border-bottom: 1px solid var(--border-default);
+  text-align: left;
+}
+.explore-table th {
+  background: var(--color-primary-light);
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+.explore-table tr:last-child td {
+  border-bottom: none;
+}
+.explore-table tr[tabindex="0"]:hover, .explore-table tr[tabindex="0"]:focus {
+  background: var(--color-accent-light);
+  color: var(--text-primary);
+  outline: 2px solid var(--color-accent);
+  cursor: pointer;
+}
+.explore-table caption.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+  border: 0;
+}
+@media (max-width: 700px) {
+  .explore-table th, .explore-table td {
+    padding: 0.5rem 0.5rem;
+    font-size: var(--font-size-xs);
+  }
+}
+/* Accessibility: Focus ring for all interactive elements */
+a:focus, button:focus, input:focus, select:focus, textarea:focus, [tabindex]:focus {
+  outline: 2px solid var(--color-accent-light);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 3px var(--color-accent-bg, #fbbf2422);
+  transition: outline var(--transition-base), box-shadow var(--transition-base);
+}
 
+/* Accessibility: Visually hidden utility */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
 /* ═══════════════════════════════════════════════════════════════
    PLEDGEHUB MODERN DESIGN SYSTEM v2.0
    Professional, Clean, Accessible
    ═══════════════════════════════════════════════════════════════ */
 
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Open+Sans:wght@300;400;500;600;700&display=swap');
+
 :root {
   /* ═══ TYPOGRAPHY ═══ */
+  /* Matching MTN Developer Portal Professional Style */
   --font-primary: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-secondary: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 
-  --font-size-xs: 0.75rem;
-  --font-size-sm: 0.875rem;
-  --font-size-base: 1rem;
-  --font-size-md: 1.0625rem;
-  --font-size-lg: 1.125rem;
-  --font-size-xl: 1.25rem;
-  --font-size-2xl: 1.5rem;
-  --font-size-3xl: 1.875rem;
-  --font-size-4xl: 2.25rem;
-  --font-size-5xl: 3rem;
+  /* Font Sizes - Mobile First Responsive Scale (MTN Developer Portal Style) */
+  --font-size-xs: 0.75rem;      /* 12px */
+  --font-size-sm: 0.875rem;     /* 14px - Body text */
+  --font-size-base: 1rem;        /* 16px - Default */
+  --font-size-md: 1.0625rem;    /* 17px - Slightly larger */
+  --font-size-lg: 1.125rem;     /* 18px - Subheading */
+  --font-size-xl: 1.25rem;      /* 20px */
+  --font-size-2xl: 1.5rem;      /* 24px - Section heading */
+  --font-size-3xl: 1.875rem;    /* 30px - Large heading */
+  --font-size-4xl: 2.25rem;     /* 36px - Page heading */
+  --font-size-5xl: 3rem;        /* 48px - Hero heading */
 
-  --line-height-tight: 1.2;
-  --line-height-snug: 1.375;
-  --line-height-normal: 1.6;
-  --line-height-relaxed: 1.75;
-  --line-height-loose: 1.9;
+  /* Line Heights - Professional & Readable */
+  --line-height-tight: 1.2;     /* Headlines */
+  --line-height-snug: 1.375;    /* Subheadings */
+  --line-height-normal: 1.6;    /* Body text (increased for readability) */
+  --line-height-relaxed: 1.75;  /* Generous spacing */
+  --line-height-loose: 1.9;     /* Extra spacing for hero text */
 
-  --font-weight-light: 300;
-  --font-weight-normal: 400;
-  --font-weight-medium: 500;
-  --font-weight-semibold: 600;
-  --font-weight-bold: 700;
-  --font-weight-extrabold: 800;
+  /* Font Weights - Professional Hierarchy */
+  --font-weight-light: 300;          /* Subtle, light text */
+  --font-weight-normal: 400;         /* Body text */
+  --font-weight-medium: 500;         /* Emphasized text, small headings */
+  --font-weight-semibold: 600;       /* Subheadings */
+  --font-weight-bold: 700;           /* Headings, labels */
+  --font-weight-extrabold: 800;      /* Hero text, important titles */
 
-  /* ═══ COLOR PALETTE ═══ */
-  --color-primary: #2563eb;
-  --color-primary-light: #3b82f6;
-  --color-primary-lighter: #60a5fa;
-  --color-primary-dark: #1e40af;
-  --color-primary-darker: #1e3a8a;
+  /* ═══ COLOR PALETTE - PROFESSIONAL SCHEME ═══ */
+  
+  /* Primary: Deep Blue - Trust & Stability */
+  --color-primary: #2563eb;           /* Professional Blue */
+  --color-primary-light: #3b82f6;     /* Light Blue */
+  --color-primary-lighter: #60a5fa;   /* Lighter Blue */
+  --color-primary-dark: #1e40af;      /* Dark Blue */
+  --color-primary-darker: #1e3a8a;    /* Darker Blue */
 
-  --color-secondary: #10b981;
-  --color-secondary-light: #34d399;
-  --color-secondary-dark: #059669;
-  --color-secondary-darker: #047857;
+  /* Secondary: Emerald Green - Growth & Impact */
+  --color-secondary: #10b981;         /* Emerald Green */
+  --color-secondary-light: #34d399;   /* Light Green */
+  --color-secondary-dark: #059669;    /* Dark Green */
+  --color-secondary-darker: #047857;  /* Darker Green */
 
-  --color-accent: #f59e0b;
-  --color-accent-light: #fbbf24;
-  --color-accent-dark: #d97706;
+  /* Accent Colors */
+  --color-accent: #f59e0b;            /* Gold - Premium & Achievement */
+  --color-accent-light: #fbbf24;      /* Light Gold */
+  --color-accent-dark: #d97706;       /* Dark Gold */
 
-  --color-success: #10b981;
+  /* Status Colors */
+  --color-success: #10b981;           /* Green */
   --color-success-bg: rgba(16, 185, 129, 0.1);
-  --color-error: #ef4444;
+  --color-error: #ef4444;             /* Red */
   --color-error-bg: rgba(239, 68, 68, 0.1);
-  --color-warning: #f59e0b;
+  --color-warning: #f59e0b;           /* Gold */
   --color-warning-bg: rgba(245, 158, 11, 0.1);
-  --color-info: #0ea5e9;
+  --color-info: #0ea5e9;              /* Sky Blue */
   --color-info-bg: rgba(14, 165, 233, 0.1);
 
+  /* Neutral Colors - Professional Gray Scale */
   --color-white: #ffffff;
-  --color-gray-50: #f9fafb;
+  --color-gray-50: #f9fafb;           /* Lightest */
   --color-gray-100: #f3f4f6;
   --color-gray-200: #e5e7eb;
   --color-gray-300: #d1d5db;
@@ -69,69 +233,88 @@
   --color-gray-600: #4b5563;
   --color-gray-700: #374151;
   --color-gray-800: #1f2937;
-  --color-gray-900: #111827;
+  --color-gray-900: #111827;          /* Darkest */
 
+  /* Background Colors */
   --bg-default: #ffffff;
   --bg-secondary: #f9fafb;
   --bg-tertiary: #f3f4f6;
   --bg-overlay: rgba(15, 23, 42, 0.4);
   --bg-glass: rgba(255, 255, 255, 0.8);
 
-  --text-primary: #111827;
-  --text-secondary: #374151;
-  --text-tertiary: #6b7280;
-  --text-muted: #9ca3af;
-  --text-inverse: #000000;
+  /* Text Colors */
+  --text-primary: #111827;            /* Darkest Gray */
+  --text-secondary: #374151;          /* Medium Gray */
+  --text-tertiary: #6b7280;           /* Light Gray */
+  --text-muted: #9ca3af;              /* Muted Gray */
+  --text-inverse: #000000;            /* Black */
 
+  /* Border Colors */
   --border-default: #e5e7eb;
   --border-light: #f3f4f6;
   --border-dark: #d1d5db;
 
-  /* ═══ SPACING ═══ */
+  /* ═══ SPACING SYSTEM (8px base - Generous for Professional Look) ═══ */
   --space-0: 0;
-  --space-1: 0.25rem;
-  --space-2: 0.5rem;
-  --space-3: 0.75rem;
-  --space-4: 1rem;
-  --space-5: 1.25rem;
-  --space-6: 1.5rem;
-  --space-7: 1.75rem;
-  --space-8: 2rem;
-  --space-9: 2.25rem;
-  --space-10: 2.5rem;
-  --space-12: 3rem;
-  --space-14: 3.5rem;
-  --space-16: 4rem;
-  --space-20: 5rem;
-  --space-24: 6rem;
+  --space-1: 0.25rem;    /* 4px - Minimal spacing */
+  --space-2: 0.5rem;     /* 8px - Tight */
+  --space-3: 0.75rem;    /* 12px - Compact */
+  --space-4: 1rem;       /* 16px - Default */
+  --space-5: 1.25rem;    /* 20px - Comfortable */
+  --space-6: 1.5rem;     /* 24px - Spacious (default section padding) */
+  --space-7: 1.75rem;    /* 28px */
+  --space-8: 2rem;       /* 32px - Section spacing */
+  --space-9: 2.25rem;    /* 36px */
+  --space-10: 2.5rem;    /* 40px - Large spacing */
+  --space-12: 3rem;      /* 48px - Hero/major sections */
+  --space-14: 3.5rem;    /* 56px - Extra large */
+  --space-16: 4rem;      /* 64px - Extra extra large */
+  --space-20: 5rem;      /* 80px - Huge spacing */
+  --space-24: 6rem;      /* 96px - Massive spacing */
 
-  /* ═══ BORDER RADIUS ═══ */
+  /* ═══ BORDER RADIUS - Clean & Professional ═══ */
   --radius-none: 0;
-  --radius-sm: 0.25rem;
-  --radius-base: 0.5rem;
-  --radius-md: 0.75rem;
-  --radius-lg: 1rem;
-  --radius-xl: 1.5rem;
-  --radius-2xl: 2rem;
-  --radius-full: 9999px;
+  --radius-sm: 0.25rem;    /* 4px - Minimal rounding */
+  --radius-base: 0.5rem;   /* 8px - Default */
+  --radius-md: 0.75rem;    /* 12px - Medium */
+  --radius-lg: 1rem;       /* 16px - Large (buttons, cards) */
+  --radius-xl: 1.5rem;     /* 24px - Extra large */
+  --radius-2xl: 2rem;      /* 32px - Hero sections */
+  --radius-full: 9999px;   /* Pill-shaped buttons */
 
-  /* ═══ SHADOWS ═══ */
+  /* ═══ SHADOWS - Subtle Elevation (MTN Developer Portal Style) ═══ */
   --shadow-none: 0 0 0 rgba(0, 0, 0, 0);
+  
+  /* Very subtle, barely noticeable */
   --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+  
+  /* Subtle for inputs, small cards */
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05), 0 1px 3px 0 rgba(0, 0, 0, 0.04);
+  
+  /* Default for cards, form elements */
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.06), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+  
+  /* Elevated cards, dropdowns */
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+  
+  /* Floating elements, popovers */
   --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  
+  /* Modals, overlays */
   --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+
+  /* Colored shadows for brand elements */
   --shadow-primary: 0 4px 12px -2px rgba(255, 204, 0, 0.15);
   --shadow-success: 0 4px 12px -2px rgba(16, 185, 129, 0.15);
   --shadow-error: 0 4px 12px -2px rgba(239, 68, 68, 0.15);
 
-  /* ═══ TRANSITIONS ═══ */
-  --transition-fast: 100ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-base: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-slow: 250ms cubic-bezier(0.3, 0, 0.2, 1);
-  --transition-slower: 350ms cubic-bezier(0.2, 0, 0.2, 1);
+  /* ═══ TRANSITIONS & ANIMATIONS (Smooth, Professional) ═══ */
+  --transition-fast: 100ms cubic-bezier(0.4, 0, 0.2, 1);           /* Quick micro-interactions */
+  --transition-base: 150ms cubic-bezier(0.4, 0, 0.2, 1);          /* Default for hover/focus */
+  --transition-slow: 250ms cubic-bezier(0.3, 0, 0.2, 1);          /* Page transitions */
+  --transition-slower: 350ms cubic-bezier(0.2, 0, 0.2, 1);        /* Complex animations */
+  
+  /* Easing functions for professional feel */
   --ease-in: cubic-bezier(0.4, 0, 1, 1);
   --ease-out: cubic-bezier(0, 0, 0.2, 1);
   --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
@@ -141,10 +324,12 @@
   --gradient-secondary: linear-gradient(135deg, #10b981 0%, #059669 100%);
   --gradient-accent: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
   --gradient-info: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+  
+  /* Subtle background gradients */
   --gradient-subtle-primary: linear-gradient(135deg, rgba(37, 99, 235, 0.05) 0%, rgba(59, 130, 246, 0.05) 100%);
   --gradient-subtle-secondary: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(52, 211, 153, 0.05) 100%);
 
-  /* ═══ Z-INDEX ═══ */
+  /* ═══ Z-INDEX SCALE ═══ */
   --z-dropdown: 100;
   --z-sticky: 200;
   --z-fixed: 300;
@@ -154,9 +339,12 @@
   --z-tooltip: 700;
   --z-notification: 800;
 
-  /* ═══ CONTAINER ═══ */
+  /* ═══ CONTAINER WIDTH ═══ */
   --container-max-width: 1280px;
   --container-padding: 1.5rem;
+
+  /* ═══ BREAKPOINTS (Mobile First) ═══ */
+  /* sm: 640px, md: 768px, lg: 1024px, xl: 1280px, 2xl: 1536px */
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -186,7 +374,7 @@ body {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   TYPOGRAPHY
+   TYPOGRAPHY - Professional Hierarchy (MTN Developer Portal Style)
    ═══════════════════════════════════════════════════════════════ */
 
 h1, h2, h3, h4, h5, h6 {
@@ -200,15 +388,15 @@ h1, h2, h3, h4, h5, h6 {
 
 h1 {
   font-size: var(--font-size-5xl);
-  font-weight: 700;
-  line-height: 1.2;
-  letter-spacing: -0.02em;
+  font-weight: 700;           /* Bold for hero text */
+  line-height: 1.2;           /* Tight for large headings */
+  letter-spacing: -0.02em;    /* Professional tightness */
   margin-bottom: var(--space-8);
 }
 
 h2 {
   font-size: var(--font-size-4xl);
-  font-weight: 700;
+  font-weight: 700;           /* Bold for section headings */
   line-height: 1.3;
   letter-spacing: -0.01em;
   margin-bottom: var(--space-6);
@@ -216,28 +404,28 @@ h2 {
 
 h3 {
   font-size: var(--font-size-3xl);
-  font-weight: 600;
+  font-weight: 600;           /* Semibold for subsections */
   line-height: 1.4;
   margin-bottom: var(--space-4);
 }
 
 h4 {
   font-size: var(--font-size-2xl);
-  font-weight: 600;
+  font-weight: 600;           /* Semibold for small headings */
   line-height: 1.4;
   margin-bottom: var(--space-4);
 }
 
 h5 {
   font-size: var(--font-size-xl);
-  font-weight: 500;
+  font-weight: 500;           /* Medium for labels */
   line-height: 1.5;
   margin-bottom: var(--space-3);
 }
 
 h6 {
   font-size: var(--font-size-lg);
-  font-weight: 500;
+  font-weight: 500;           /* Medium for small labels */
   line-height: 1.5;
   margin-bottom: var(--space-3);
 }
@@ -245,8 +433,8 @@ h6 {
 p {
   margin-bottom: var(--space-4);
   color: var(--text-secondary);
-  line-height: var(--line-height-normal);
-  font-weight: 400;
+  line-height: var(--line-height-normal);  /* 1.6 for readability */
+  font-weight: 400;                         /* Normal for body text */
 }
 
 p.lead {
@@ -272,6 +460,7 @@ a:active {
   opacity: 0.6;
 }
 
+/* Label & Caption Styles */
 .label, label {
   font-family: var(--font-primary);
   font-size: var(--font-size-sm);
@@ -313,23 +502,25 @@ a:active {
   border-width: 0;
 }
 
-.visually-hidden {
-  position: absolute !important;
-  width: 1px !important;
-  height: 1px !important;
-  padding: 0 !important;
-  margin: -1px !important;
-  overflow: hidden !important;
-  clip: rect(0, 0, 0, 0) !important;
-  white-space: nowrap !important;
-  border: 0 !important;
+.text-center {
+  text-align: center;
 }
 
-.text-center { text-align: center; }
-.text-right { text-align: right; }
-.text-left { text-align: left; }
-.text-muted { color: var(--text-muted); }
-.text-secondary { color: var(--text-secondary); }
+.text-right {
+  text-align: right;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.text-muted {
+  color: var(--text-muted);
+}
+
+.text-secondary {
+  color: var(--text-secondary);
+}
 
 .mt-4 { margin-top: var(--space-4); }
 .mb-4 { margin-bottom: var(--space-4); }
@@ -338,58 +529,40 @@ a:active {
 .mt-8 { margin-top: var(--space-8); }
 .mb-8 { margin-bottom: var(--space-8); }
 
-.flex { display: flex; }
-.flex-col { flex-direction: column; }
-.items-center { align-items: center; }
-.justify-center { justify-content: center; }
-.justify-between { justify-content: space-between; }
-.gap-4 { gap: var(--space-4); }
-.gap-6 { gap: var(--space-6); }
-.gap-8 { gap: var(--space-8); }
+.flex {
+  display: flex;
+}
 
-/* ═══════════════════════════════════════════════════════════════
-   DARK MODE
-   ═══════════════════════════════════════════════════════════════ */
+.flex-col {
+  flex-direction: column;
+}
 
-body.dark-mode {
-  --bg-default: #181c24;
-  --bg-secondary: #23293a;
-  --bg-tertiary: #23293a;
-  --color-primary: #60a5fa;
-  --color-primary-light: #2563eb;
-  --color-primary-dark: #1e3a8a;
-  --color-secondary: #10b981;
-  --color-accent: #fbbf24;
-  --color-accent-light: #fde68a;
-  --color-accent-dark: #b45309;
-  --color-success: #34d399;
-  --color-error: #f87171;
-  --color-warning: #fbbf24;
-  --color-info: #38bdf8;
-  --color-white: #23293a;
-  --color-gray-50: #23293a;
-  --color-gray-100: #23293a;
-  --color-gray-200: #23293a;
-  --color-gray-300: #23293a;
-  --color-gray-400: #6b7280;
-  --color-gray-500: #9ca3af;
-  --color-gray-600: #d1d5db;
-  --color-gray-700: #f3f4f6;
-  --color-gray-800: #f9fafb;
-  --color-gray-900: #fff;
-  --text-primary: #f3f4f6;
-  --text-secondary: #d1d5db;
-  --text-tertiary: #9ca3af;
-  --text-muted: #6b7280;
-  --text-inverse: #fff;
-  --border-default: #374151;
-  --border-light: #23293a;
-  background: var(--bg-default) !important;
-  color: var(--text-primary) !important;
+.items-center {
+  align-items: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.gap-4 {
+  gap: var(--space-4);
+}
+
+.gap-6 {
+  gap: var(--space-6);
+}
+
+.gap-8 {
+  gap: var(--space-8);
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   COMPONENTS
+   COMPONENT BASE STYLES (Professional MTN Developer Portal Inspired)
    ═══════════════════════════════════════════════════════════════ */
 
 /* ─── BUTTONS ─── */
@@ -401,7 +574,7 @@ body.dark-mode {
   border: none;
   border-radius: var(--radius-lg);
   cursor: pointer;
-  transition:
+  transition: 
     background-color var(--transition-base),
     transform var(--transition-fast),
     box-shadow var(--transition-base),
@@ -429,6 +602,7 @@ body.dark-mode {
   transform: translateY(0);
 }
 
+/* Primary Button - MTN Gold */
 .btn-primary {
   background: var(--gradient-primary);
   color: #000000;
@@ -440,10 +614,11 @@ body.dark-mode {
   box-shadow: var(--shadow-lg);
 }
 
+/* Secondary Button */
 .btn-secondary {
   background-color: var(--bg-tertiary);
   color: var(--text-primary);
-  border: 1px solid var(--border-default);
+  border: 1px solid var(--border-color);
 }
 
 .btn-secondary:hover:not(:disabled) {
@@ -453,12 +628,12 @@ body.dark-mode {
 
 /* ─── CARDS ─── */
 .card {
-  background-color: var(--bg-default);
-  border: 1px solid var(--border-default);
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
   padding: var(--space-6);
   box-shadow: var(--shadow-sm);
-  transition:
+  transition: 
     box-shadow var(--transition-base),
     transform var(--transition-base);
 }
@@ -498,11 +673,11 @@ textarea {
   font-family: var(--font-secondary);
   font-size: var(--font-size-base);
   padding: var(--space-3) var(--space-4);
-  border: 1px solid var(--border-default);
+  border: 1px solid var(--border-color);
   border-radius: var(--radius-base);
-  background-color: var(--bg-default);
+  background-color: var(--bg-primary);
   color: var(--text-primary);
-  transition:
+  transition: 
     border-color var(--transition-base),
     box-shadow var(--transition-base);
   width: 100%;
@@ -532,6 +707,7 @@ textarea::placeholder {
   color: var(--text-muted);
 }
 
+/* Form Group */
 .form-group {
   margin-bottom: var(--space-6);
   display: flex;
@@ -543,7 +719,7 @@ textarea::placeholder {
   font-weight: 500;
 }
 
-/* ─── ALERTS ─── */
+/* ─── ALERTS & STATUS ─── */
 .alert {
   padding: var(--space-4) var(--space-6);
   border-radius: var(--radius-lg);
@@ -578,139 +754,4 @@ textarea::placeholder {
   color: #0369a1;
 }
 
-/* ─── ACCESSIBILITY: FOCUS RING ─── */
-a:focus-visible,
-button:focus-visible,
-input:focus-visible,
-select:focus-visible,
-textarea:focus-visible,
-[tabindex]:focus-visible {
-  outline: 2px solid var(--color-accent-light);
-  outline-offset: 2px;
-  box-shadow: 0 0 0 3px var(--color-accent-bg, #fbbf2422);
-  transition: outline var(--transition-base), box-shadow var(--transition-base);
-}
 
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-}
-
-/* ─── EXPLORE TABLE ─── */
-.explore-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: var(--bg-default);
-  font-size: var(--font-size-sm);
-  margin-bottom: 1.5rem;
-  box-shadow: 0 2px 12px #0001;
-  border-radius: 10px;
-  overflow: hidden;
-}
-
-.explore-table th,
-.explore-table td {
-  padding: 0.75rem 1.25rem;
-  border-bottom: 1px solid var(--border-default);
-  text-align: left;
-}
-
-.explore-table th {
-  background: var(--color-primary-light);
-  color: #fff;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-}
-
-.explore-table tr:last-child td {
-  border-bottom: none;
-}
-
-.explore-table tr[tabindex="0"]:hover,
-.explore-table tr[tabindex="0"]:focus {
-  background: var(--color-accent-light);
-  color: var(--text-primary);
-  outline: 2px solid var(--color-accent);
-  cursor: pointer;
-}
-
-.explore-table caption.visually-hidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   PRINT STYLES
-   ═══════════════════════════════════════════════════════════════ */
-
-@media print {
-  body {
-    background: #fff !important;
-    color: #000 !important;
-    font-size: 12pt !important;
-  }
-
-  .explore-table, .card, .bulk-action-bar, .alert, .btn, button {
-    box-shadow: none !important;
-    background: #fff !important;
-    color: #000 !important;
-    border: 1px solid #000 !important;
-  }
-
-  nav, .navbar, .sidebar, .user-guide-modal, .onboarding-tooltip, .modal, .notification-toast {
-    display: none !important;
-  }
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   RESPONSIVE
-   ═══════════════════════════════════════════════════════════════ */
-
-@media (max-width: 700px) {
-  .explore-table {
-    font-size: var(--font-size-xs);
-    border-radius: 0;
-    box-shadow: none;
-    margin-bottom: 1rem;
-  }
-
-  .explore-table th,
-  .explore-table td {
-    padding: 0.5rem 0.5rem;
-    font-size: var(--font-size-xs);
-    min-width: 60px;
-    word-break: break-word;
-  }
-
-  .explore-table th {
-    padding: 0.5rem 0.25rem;
-  }
-
-  .bulk-action-bar {
-    flex-direction: column !important;
-    gap: 0.5rem !important;
-    align-items: stretch !important;
-    padding: 0.75rem 0.5rem !important;
-    font-size: var(--font-size-xs);
-  }
-
-  .bulk-action-bar button {
-    min-height: 44px;
-    font-size: var(--font-size-xs);
-    width: 100%;
-    margin-bottom: 0.5rem;
-  }
-}

@@ -5,9 +5,9 @@ export default function About() {
     <main
       style={{ fontFamily: 'system-ui, sans-serif', padding: 20, maxWidth: 800, margin: '0 auto' }}
     >
-      <h1>About PledgedHub</h1>
+      <h1>About PledgeHub</h1>
       <p style={{ color: '#444' }}>
-        PledgedHub is a simple pledge and donation platform. The frontend (this React app)
+        PledgeHub is a simple pledge and donation platform. The frontend (this React app)
         talks to an Express + MySQL backend to manage users, pledges and payments.
       </p>
 
@@ -36,12 +36,12 @@ export default function About() {
             The app uses <code>getViteEnv().API_URL</code> to access this value.
           </li>
           <li>Run backend from backend/ with npm install && npm start.</li>
-          <li>This page is informational ï¿½ use the app UI to create and view pledges.</li>
+          <li>This page is informational — use the app UI to create and view pledges.</li>
         </ol>
       </section>
 
       <footer style={{ marginTop: 20, color: '#666', fontSize: 13 }}>
-        <div>Repository: PledgedHub-pledge</div>
+        <div>Repository: PledgeHub-pledge</div>
         <div>Contact: (add maintainer email or link in backend/utils/sendEmail.js)</div>
       </footer>
     </main>

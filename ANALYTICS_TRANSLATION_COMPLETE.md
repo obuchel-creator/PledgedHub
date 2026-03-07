@@ -1,4 +1,4 @@
-# Analytics Dashboard - Multi-Language Implementation ✅
+﻿# Analytics Dashboard - Multi-Language Implementation ✅
 
 ## Overview
 The Analytics Dashboard has been fully translated into **English**, **Luganda**, and **Swahili**. All user-facing text now dynamically updates based on the selected language in Settings.

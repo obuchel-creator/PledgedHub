@@ -45,7 +45,7 @@ const LoginPage = () => {
   return (
     <div style={{ minHeight: '100vh', background: '#f8f9fa', padding: '2rem 0' }}>
       <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-        <h1 style={{ color: '#333', marginBottom: '0.5rem' }}>PledgedHub</h1>
+        <h1 style={{ color: '#333', marginBottom: '0.5rem' }}>PledgeHub</h1>
         <p style={{ color: '#666' }}>Pledge Management System</p>
       </div>
       <OAuthButtons />

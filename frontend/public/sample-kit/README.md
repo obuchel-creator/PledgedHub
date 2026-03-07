@@ -1,4 +1,4 @@
-# PledgeHub Sample Kit
+﻿# PledgeHub Sample Kit
 
 ## Welcome to Your Complete Supporter Engagement Toolkit! 🎉
 

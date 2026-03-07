@@ -217,7 +217,7 @@ function generateAdvancedReminderMessage(pledge, category) {
                             <p style="margin: 5px 0;"><strong>Days Until Due:</strong> ${daysUntil} days</p>
                         </div>
                         <p>You'll receive reminders as the date approaches. Thank you for your generous support!</p>
-                        <p style="color: #666; font-size: 12px; margin-top: 30px;">PledgedHub System</p>
+                        <p style="color: #666; font-size: 12px; margin-top: 30px;">PledgeHub System</p>
                     </div>
                 `
             }
@@ -239,7 +239,7 @@ function generateAdvancedReminderMessage(pledge, category) {
                         </div>
                         <p>Please begin preparing for your pledge fulfillment.</p>
                         <p>Thank you for your commitment!</p>
-                        <p style="color: #666; font-size: 12px; margin-top: 30px;">PledgedHub System</p>
+                        <p style="color: #666; font-size: 12px; margin-top: 30px;">PledgeHub System</p>
                     </div>
                 `
             }
@@ -262,7 +262,7 @@ function generateAdvancedReminderMessage(pledge, category) {
                         </div>
                         <p>Please ensure you're ready for collection on the due date.</p>
                         <p>Thank you for your continued support!</p>
-                        <p style="color: #666; font-size: 12px; margin-top: 30px;">PledgedHub System</p>
+                        <p style="color: #666; font-size: 12px; margin-top: 30px;">PledgeHub System</p>
                     </div>
                 `
             }
@@ -283,7 +283,7 @@ function generateAdvancedReminderMessage(pledge, category) {
                             <p style="margin: 5px 0;"><strong>Collection Date:</strong> ${collectionDate}</p>
                         </div>
                         <p>Thank you for honoring your commitment!</p>
-                        <p style="color: #666; font-size: 12px; margin-top: 30px;">PledgedHub System</p>
+                        <p style="color: #666; font-size: 12px; margin-top: 30px;">PledgeHub System</p>
                     </div>
                 `
             }
@@ -307,7 +307,7 @@ function generateAdvancedReminderMessage(pledge, category) {
                         <p>If you've already made this payment, please disregard this message.</p>
                         <p>Otherwise, please contact us immediately to arrange payment.</p>
                         <p>Thank you for your understanding.</p>
-                        <p style="color: #666; font-size: 12px; margin-top: 30px;">PledgedHub System</p>
+                        <p style="color: #666; font-size: 12px; margin-top: 30px;">PledgeHub System</p>
                     </div>
                 `
             }

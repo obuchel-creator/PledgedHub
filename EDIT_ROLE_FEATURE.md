@@ -1,4 +1,4 @@
-# Edit Role Feature - Implementation Complete ✅
+﻿# Edit Role Feature - Implementation Complete ✅
 
 ## Overview
 Superadmins can now dynamically change user roles through the UI, including promoting admins to superadmin status.

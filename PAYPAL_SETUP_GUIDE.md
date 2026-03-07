@@ -1,4 +1,4 @@
-# PayPal Integration Setup Guide
+﻿# PayPal Integration Setup Guide
 
 This guide will help you set up PayPal payment integration for the PledgeHub system.
 

@@ -2,12 +2,19 @@ import React, { useEffect, useMemo, useState, useContext } from 'react';
 import OnboardingModal from '../components/OnboardingModal';
 import useOnboardingModal from '../hooks/useOnboardingModal';
 
-import { FaWhatsapp, FaEnvelope, FaChartBar, FaMoneyBillWave, FaUsers, FaRobot, FaMobileAlt, FaShieldAlt } from 'react-icons/fa';
+import { FaSortAmountUp, FaSortAmountDown, FaFire, FaDownload, FaUserShield, FaHistory, FaMoon, FaSun, FaWhatsapp, FaEnvelope } from 'react-icons/fa';
+import { Bar, Pie } from 'react-chartjs-2';
+import { CSVLink } from 'react-csv';
 import { getViteEnv } from '../utils/getViteEnv';
 import { Link } from 'react-router-dom';
 import { getCampaigns } from '../services/api';
+import AIFeatureBanner from '../components/AIFeatureBanner';
+import HeroBanner from '../components/HeroBanner';
+import { FaChartBar, FaMoneyBillWave, FaUsers, FaRobot, FaMobileAlt, FaShieldAlt } from 'react-icons/fa'; // Only this import for icons used in stats/features
 import FeedbackButton from '../components/FeedbackButton';
 import ShareButton from '../components/ShareButton';
+import PledgesList from '../components/PledgesList';
+import RecentPayments from '../components/RecentPayments';
 import { AuthContext } from '../context/AuthContext';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -208,7 +215,7 @@ function HomeScreen() {
       >
         {/* Fancy Animated Hero Section */}
         <div style={{ background: 'linear-gradient(120deg, #16a34a 0%, #22d3ee 100%)', color: '#fff', borderRadius: '0 0 32px 32px', padding: '3.2rem 2rem 2.2rem 2rem', textAlign: 'center', boxShadow: '0 4px 32px rgba(16,185,129,0.08)', marginBottom: '2.5rem', position: 'relative', overflow: 'hidden' }}>
-          <h1 style={{ fontSize: '2.7rem', fontWeight: 900, marginBottom: '0.5rem', letterSpacing: '-1.5px', textShadow: '0 2px 12px rgba(0,0,0,0.13)' }}>Welcome to PledgedHub</h1>
+          <h1 style={{ fontSize: '2.7rem', fontWeight: 900, marginBottom: '0.5rem', letterSpacing: '-1.5px', textShadow: '0 2px 12px rgba(0,0,0,0.13)' }}>Welcome to PledgeHub</h1>
           <p style={{ fontSize: '1.18rem', fontWeight: 400, marginBottom: '1.2rem', color: '#e0f2fe' }}>
             A smarter way to manage pledges, campaigns, and payments across Africa.<br />
             Discover the power of automation, analytics, and mobile money—all in one platform.

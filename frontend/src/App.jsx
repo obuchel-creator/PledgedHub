@@ -1,11 +1,19 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { TablePreferencesProvider } from './context/TablePreferencesContext';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
-import Footer from './components/Footer';
 import ProtectedRoute from './components/ProtectedRoute';
+
+// Global error logging
+// Removed debug log
+window.addEventListener('error', (event) => {
+  window.alert('A global error occurred. See console for details.');
+});
+window.addEventListener('unhandledrejection', (event) => {
+  window.alert('An unhandled promise rejection occurred. See console for details.');
+});
 
 // Design System Imports
 import './styles/modern-design-system.css';
@@ -42,30 +50,9 @@ import VerifyPledgeScreen from './screens/VerifyPledgeScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import SharePledgeScreen from './screens/SharePledgeScreen';
 import PricingScreen from './screens/PricingScreen';
-import ContactScreen from './screens/ContactScreen';
 
 function App() {
-  useEffect(() => {
-    const onError = (event) => {
-      console.error('[App] Global error captured:', event?.error || event?.message || event);
-    };
-
-    const onUnhandledRejection = (event) => {
-      console.error(
-        '[App] Unhandled promise rejection:',
-        event?.reason || event?.message || event
-      );
-    };
-
-    window.addEventListener('error', onError);
-    window.addEventListener('unhandledrejection', onUnhandledRejection);
-
-    return () => {
-      window.removeEventListener('error', onError);
-      window.removeEventListener('unhandledrejection', onUnhandledRejection);
-    };
-  }, []);
-
+  // Removed debug log
   return (
     <TablePreferencesProvider>
       <Router>
@@ -188,7 +175,6 @@ function App() {
         } />
         <Route path="/help" element={<HelpScreen />} />
         <Route path="/pricing" element={<PricingScreen />} />
-        <Route path="/contact" element={<ContactScreen />} />
         <Route path="/privacy" element={<PrivacyScreen />} />
         <Route path="/terms" element={<TermsScreen />} />
         <Route path="/verify-pledge" element={<VerifyPledgeScreen />} />
@@ -196,7 +182,9 @@ function App() {
         <Route path="*" element={<NotFoundScreen />} />
           </Routes>
         </div>
-        <Footer />
+        <footer style={{ background: '#f8fafc', color: '#1e293b', textAlign: 'center', padding: '1.2rem 0', fontSize: '1.08rem', borderTop: '2px solid #e5e7eb', fontWeight: 'bold', letterSpacing: '0.02em', textShadow: '0 1px 6px #fff, 0 1px 1px #e5e7eb' }}>
+          &copy; {new Date().getFullYear()} PledgeHub. All rights reserved.
+        </footer>
         <ToastContainer position="top-center" autoClose={2500} hideProgressBar newestOnTop closeOnClick pauseOnFocusLoss draggable pauseOnHover />
       </div>
     </Router>

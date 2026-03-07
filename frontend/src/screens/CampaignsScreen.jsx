@@ -27,6 +27,7 @@ const CampaignsScreen = () => {
     try {
       setLoading(true);
       const result = await getCampaigns();
+      console.log('Campaigns result:', result);
       
       // Handle both wrapped and unwrapped responses
       if (result.success) {

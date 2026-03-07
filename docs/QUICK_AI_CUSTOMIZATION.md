@@ -1,4 +1,4 @@
-# 🎯 Quick AI Prompt Customization Guide
+﻿# 🎯 Quick AI Prompt Customization Guide
 
 **Your System**: PledgeHub Management  
 **Date**: November 6, 2025  

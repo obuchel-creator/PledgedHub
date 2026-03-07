@@ -1,5 +1,5 @@
 /**
- * PledgedHub Monetization Configuration
+ * PledgeHub Monetization Configuration
  * Automatically activates 6 months after launch date
  */
 
@@ -227,7 +227,7 @@ const getSubscriptionStatus = (user) => {
       status: 'pre_monetization',
       tier: 'FREE',
       daysUntilMonetization: Math.ceil((monetizationStart - now) / (1000 * 60 * 60 * 24)),
-      message: `PledgedHub will start charging in ${Math.ceil((monetizationStart - now) / (1000 * 60 * 60 * 24))} days. Enjoy unlimited access until then!`
+      message: `PledgeHub will start charging in ${Math.ceil((monetizationStart - now) / (1000 * 60 * 60 * 24))} days. Enjoy unlimited access until then!`
     };
   }
   
@@ -243,7 +243,7 @@ const getSubscriptionStatus = (user) => {
         status: 'trial',
         tier: 'FREE',
         daysLeft,
-        message: `You have ${daysLeft} days left in your free trial. Upgrade to continue using PledgedHub.`
+        message: `You have ${daysLeft} days left in your free trial. Upgrade to continue using PledgeHub.`
       };
     }
     

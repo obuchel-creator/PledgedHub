@@ -1,4 +1,4 @@
-# 🔐 OAuth Integration - Quick Reference
+﻿# 🔐 OAuth Integration - Quick Reference
 
 ## ✅ What's Done
 

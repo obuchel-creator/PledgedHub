@@ -53,7 +53,7 @@ export default function AccountingScreen() {
   const fetchAccountingData = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/accounting/reports/dashboard', {
+      const response = await fetch('/api/accounting/dashboard', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (response.ok) {

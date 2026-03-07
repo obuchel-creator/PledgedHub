@@ -21,7 +21,7 @@ const ReferralShare = ({ style = 'card' }) => {
       try {
         const response = await fetch('/api/analytics/referrals/stats', {
           headers: {
-            'Authorization': `Bearer ${localStorage.getItem('pledgedhub_token')}`,
+            'Authorization': `Bearer ${localStorage.getItem('pledgehub_token')}`,
           },
         });
         if (response.ok) {
@@ -58,7 +58,7 @@ const ReferralShare = ({ style = 'card' }) => {
       >
         <div style={{ flex: 1 }}>
           <p style={{ margin: '0 0 0.25rem 0', fontSize: '0.9rem', opacity: 0.9 }}>
-            💎 Invite friends to PledgedHub
+            💎 Invite friends to PledgeHub
           </p>
           <p style={{ margin: 0, fontSize: '0.85rem', opacity: 0.8 }}>
             {referralStats.signups} signups • {referralStats.activePledgers} active
@@ -97,10 +97,10 @@ const ReferralShare = ({ style = 'card' }) => {
             backgroundClip: 'text',
           }}
         >
-          🎁 Invite Friends to PledgedHub
+          🎁 Invite Friends to PledgeHub
         </h3>
         <p style={{ margin: 0, color: '#6b7280', fontSize: '0.95rem', lineHeight: '1.6' }}>
-          Share PledgedHub with your network and help more people organize their pledges and campaigns.
+          Share PledgeHub with your network and help more people organize their pledges and campaigns.
         </p>
       </div>
 
@@ -246,7 +246,7 @@ const ReferralShare = ({ style = 'card' }) => {
             color: '#2563eb',
           }}
         >
-          ✨ Why share PledgedHub?
+          ✨ Why share PledgeHub?
         </p>
         <ul
           style={{

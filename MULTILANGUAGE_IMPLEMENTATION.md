@@ -1,4 +1,4 @@
-# Multi-Language Support Implementation
+﻿# Multi-Language Support Implementation
 
 ## ✅ Languages Added
 - **English (en)** - Default

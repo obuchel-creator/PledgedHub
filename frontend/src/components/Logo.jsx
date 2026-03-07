@@ -25,7 +25,7 @@ export default function Logo({ size = 'xlarge', showText = true, textSize, onlyI
     >
       <img
         src={logoImage}
-        alt="PledgedHub Logo"
+        alt="PledgeHub Logo"
         style={{
           height: `${height}px`,
           width: 'auto',
@@ -34,7 +34,7 @@ export default function Logo({ size = 'xlarge', showText = true, textSize, onlyI
         }}
       />
       {showText && !onlyImage && (
-        <span style={{ fontWeight: 700, fontSize: fontSize, color: '#1a237e', letterSpacing: '0.02em' }}>PledgedHub</span>
+        <span style={{ fontWeight: 700, fontSize: fontSize, color: '#1a237e', letterSpacing: '0.02em' }}>PledgeHub</span>
       )}
     </div>
   );

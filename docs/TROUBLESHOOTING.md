@@ -1,4 +1,4 @@
-# PledgeHub - Troubleshooting Guide
+﻿# PledgeHub - Troubleshooting Guide
 
 Common issues and solutions for the PledgeHub system with AI and automation features.
 

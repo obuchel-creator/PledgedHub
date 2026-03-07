@@ -8,6 +8,7 @@ import './styles/theme.css';
 import './styles/globals.css';
 import './styles/mobile-optimizations.css';
 
+console.log('✓ index.jsx loaded');
 const applyInitialTheme = () => {
   const savedTheme = localStorage.getItem('theme') || 'light';
   if (savedTheme === 'auto') {
@@ -26,10 +27,13 @@ const applyInitialTheme = () => {
 applyInitialTheme();
 
 const rootElement = document.getElementById('root');
+console.log('✓ Root element found:', !!rootElement);
 
 if (rootElement) {
   try {
+    console.log('✓ Creating React root...');
     const root = createRoot(rootElement);
+    console.log('✓ React root created');
     
     root.render(
       <React.StrictMode>
@@ -42,6 +46,7 @@ if (rootElement) {
         </ErrorBoundary>
       </React.StrictMode>
     );
+    console.log('✓ App rendered successfully');
   } catch (error) {
     console.error('✗ Error rendering app:', error);
     rootElement.innerHTML = `<div style="padding: 20px; color: red;"><h2>Error Loading App</h2><p>${error.message}</p></div>`;

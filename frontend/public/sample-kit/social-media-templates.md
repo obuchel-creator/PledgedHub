@@ -1,4 +1,4 @@
-# Social Media Templates for Event Promotion & Updates
+﻿# Social Media Templates for Event Promotion & Updates
 
 ## INSTAGRAM POST TEMPLATES
 

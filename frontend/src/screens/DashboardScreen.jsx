@@ -370,7 +370,7 @@ function Dashboard() {
                     contentType="achievement"
                     contentData={{
                       milestone: `${pledges.length} Pledges`,
-                      description: `I've successfully collected ${pledges.length} pledges on PledgedHub! 🎉`,
+                      description: `I've successfully collected ${pledges.length} pledges on PledgeHub! 🎉`,
                     }}
                     shareUrl={`${window.location.origin}/dashboard`}
                     style="button"

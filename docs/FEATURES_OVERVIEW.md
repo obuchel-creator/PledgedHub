@@ -1,4 +1,4 @@
-# PledgeHub - AI & Automation Features Overview
+﻿# PledgeHub - AI & Automation Features Overview
 
 ## Table of Contents
 - [Introduction](#introduction)

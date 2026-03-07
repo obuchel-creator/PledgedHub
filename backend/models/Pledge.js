@@ -73,8 +73,7 @@ async function list(filter = {}) {
 
     // Always filter for deleted = 0 unless explicitly overridden
     if (!('deleted' in filter)) {
-        where.push('deleted = ?');
-        params.push(0);
+        where.push('deleted = 0');
     } else if (filter.deleted !== undefined) {
         where.push('deleted = ?');
         params.push(filter.deleted);
@@ -83,16 +82,6 @@ async function list(filter = {}) {
     if (filter.ownerId != null) {
         where.push('ownerId = ?');
         params.push(filter.ownerId);
-    }
-
-    if (filter.userId != null) {
-        where.push('user_id = ?');
-        params.push(filter.userId);
-    }
-
-    if (filter.campaignId != null) {
-        where.push('campaign_id = ?');
-        params.push(filter.campaignId);
     }
 
     if (filter.search) {

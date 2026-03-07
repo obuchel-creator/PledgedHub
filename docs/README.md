@@ -1,4 +1,4 @@
-# PledgeHub - Complete Documentation# PledgeHub App Documentation
+﻿# PledgeHub - Complete Documentation# PledgeHub App Documentation
 
 ## Overview
 

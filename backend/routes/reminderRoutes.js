@@ -116,8 +116,8 @@ router.post('/send/:pledgeId', simpleAuth, async (req, res) => {
         const { type } = req.body; // '7_days', '3_days', 'due_today', 'overdue'
         
         // Get pledge details
-        const { pool } = require('../config/db');
-        const [pledges] = await pool.execute(
+        const db = require('../config/db');
+        const [pledges] = await db.execute(
             'SELECT * FROM pledges WHERE id = ?',
             [pledgeId]
         );

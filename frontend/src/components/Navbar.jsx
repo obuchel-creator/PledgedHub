@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Logo from './Logo';
@@ -8,7 +8,6 @@ export default function Navbar() {
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const userMenuRef = useRef(null);
 
   // Dynamic nav links based on user role
   const navLinks = [
@@ -16,11 +15,11 @@ export default function Navbar() {
     { to: '/campaigns', label: 'Campaigns' },
     { to: '/analytics', label: 'Analytics' },
     { to: '/create', label: 'Create' },
-    ...(user?.role === 'admin' || user?.role === 'superadmin' || user?.role === 'super_admin'
+    ...(user?.role === 'admin' || user?.role === 'superadmin'
       ? [
-          { to: '/admin/users', label: 'Users' },
-          { to: '/accounting/dashboard', label: 'Accounting' },
-          { to: '/accounting/chart-of-accounts', label: 'Accounts' }
+          { to: '/admin/users', label: '👥 Users' },
+          { to: '/accounting/dashboard', label: '📊 Accounting' },
+          { to: '/accounting/chart-of-accounts', label: '📋 Accounts' }
         ]
       : []),
     { to: '/about', label: 'About' },
@@ -35,40 +34,24 @@ export default function Navbar() {
     navigate('/login', { replace: true });
   };
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (!userMenuRef.current) return;
-      if (!userMenuRef.current.contains(event.target)) {
-        setUserMenuOpen(false);
-      }
-    };
-
-    const handleEscape = (event) => {
-      if (event.key === 'Escape') {
-        setUserMenuOpen(false);
-        setMobileMenuOpen(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    document.addEventListener('keydown', handleEscape);
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('keydown', handleEscape);
-    };
-  }, []);
-
   return (
     <header className="navbar" role="banner">
       <div className="navbar__inner">
-        <div className="navbar__top-row">
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            width: '100%',
+          }}
+        >
           <Link
             to="/"
             className="navbar__brand"
             onClick={closeMobileMenu}
+            style={{ textDecoration: 'none' }}
           >
-            <span className="navbar__brand-wrap">
+            <span style={{ display: 'flex', alignItems: 'center', gap: '0.7rem' }}>
               <Logo size="large" showText={false} />
             </span>
           </Link>
@@ -80,6 +63,15 @@ export default function Navbar() {
             onClick={toggleMobileMenu}
             aria-label="Toggle navigation menu"
             aria-expanded={mobileMenuOpen}
+            style={{
+              display: 'none',
+              background: 'none',
+              border: 'none',
+              fontSize: '1.5rem',
+              cursor: 'pointer',
+              padding: '0.5rem',
+              color: 'var(--text)',
+            }}
           >
             {mobileMenuOpen ? '✕' : '☰'}
           </button>
@@ -118,57 +110,125 @@ export default function Navbar() {
             {user ? (
               <div
                 className="navbar__user"
-                ref={userMenuRef}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '1rem',
+                  flexDirection: 'row',
+                  position: 'relative',
+                }}
               >
                 <button
-                  type="button"
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
-                  aria-haspopup="menu"
-                  aria-expanded={userMenuOpen}
-                  aria-controls="user-menu-dropdown"
-                  className="navbar__user-trigger"
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    padding: 0,
+                  }}
                 >
-                  <span className="navbar__greeting">
-                    <span className="navbar__greeting-text">Hi, {user.name || user.email || 'Member'}</span>
-                    <span className="navbar__greeting-chevron" aria-hidden="true">{userMenuOpen ? '▲' : '▼'}</span>
+                  <span
+                    className="navbar__greeting"
+                    style={{
+                      fontWeight: '600',
+                      fontSize: '0.95rem',
+                      padding: '0.5rem 1rem',
+                      background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
+                      color: '#ffffff',
+                      borderRadius: '8px',
+                      boxShadow: '0 2px 8px rgba(102, 126, 234, 0.3)',
+                      textShadow: '0 1px 2px rgba(0,0,0,0.2)',
+                      whiteSpace: 'nowrap',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.5rem',
+                    }}
+                  >
+                    <span>👤</span>
+                    <span>Hi, {user.name || user.email || 'Member'}</span>
+                    <span style={{ fontSize: '0.8rem' }}>{userMenuOpen ? '▲' : '▼'}</span>
                   </span>
                 </button>
 
                 {userMenuOpen && (
                   <div
-                    id="user-menu-dropdown"
-                    role="menu"
-                    aria-label="User menu"
-                    className="navbar__dropdown"
+                    style={{
+                      position: 'absolute',
+                      top: '100%',
+                      right: 0,
+                      marginTop: '0.5rem',
+                      background: 'white',
+                      borderRadius: '8px',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                      minWidth: '200px',
+                      zIndex: 1000,
+                      overflow: 'hidden',
+                    }}
                   >
                     <Link
                       to="/change-password"
-                      role="menuitem"
                       onClick={() => {
                         setUserMenuOpen(false);
                         closeMobileMenu();
                       }}
-                      className="navbar__dropdown-item"
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.75rem',
+                        padding: '0.75rem 1rem',
+                        textDecoration: 'none',
+                        color: '#1f2937',
+                        borderBottom: '1px solid #e5e7eb',
+                        transition: 'background 0.2s',
+                      }}
+                      onMouseEnter={(e) => (e.target.style.background = '#f3f4f6')}
+                      onMouseLeave={(e) => (e.target.style.background = 'transparent')}
                     >
+                      <span>🔒</span>
                       <span>Change Password</span>
                     </Link>
                     <Link
                       to="/profile"
-                      role="menuitem"
                       onClick={() => {
                         setUserMenuOpen(false);
                         closeMobileMenu();
                       }}
-                      className="navbar__dropdown-item"
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.75rem',
+                        padding: '0.75rem 1rem',
+                        textDecoration: 'none',
+                        color: '#1f2937',
+                        borderBottom: '1px solid #e5e7eb',
+                        transition: 'background 0.2s',
+                      }}
+                      onMouseEnter={(e) => (e.target.style.background = '#f3f4f6')}
+                      onMouseLeave={(e) => (e.target.style.background = 'transparent')}
                     >
+                      <span>👤</span>
                       <span>Profile</span>
                     </Link>
                     <button
-                      type="button"
-                      role="menuitem"
                       onClick={handleLogout}
-                      className="navbar__dropdown-item navbar__dropdown-item--danger"
+                      style={{
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.75rem',
+                        padding: '0.75rem 1rem',
+                        background: 'none',
+                        border: 'none',
+                        textAlign: 'left',
+                        cursor: 'pointer',
+                        color: '#dc2626',
+                        fontWeight: '500',
+                        transition: 'background 0.2s',
+                      }}
+                      onMouseEnter={(e) => (e.target.style.background = '#fef2f2')}
+                      onMouseLeave={(e) => (e.target.style.background = 'transparent')}
                     >
+                      <span>🚪</span>
                       <span>Logout</span>
                     </button>
                   </div>

@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { getPledges, createPledge, getPayments } from '../services/api';
-import { uiDebug } from '../utils/debug';
 
 // Real implementation with API calls
 export default function useDashboardData() {
@@ -51,7 +50,7 @@ export default function useDashboardData() {
           pledgesArr = pledgesResult.pledges;
         }
       }
-      uiDebug('[Dashboard] Loaded pledges:', pledgesArr.length, pledgesArr.map(p => ({ id: p.id, donor: p.donor_name || p.donorName })));
+      console.log('📊 [Dashboard] Loaded pledges:', pledgesArr.length, pledgesArr.map(p => ({ id: p.id, donor: p.donor_name || p.donorName })));
 
       setState((prev) => ({
         ...prev,
@@ -87,7 +86,7 @@ export default function useDashboardData() {
       const form = state.pledgeForm;
       const finalPurpose = form.purpose === 'Other' ? form.customPurpose : form.purpose;
 
-      uiDebug('[PLEDGE CREATE] Submitting pledge:', {
+      console.log('📝 [PLEDGE CREATE] Submitting pledge:', {
         amount: Number(form.amount),
         donor_name: form.fullName,
         donor_email: form.email,
@@ -111,7 +110,7 @@ export default function useDashboardData() {
         date: new Date().toISOString(),
       });
 
-      uiDebug('[PLEDGE CREATE] Response:', result);
+      console.log('✅ [PLEDGE CREATE] Response:', result);
 
       // Check if the response indicates success
       if (result && (result.success === false || result.error)) {

@@ -1,4 +1,4 @@
-# 🎯 AI Prompt Customization Guide
+﻿# 🎯 AI Prompt Customization Guide
 
 **Date**: November 6, 2025  
 **File**: `backend/services/aiService.js`

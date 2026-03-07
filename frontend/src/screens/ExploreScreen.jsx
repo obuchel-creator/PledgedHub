@@ -81,7 +81,7 @@ export default function ExploreScreen() {
         setStats({
           donors: overview?.activeDonors || 0,
           pledges: overview?.totalPledges || 0,
-          campaigns: Array.isArray(campaignsRes?.data) ? campaignsRes.data.length : 0,
+          campaigns: Array.isArray(campaignsRes?.data?.campaigns) ? campaignsRes.data.campaigns.length : 0,
           payments: overview?.totalCollected || 0,
           aiReminders: aiStatus?.data?.remindersSent || 0,
           securityEvents: reminderStatus?.data?.criticalEvents || 0,
@@ -107,7 +107,7 @@ export default function ExploreScreen() {
   return (
     <div className="explore-main">
       <section className="explore-hero">
-        <h1 className="explore-hero__title">Welcome to PledgedHub</h1>
+        <h1 className="explore-hero__title">Welcome to PledgeHub</h1>
         <p className="explore-hero__desc">A smarter way to manage pledges, campaigns, and payments across Uganda. Discover the power of automation, analytics, and mobile money—all in one platform.</p>
         <Link to="/register" className="explore-hero__cta">Get Started</Link>
       </section>
@@ -141,6 +141,25 @@ export default function ExploreScreen() {
             <Link to={f.link} className="explore-feature__cta">{f.cta}</Link>
           </div>
         ))}
+      </section>
+
+      {/* Optionally, replace demo cards with real campaign/pledge/payment highlights in future */}
+      <section className="explore-demo-cards">
+        <div className="explore-demo-card">
+          <h4>Sample Campaign</h4>
+          <p>"Clean Water for Schools"<br />Goal: UGX 10,000,000<br />Raised: UGX 7,200,000</p>
+          <Link to="/campaigns/1" className="explore-demo-card__cta">View Campaign</Link>
+        </div>
+        <div className="explore-demo-card">
+          <h4>Sample Pledge</h4>
+          <p>Donor: Jane Doe<br />Amount: UGX 250,000<br />Status: Unpaid</p>
+          <Link to="/pledges/1" className="explore-demo-card__cta">View Pledge</Link>
+        </div>
+        <div className="explore-demo-card">
+          <h4>Sample Payment</h4>
+          <p>Method: MTN Mobile Money<br />Amount: UGX 100,000<br />Date: 2026-01-01</p>
+          <Link to="/payment" className="explore-demo-card__cta">View Payment</Link>
+        </div>
       </section>
 
       <div style={{textAlign:'center',margin:'2rem 0'}}>

@@ -1,4 +1,4 @@
-# New Features Implementation Summary
+﻿# New Features Implementation Summary
 
 ## Overview
 This document details the implementation of two critical features added to the PledgeHub Management System:

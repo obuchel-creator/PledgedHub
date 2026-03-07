@@ -87,6 +87,21 @@ async function create(user) {
         console.error('[USER CREATE ERROR]', err.message);
         throw err;
     }
+
+    // Fallback to in-memory
+    const newUser = {
+        id: nextId++,
+        email: user.email,
+        password_hash: user.passwordHash || user.password || null,
+        username: user.name || user.username || '',
+        oauth_provider: user.oauthProvider || null,
+        oauth_id: user.oauthId || null,
+        email_verified: user.emailVerified || false,
+        created_at: new Date(),
+        updated_at: new Date()
+    };
+    users.push(newUser);
+    return newUser;
 }
 
 async function getById(id) {
@@ -103,23 +118,19 @@ async function getById(id) {
 
 async function getByEmail(email) {
     try {
-        const [rows] = await pool.execute('SELECT * FROM users WHERE LOWER(email) = LOWER(?) LIMIT 1', [email]);
+        const [rows] = await pool.execute('SELECT * FROM users WHERE email = ? LIMIT 1', [email]);
         if (rows && rows.length) return rows[0];
     } catch (err) {
         console.error('DB error in getByEmail, falling back to in-memory:', err);
     }
 
-    // Fallback (case-insensitive)
-    const lower = email.toLowerCase();
-    return users.find(u => u.email && u.email.toLowerCase() === lower) || null;
+    // Fallback
+    return users.find(u => u.email === email) || null;
 }
 
 async function getByPhone(phone) {
     try {
-        const [rows] = await pool.execute(
-            'SELECT * FROM users WHERE phone_number = ? OR phone = ? LIMIT 1',
-            [phone, phone]
-        );
+        const [rows] = await pool.execute('SELECT * FROM users WHERE phone_number = ? LIMIT 1', [phone]);
         if (rows && rows.length) return rows[0];
     } catch (err) {
         console.error('DB error in getByPhone, falling back to in-memory:', err);
@@ -129,16 +140,6 @@ async function getByPhone(phone) {
     return users.find(u => u.phone === phone || u.phone_number === phone) || null;
 }
 
-async function getByUsername(username) {
-    try {
-        const [rows] = await pool.execute('SELECT * FROM users WHERE username = ? LIMIT 1', [username]);
-        if (rows && rows.length) return rows[0];
-    } catch (err) {
-        console.error('DB error in getByUsername, falling back to in-memory:', err);
-    }
-    return users.find(u => u.username === username) || null;
-}
-
 // Alias for compatibility with authController
 async function findOne(query) {
     if (query && query.phone) {
@@ -146,9 +147,6 @@ async function findOne(query) {
     }
     if (query && query.email) {
         return await getByEmail(query.email);
-    }
-    if (query && query.username) {
-        return await getByUsername(query.username);
     }
     if (query && query.passwordResetToken) {
         try {
@@ -391,28 +389,11 @@ async function restore(id) {
  */
 async function listAll(filter = {}) {
     try {
-        const where = [];
-        const params = [];
-
-        // Respect includeDeleted filter; default to excluding deleted users
-        if (!filter.includeDeleted) {
-            where.push('deleted_at IS NULL');
-        }
-
-        // Support optional search
-        if (filter.search) {
-            where.push('(username LIKE ? OR email LIKE ? OR phone_number LIKE ?)');
-            const s = `%${filter.search}%`;
-            params.push(s, s, s);
-        }
-
-        const whereSql = where.length ? `WHERE ${where.join(' AND ')}` : '';
-        const sql = `SELECT * FROM users ${whereSql} ORDER BY id DESC`;
-
-        // Use query() when no params to avoid MySQL2 prepared-statement issues with empty params
-        const [rows] = params.length
-            ? await pool.execute(sql, params)
-            : await pool.query(sql);
+        // Force: ignore all filters and return all users
+        const sql = 'SELECT * FROM users ORDER BY id DESC';
+        const [rows] = await pool.execute(sql);
+        console.log('[DEBUG] User.listAll SQL:', sql);
+        console.log('[DEBUG] User.listAll result:', rows);
         return rows || [];
     } catch (err) {
         console.error('DB error in listAll:', err);

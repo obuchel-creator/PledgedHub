@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import '../authOutlook.css';
 
 export default function OAuthCallbackScreen() {
   const [searchParams] = useSearchParams();
@@ -57,15 +56,50 @@ export default function OAuthCallbackScreen() {
   }, [searchParams, navigate, setToken]);
 
   return (
-    <div className="oauth-callback-screen">
-      <div className="oauth-callback-card">
+    <div
+      style={{
+        background: '#fff',
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '2rem',
+      }}
+    >
+      <div
+        style={{
+          textAlign: 'center',
+          maxWidth: '400px',
+        }}
+      >
         {status === 'processing' && (
           <>
-            <div className="oauth-spinner"></div>
-            <h2 className="oauth-title">
+            <div
+              style={{
+                width: '60px',
+                height: '60px',
+                border: '4px solid #f3f3f3',
+                borderTop: '4px solid #1a73e8',
+                borderRadius: '50%',
+                margin: '0 auto 24px',
+                animation: 'spin 1s linear infinite',
+              }}
+            ></div>
+            <h2
+              style={{
+                fontSize: '24px',
+                color: '#202124',
+                marginBottom: '12px',
+              }}
+            >
               Signing you in...
             </h2>
-            <p className="oauth-subtitle">
+            <p
+              style={{
+                color: '#5f6368',
+                fontSize: '14px',
+              }}
+            >
               Please wait while we complete your authentication
             </p>
           </>
@@ -73,13 +107,37 @@ export default function OAuthCallbackScreen() {
 
         {status === 'success' && (
           <>
-            <div className="oauth-status-icon oauth-status-success">
+            <div
+              style={{
+                width: '60px',
+                height: '60px',
+                background: '#34a853',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 24px',
+                fontSize: '32px',
+                color: 'white',
+              }}
+            >
               ✓
             </div>
-            <h2 className="oauth-title">
+            <h2
+              style={{
+                fontSize: '24px',
+                color: '#202124',
+                marginBottom: '12px',
+              }}
+            >
               Success!
             </h2>
-            <p className="oauth-subtitle">
+            <p
+              style={{
+                color: '#5f6368',
+                fontSize: '14px',
+              }}
+            >
               Redirecting to your dashboard...
             </p>
           </>
@@ -87,20 +145,60 @@ export default function OAuthCallbackScreen() {
 
         {status === 'error' && (
           <>
-            <div className="oauth-status-icon oauth-status-error">
+            <div
+              style={{
+                width: '60px',
+                height: '60px',
+                background: '#ea4335',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 24px',
+                fontSize: '32px',
+                color: 'white',
+              }}
+            >
               ✕
             </div>
-            <h2 className="oauth-title">
+            <h2
+              style={{
+                fontSize: '24px',
+                color: '#202124',
+                marginBottom: '12px',
+              }}
+            >
               Authentication Failed
             </h2>
-            <p className="oauth-subtitle oauth-error-copy">
+            <p
+              style={{
+                color: '#5f6368',
+                fontSize: '14px',
+                marginBottom: '24px',
+              }}
+            >
               {error || 'Something went wrong. Please try again.'}
             </p>
-            <a href="/login" className="auth-inline-link auth-inline-link-compact">
+            <a
+              href="/login"
+              style={{
+                color: '#1a73e8',
+                textDecoration: 'none',
+                fontSize: '14px',
+                fontWeight: '500',
+              }}
+            >
               Return to login
             </a>
           </>
         )}
+
+        <style>{`
+                    @keyframes spin {
+                        0% { transform: rotate(0deg); }
+                        100% { transform: rotate(360deg); }
+                    }
+                `}</style>
       </div>
     </div>
   );

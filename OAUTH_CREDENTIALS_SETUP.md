@@ -1,4 +1,4 @@
-# OAuth Credentials Setup Guide
+﻿# OAuth Credentials Setup Guide
 
 This guide will help you obtain the actual Google and Facebook OAuth credentials for your application.
 

@@ -1,9 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import {
   getPledge,
   getPayments,
-  createPayment,
   deletePledge,
   updatePledge,
   sendPledgeReminder,
@@ -12,7 +11,6 @@ import {
 import { useAuth } from '../context/AuthContext';
 import PaymentModal from '../components/PaymentModal';
 import ShareButton from '../components/ShareButton';
-import { uiDebug } from '../utils/debug';
 
 function resolveId(props) {
   if (props && props.match && props.match.params && props.match.params.id) {
@@ -52,7 +50,6 @@ export default function PledgeDetailScreen(props) {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
 
   const navigate = useNavigate();
-  const location = useLocation();
   const { user } = useAuth();
   const { id: routeId } = useParams();
   const id = routeId || resolveId(props);
@@ -86,7 +83,7 @@ export default function PledgeDetailScreen(props) {
         return;
       }
 
-      uiDebug('[PledgeDetailScreen] Fetching pledge with ID:', id);
+      console.log('🔵 [PledgeDetailScreen] Fetching pledge with ID:', id);
       setLoading(true);
       setError('');
 
@@ -101,7 +98,7 @@ export default function PledgeDetailScreen(props) {
           return;
         }
         
-        uiDebug('[PledgeDetailScreen] Pledge fetched successfully:', fetchedPledge);
+        console.log('✅ [PledgeDetailScreen] Pledge fetched successfully:', fetchedPledge);
         setPledge(fetchedPledge);
 
         let fetchedPayments = [];
@@ -129,14 +126,6 @@ export default function PledgeDetailScreen(props) {
       canceled = true;
     };
   }, [id]);
-
-  useEffect(() => {
-    if (!user) return;
-    const params = new URLSearchParams(location.search || '');
-    if (params.get('action') === 'pay') {
-      setShowPaymentModal(true);
-    }
-  }, [location.search, user]);
 
   const totalRaised = useMemo(() => {
     if (pledge && (typeof pledge.amountRaised === 'number' || pledge?.amountRaised)) {
@@ -167,7 +156,12 @@ export default function PledgeDetailScreen(props) {
 
     setDonating(true);
     try {
-      await createPayment({
+      const api = await import('../services/api');
+      if (typeof api.createPayment !== 'function') {
+        throw new Error('createPayment is not available.');
+      }
+
+      await api.createPayment({
         pledgeId: id,
         amount,
         donorName: donorName.trim() || 'Anonymous',

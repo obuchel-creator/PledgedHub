@@ -1,5 +1,4 @@
-const { pool } = require('../config/db');
-const db = { query: pool.query.bind(pool), execute: pool.execute.bind(pool) };
+const db = require('../config/db');
 const paymentTrackingService = require('../services/paymentTrackingService');
 
 let Payment;

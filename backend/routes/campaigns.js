@@ -1,25 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const { pool } = require('../config/db');
-const db = { query: pool.query.bind(pool), execute: pool.execute.bind(pool) };
+const db = require('../config/db');
 
 router.get('/', async (req, res) => {
   try {
-    const { status } = req.query;
-    let sql = 'SELECT * FROM campaigns WHERE deleted = 0 OR deleted IS NULL';
-    const params = [];
-    if (status) {
-      sql += ' AND status = ?';
-      params.push(status);
-    }
-    sql += ' ORDER BY created_at DESC';
-    const [rows] = params.length
-      ? await db.execute(sql, params)
-      : await db.query(sql);
-    res.json({ success: true, data: rows });
+    const [rows] = await db.execute('SELECT * FROM campaigns');
+    res.json({ campaigns: rows });
   } catch (err) {
-    console.error('Campaigns route error:', err);
-    res.status(500).json({ success: false, error: 'Server error' });
+    res.status(500).json({ error: 'Server error' });
   }
 });
 

@@ -1,4 +1,4 @@
-const express = require('express');
+﻿const express = require('express');
 const router = express.Router();
 
 // Public: Get a pledge by id (safe for sharing)
@@ -67,7 +67,7 @@ router.get('/public/:id', async (req, res) => {
   }
 });
 const { createPledge, getPledge, listPledges, updatePledge, deletePledge, batchCreatePledges } = require('../controllers/pledgeController');
-const { authenticateToken, requireStaff, optionalAuth } = require('../middleware/authMiddleware');
+const { authenticateToken, requireStaff } = require('../middleware/authMiddleware');
 const pledgeVerificationService = require('../services/pledgeVerificationService');
 const {
   validateEmail,
@@ -90,11 +90,12 @@ router.post('/batch', authenticateToken, requireStaff, batchCreatePledges);
  * Protected: Public - allow anyone to create a pledge
  * Adds validation middleware
  */
-router.post('/', optionalAuth, (req, res, next) => {
+router.post('/', (req, res, next) => {
   const { donor_name, donor_email, donor_phone, amount } = req.body;
-  // Validate required fields (email is optional)
+  // Validate required fields
   const requiredFields = [
     { value: donor_name, name: 'Donor name' },
+    { value: donor_email, name: 'Donor email' },
     { value: donor_phone, name: 'Donor phone' },
     { value: amount, name: 'Amount' }
   ];
@@ -102,8 +103,7 @@ router.post('/', optionalAuth, (req, res, next) => {
     const check = validateRequired(field.value, field.name);
     if (!check.valid) return sendError(res, 400, check.error);
   }
-  // Only validate email format if email is provided
-  if (donor_email && !validateEmail(donor_email)) return sendError(res, 400, 'Invalid email format');
+  if (!validateEmail(donor_email)) return sendError(res, 400, 'Invalid email format');
   if (!validatePhone(donor_phone)) return sendError(res, 400, 'Invalid phone format');
   if (!validateAmount(amount)) return sendError(res, 400, 'Invalid amount');
   next();
@@ -136,7 +136,7 @@ router.post('/verify/:token', async (req, res) => {
  * Query: ?page=1&limit=20
  * Protected: Authenticated users (Staff/Admin see all, Donors see own)
  */
-router.get('/', optionalAuth, (req, res, next) => {
+router.get('/', authenticateToken, (req, res, next) => {
   req.query.page = parseInt(req.query.page) > 0 ? parseInt(req.query.page) : 1;
   req.query.limit = parseInt(req.query.limit) > 0 ? parseInt(req.query.limit) : 20;
   next();

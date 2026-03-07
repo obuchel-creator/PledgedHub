@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import TextInput from '../components/TextInput';
 import PasswordInput from '../components/PasswordInput';
+import { uiDebug } from '../utils/debug';
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -111,7 +112,7 @@ export default function Register() {
         name: `${firstName} ${lastName}`.trim(),
       };
       const response = await register(registerData);
-      console.log('[Register] Registration response:', response);
+      uiDebug('[Register] Registration response:', response);
       // Only navigate if registration returns a token (success)
       if (response && (response.token || response.accessToken)) {
         navigate('/dashboard');

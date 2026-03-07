@@ -1,0 +1,176 @@
+.pledges-section {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.pledges-section__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-top: 0.35rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.875rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.pledges-section__title {
+  margin: 0;
+  font-size: 1.25rem;
+  line-height: 1.2;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.pledges-section__subtitle {
+  margin: 0.5rem 0 0;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: #475569;
+}
+
+.pledges-list {
+  flex: 1;
+}
+
+.pledges-section__footer {
+  margin-top: auto;
+  padding-top: 1rem;
+  text-align: center;
+}
+
+.pledges-section__view-more-btn {
+  width: 100%;
+  background: #0f172a;
+  color: #ffffff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: background 0.2s ease;
+}
+
+.pledges-section__view-more-btn:hover {
+  background: #1e293b;
+}
+
+.pledge-list-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.9rem;
+  padding: 0.85rem 0.15rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.pledge-list-item:last-child {
+  border-bottom: none;
+}
+
+.pledge-list-item__main {
+  flex: 1;
+  min-width: 0;
+}
+
+.pledge-list-item__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.pledge-list-item__amount {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.pledge-list-item__details {
+  margin-top: 0.35rem;
+}
+
+.pledge-list-item__purpose,
+.pledge-list-item__donor,
+.pledge-list-item__contact {
+  margin: 0;
+  line-height: 1.35;
+}
+
+.pledge-list-item__purpose {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.pledge-list-item__donor,
+.pledge-list-item__contact {
+  margin-top: 0.15rem;
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+.pledge-list-item__dates {
+  margin-top: 0.35rem;
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.pledge-list-item__date {
+  font-size: 0.74rem;
+  color: #475569;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 999px;
+  padding: 0.12rem 0.5rem;
+}
+
+.pledge-list-item__date--muted {
+  color: #64748b;
+}
+
+.pledge-list-item__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+.pledge-status {
+  text-transform: capitalize;
+  font-size: 0.72rem;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 0.16rem 0.48rem;
+  border: 1px solid transparent;
+}
+
+.pledge-status--pending,
+.pledge-status--active {
+  background: #fff7ed;
+  color: #9a3412;
+  border-color: #fed7aa;
+}
+
+.pledge-status--overdue {
+  background: #fef2f2;
+  color: #991b1b;
+  border-color: #fecaca;
+}
+
+.pledge-status--completed,
+.pledge-status--collected {
+  background: #f0fdf4;
+  color: #166534;
+  border-color: #bbf7d0;
+}
+
+@media (max-width: 640px) {
+  .pledges-section__header {
+    margin-top: 0.2rem;
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

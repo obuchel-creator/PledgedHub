@@ -3,9 +3,9 @@ import React, { useState, useEffect } from 'react';
 import '../authOutlook.css';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { uiDebug } from '../utils/debug';
 
 import Logo from '../components/Logo';
-import { socialLogos } from '../assets/social-logos';
 import OAuthButtons from '../components/OAuthButtons';
 
 export default function LoginScreen() {
@@ -35,6 +35,27 @@ export default function LoginScreen() {
     setError('');
   };
 
+  // Normalize phone number format (remove spaces, dashes, parentheses, convert 0 prefix to 256)
+  const normalizeIdentifier = (input) => {
+    if (!input) return '';
+    const trimmed = input.trim();
+    // Check if it looks like a phone number
+    if (/^\+?[1-9]\d{7,14}$/.test(trimmed.replace(/[\s\-()]/g, ''))) {
+      let normalized = trimmed.replace(/[\s\-()]/g, '');
+      // Convert 0771234567 to +256771234567
+      if (normalized.startsWith('0')) {
+        normalized = '+256' + normalized.substring(1);
+      }
+      // Ensure + prefix for international numbers
+      if (!normalized.startsWith('+')) {
+        normalized = '+' + normalized;
+      }
+      return normalized;
+    }
+    // Not a phone number, return as-is (email or username)
+    return trimmed;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -52,10 +73,11 @@ export default function LoginScreen() {
     setError('');
 
     try {
-      console.log('[LoginScreen] 🔐 Attempting login with:', { email: form.email });
-      const result = await login({ email: form.email, password: form.password });
+      const normalizedEmail = normalizeIdentifier(form.email);
+      uiDebug('[LoginScreen] Attempting login with:', { email: normalizedEmail });
+      const result = await login({ email: normalizedEmail, password: form.password });
       
-      console.log('[LoginScreen] 🔐 Login result received:', result);
+      uiDebug('[LoginScreen] Login result received:', result);
       
       // Check if login was successful
       if (result && result.success === false && result.error) {
@@ -64,7 +86,7 @@ export default function LoginScreen() {
         setError(result.error);
         setSuccess('');
       } else if (result && result.token) {
-        console.log('[LoginScreen] ✅ Login successful, token received, showing success and redirecting');
+        uiDebug('[LoginScreen] Login successful, token received, showing success and redirecting');
         setSuccess('Login successful! Redirecting to dashboard...');
         setError('');
         setTimeout(() => {
@@ -110,7 +132,7 @@ export default function LoginScreen() {
             <Logo size="medium" showText={false} />
           </div>
 
-          <h2>Sign in to PledgeHub</h2>
+          <h2>Sign in to PledgedHub</h2>
 
           {/* OAuth login options */}
           <OAuthButtons className="mb-4" />
@@ -143,7 +165,7 @@ Email, Username, or Phone <span style={{ color: 'var(--error)' }}>*</span>
                 <label htmlFor="password">
                   Password <span style={{ color: 'var(--error)' }}>*</span>
                 </label>
-                <div style={{ position: 'relative', marginBottom: '20px' }}>
+                <div className="auth-password-wrap">
                   <input
                     id="password"
                     name="password"
@@ -154,33 +176,15 @@ Email, Username, or Phone <span style={{ color: 'var(--error)' }}>*</span>
                     autoComplete="current-password"
                     disabled={loading}
                     required
-                    style={{ paddingRight: '90px !important', marginBottom: '0' }}
+                    className="auth-password-input"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword((v) => !v)}
                     disabled={loading}
-                    style={{ 
-                      position: 'absolute',
-                      right: '12px',
-                      top: '50%',
-                      transform: 'translateY(-50%)',
-                      background: 'transparent',
-                      border: 'none',
-                      color: '#3498db',
-                      cursor: 'pointer',
-                      fontSize: '13px',
-                      fontWeight: '600',
-                      padding: '6px 8px',
-                      whiteSpace: 'nowrap',
-                      zIndex: 1000,
-                      lineHeight: 1,
-                      height: 'auto',
-                      width: 'auto',
-                      margin: '0'
-                    }}
+                    className="auth-toggle-btn"
                   >
-                    {showPassword ? '👁️ Hide' : '👁️ Show'}
+                    {showPassword ? 'Hide' : 'Show'}
                   </button>
                 </div>
               </div>
@@ -193,7 +197,7 @@ Email, Username, or Phone <span style={{ color: 'var(--error)' }}>*</span>
               disabled={loading}
               aria-busy={loading}
             >
-              {step === 1 ? 'Next' : loading ? 'Signing in...' : 'Login'}
+              {step === 1 ? 'Next' : loading ? 'Signing in...' : 'Sign in'}
             </button>
 
             <div style={{ textAlign: 'center', marginTop: '16px' }}>

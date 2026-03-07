@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { pool } = require('../config/db');
-const { mobileMoneyService } = require('../services/mobileMoneyService');
+const mobileMoneyService = require('../services/mobileMoneyService');
 const paymentTrackingService = require('../services/paymentTrackingService');
 const { encryptValue, decryptFields } = require('../services/dataEncryptionService');
 const { rejectSensitivePaymentData } = require('../middleware/pciDssMiddleware');
@@ -416,6 +416,7 @@ router.post('/pledges/:pledgeId/pay', pciGuard, async (req, res) => {
   try {
     const { pledgeId } = req.params;
     const { payment_method, donor_phone } = req.body;
+    const schema = await getPledgesSchema();
 
     // Validate pledge exists
     const [pledges] = await pool.execute(`
@@ -430,7 +431,9 @@ router.post('/pledges/:pledgeId/pay', pciGuard, async (req, res) => {
     }
 
     const pledge = decryptFields(pledges[0], ['donor_email', 'donor_phone', 'payment_reference']);
-    const amount = pledge.balance || pledge.amount;
+    const amount = Number(
+      pledge.balance_remaining ?? pledge.balance ?? pledge.amount ?? 0,
+    );
 
     if (amount <= 0) {
       return res.status(400).json({
@@ -440,24 +443,66 @@ router.post('/pledges/:pledgeId/pay', pciGuard, async (req, res) => {
     }
 
     // Handle different payment methods
-    if (payment_method === 'mtn') {
-      // Use mobile money service
+    if (payment_method === 'mtn' || payment_method === 'airtel') {
       const phoneNumber = donor_phone || pledge.donor_phone;
 
-      if (!phoneNumber.match(/^256\d{9}$/)) {
+      if (!phoneNumber || !phoneNumber.match(/^256\d{9}$/)) {
         return res.status(400).json({
           success: false,
-          error: 'Invalid phone number format'
+          error: 'Invalid phone number format. Must be 256XXXXXXXXX'
         });
       }
 
-      const paymentResult = await mobileMoneyService.requestPayment(
-        phoneNumber,
-        amount,
-        pledgeId,
-        'PledgeHub Donation',
-        'Event Fundraiser Pledge Payment'
-      );
+      // Validate phone matches selected provider (before calling service)
+      const isMTN = phoneNumber.match(/^25676/) || phoneNumber.match(/^25677/) || phoneNumber.match(/^25678/);
+      const isAirtel = phoneNumber.match(/^25670/) || phoneNumber.match(/^25674/) || phoneNumber.match(/^25675/);
+
+      if (payment_method === 'mtn' && !isMTN) {
+        return res.status(400).json({
+          success: false,
+          error: `Phone number does not match MTN. MTN numbers start with 076, 077, or 078. Your number starts with ${phoneNumber.substring(0, 6)}.`
+        });
+      }
+
+      if (payment_method === 'airtel' && !isAirtel) {
+        return res.status(400).json({
+          success: false,
+          error: `Phone number does not match Airtel. Airtel numbers start with 070, 074, or 075. Your number starts with ${phoneNumber.substring(0, 6)}.`
+        });
+      }
+
+      let paymentResult;
+      if (payment_method === 'mtn') {
+        const missingMTN = !process.env.MTN_SUBSCRIPTION_KEY || !process.env.MTN_API_USER || !process.env.MTN_API_KEY;
+        if (missingMTN) {
+          return res.status(400).json({
+            success: false,
+            error: 'MTN payments are not configured. Please choose Airtel or Bank Transfer.',
+            fallback: 'bank'
+          });
+        }
+        paymentResult = await mobileMoneyService.requestMTNPayment({
+          phoneNumber,
+          amount,
+          pledgeId,
+          currency: 'UGX'
+        });
+      } else {
+        const missingAirtel = !process.env.AIRTEL_CLIENT_ID || !process.env.AIRTEL_CLIENT_SECRET;
+        if (missingAirtel) {
+          return res.status(400).json({
+            success: false,
+            error: 'Airtel payments are not configured yet. Please choose MTN or Bank Transfer.',
+            fallback: 'bank'
+          });
+        }
+        paymentResult = await mobileMoneyService.requestAirtelPayment({
+          phoneNumber,
+          amount,
+          pledgeId,
+          currency: 'UGX'
+        });
+      }
 
       if (!paymentResult.success) {
         return res.status(400).json({
@@ -466,21 +511,37 @@ router.post('/pledges/:pledgeId/pay', pciGuard, async (req, res) => {
         });
       }
 
-      // Update pledge with payment reference
-      await pool.execute(`
-        UPDATE pledges SET 
-          payment_status = 'pending',
-          payment_reference = ?,
-          payment_method = 'mtn'
-        WHERE id = ?
-      `, [paymentResult.transactionId, pledgeId]);
+      // Update pledge with payment reference using only existing columns.
+      const updates = [];
+      const params = [];
+
+      if (schema.has('payment_status')) {
+        updates.push('payment_status = ?');
+        params.push('pending');
+      }
+      if (schema.has('payment_reference')) {
+        updates.push('payment_reference = ?');
+        params.push(paymentResult.transactionId || paymentResult.referenceId || null);
+      }
+      if (schema.has('payment_method')) {
+        updates.push('payment_method = ?');
+        params.push(payment_method);
+      }
+
+      if (updates.length > 0) {
+        params.push(pledgeId);
+        await pool.execute(
+          `UPDATE pledges SET ${updates.join(', ')} WHERE id = ?`,
+          params,
+        );
+      }
 
       res.json({
         success: true,
         data: {
           pledgeId,
-          paymentMethod: 'mtn',
-          transactionId: paymentResult.transactionId,
+          paymentMethod: payment_method,
+          transactionId: paymentResult.transactionId || paymentResult.referenceId,
           message: 'Payment initiated. Check your phone for prompt.'
         }
       });

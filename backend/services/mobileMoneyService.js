@@ -117,9 +117,10 @@ async function requestMTNPayment(paymentData) {
         const { phoneNumber, amount, pledgeId, currency = 'UGX' } = paymentData;
         
         // Validate phone number (MTN Uganda format: 256XXXXXXXXX)
+        // MTN prefixes: 256-76, 256-77, 256-78
         const cleanPhone = phoneNumber.replace(/\D/g, '');
-        if (!cleanPhone.startsWith('25677') && !cleanPhone.startsWith('25678')) {
-            throw new Error('Invalid MTN phone number. Must start with 256-77 or 256-78');
+        if (!cleanPhone.startsWith('25676') && !cleanPhone.startsWith('25677') && !cleanPhone.startsWith('25678')) {
+            throw new Error('Invalid MTN phone number. Must start with 256-76, 256-77, or 256-78');
         }
         
         const token = await getMTNToken();
@@ -227,9 +228,10 @@ async function requestAirtelPayment(paymentData) {
         const { phoneNumber, amount, pledgeId, currency = 'UGX' } = paymentData;
         
         // Validate phone number (Airtel Uganda format: 256XXXXXXXXX)
+        // Airtel prefixes: 256-70, 256-74, 256-75
         const cleanPhone = phoneNumber.replace(/\D/g, '');
-        if (!cleanPhone.startsWith('25670') && !cleanPhone.startsWith('25675')) {
-            throw new Error('Invalid Airtel phone number. Must start with 256-70 or 256-75');
+        if (!cleanPhone.startsWith('25670') && !cleanPhone.startsWith('25674') && !cleanPhone.startsWith('25675')) {
+            throw new Error('Invalid Airtel phone number. Must start with 256-70, 256-74, or 256-75');
         }
         
         const token = await getAirtelToken();
@@ -340,10 +342,10 @@ async function initiatePayment(paymentData) {
     const cleanPhone = phoneNumber.replace(/\D/g, '');
     
     // Auto-detect provider
-    if (cleanPhone.startsWith('25677') || cleanPhone.startsWith('25678')) {
+    if (cleanPhone.startsWith('25676') || cleanPhone.startsWith('25677') || cleanPhone.startsWith('25678')) {
         console.log('[INFO] Detected MTN number, using MTN Mobile Money');
         return await requestMTNPayment(paymentData);
-    } else if (cleanPhone.startsWith('25670') || cleanPhone.startsWith('25675')) {
+    } else if (cleanPhone.startsWith('25670') || cleanPhone.startsWith('25674') || cleanPhone.startsWith('25675')) {
         console.log('[INFO] Detected Airtel number, using Airtel Money');
         return await requestAirtelPayment(paymentData);
     } else {

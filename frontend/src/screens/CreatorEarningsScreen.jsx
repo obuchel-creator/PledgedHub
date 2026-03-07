@@ -187,7 +187,7 @@ export default function CreatorEarningsScreen() {
             <div className="step-number">4️⃣</div>
             <div className="step-content">
               <h3>Platform Commission (10%)</h3>
-              <p>PledgeHub takes 10% to cover operations</p>
+              <p>PledgedHub takes 10% to cover operations</p>
             </div>
           </div>
           <div className="step">

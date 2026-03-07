@@ -44,7 +44,7 @@ export function RBACNavBar({ userRole, userName = 'User' }) {
           {/* Logo */}
           <div className="flex items-center">
             <Link to="/dashboard" className="flex items-center">
-              <span className="text-2xl font-bold text-blue-600">PledgeHub</span>
+              <span className="text-2xl font-bold text-blue-600">PledgedHub</span>
             </Link>
           </div>
 
@@ -141,7 +141,7 @@ export function RBACSidebar({ userRole, userName = 'User' }) {
     <aside className="w-64 bg-gray-900 text-white h-screen shadow-xl">
       {/* Header */}
       <div className="px-6 py-8">
-        <h1 className="text-2xl font-bold text-blue-400">PledgeHub</h1>
+        <h1 className="text-2xl font-bold text-blue-400">PledgedHub</h1>
         <div className="mt-4 text-sm text-gray-400">
           <div className="font-semibold text-white">{userName}</div>
           <div className="text-gray-500">Role: {userRole}</div>

@@ -1,4 +1,4 @@
-﻿// jest.mock('mysql2/promise', () => ({
+// jest.mock('mysql2/promise', () => ({
 //   createPool: () => ({
 //     getConnection: async () => ({ release: () => {} }),
 //     execute: async () => [[], []],

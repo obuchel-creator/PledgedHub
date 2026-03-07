@@ -1,4 +1,4 @@
-﻿# PledgeHub - Quick Reference
+# PledgeHub - Quick Reference
 
 ## 🚀 Quick Start
 

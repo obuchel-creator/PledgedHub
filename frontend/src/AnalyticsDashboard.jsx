@@ -319,7 +319,7 @@ export default function AnalyticsDashboard() {
             )}
           </div>
         ) : (
-          <div style={{ color: '#6b7280', fontStyle: 'italic' }}>No insights available yet. Continue using PledgeHub to generate AI insights.</div>
+          <div style={{ color: '#6b7280', fontStyle: 'italic' }}>No insights available yet. Continue using PledgedHub to generate AI insights.</div>
         )}
       </div>
       <div className={"analytics-dashboard" + (darkMode ? ' dark' : '')}>

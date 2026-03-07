@@ -275,7 +275,7 @@ export default function PrivacyPolicyScreen() {
                 marginTop: '1rem',
               }}
             >
-              <strong>Email:</strong> privacy@PledgeHubpledge.com
+              <strong>Email:</strong> privacy@PledgedHubpledge.com
               <br />
               <strong>Address:</strong> [Your Business Address]
             </p>

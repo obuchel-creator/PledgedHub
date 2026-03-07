@@ -23,9 +23,9 @@ export default function HelpScreen() {
         answer: `Click the "Sign Up" button and choose to register with email or use OAuth (Google/Facebook). Fill in your details and verify your email address. You can also sign in with your existing Google or Facebook account for faster access.`,
       },
       {
-        question: 'What is PledgeHub?',
+        question: 'What is PledgedHub?',
         answer:
-          'PledgeHub is a comprehensive platform for managing pledges, donations, and commitments. It helps organizations and individuals track pledge fulfillment, send automated reminders, and maintain donor relationships.',
+          'PledgedHub is a comprehensive platform for managing pledges, donations, and commitments. It helps organizations and individuals track pledge fulfillment, send automated reminders, and maintain donor relationships.',
       },
       {
         question: 'How do I navigate the dashboard?',
@@ -213,7 +213,7 @@ export default function HelpScreen() {
               Help Center
             </h1>
             <p style={{ color: '#4a5568', fontSize: '1.1rem', margin: '0', lineHeight: '1.6' }}>
-              Find answers to common questions and learn how to make the most of PledgeHub.
+              Find answers to common questions and learn how to make the most of PledgedHub.
             </p>
           </div>
 
@@ -417,14 +417,14 @@ export default function HelpScreen() {
                     Get help with your account, technical issues, or general questions.
                   </p>
                   <a
-                    href="mailto:support@PledgeHub.org"
+                    href="mailto:support@PledgedHub.org"
                     style={{
                       color: '#0369a1',
                       textDecoration: 'none',
                       fontWeight: '600',
                     }}
                   >
-                    support@PledgeHub.org
+                    support@PledgedHub.org
                   </a>
                 </div>
 
@@ -477,7 +477,7 @@ export default function HelpScreen() {
                     Found an issue? Help us improve by reporting bugs.
                   </p>
                   <a
-                    href="mailto:bugs@PledgeHub.org?subject=Bug Report"
+                    href="mailto:bugs@PledgedHub.org?subject=Bug Report"
                     style={{
                       color: '#a21caf',
                       textDecoration: 'none',

@@ -1,4 +1,4 @@
-﻿# Artillery Load Testing Instructions
+# Artillery Load Testing Instructions
 
 1. Install Artillery in backend:
    cd backend && npm install --save-dev artillery

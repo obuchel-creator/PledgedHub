@@ -1,4 +1,4 @@
-﻿# 🎯 OAuth Configuration - Simple Walkthrough
+# 🎯 OAuth Configuration - Simple Walkthrough
 
 **Time needed:** 30 minutes total (15 min Google + 15 min Facebook)
 

@@ -1,4 +1,4 @@
-﻿# PledgeHub Analytics Dashboard Documentation
+# PledgeHub Analytics Dashboard Documentation
 
 ## Overview
 The Analytics Dashboard provides staff and admin users with real-time insights into pledge activity, collection performance, and trends. It aggregates data from the pledges table and exposes it via secure API endpoints for visualization in the frontend dashboard.

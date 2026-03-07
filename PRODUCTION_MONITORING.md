@@ -1,4 +1,4 @@
-﻿# Production Monitoring Setup Guide
+# Production Monitoring Setup Guide
 
 1. **UptimeRobot (Free):**
    - Go to https://uptimerobot.com/

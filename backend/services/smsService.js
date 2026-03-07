@@ -1,4 +1,4 @@
-﻿const twilio = require('twilio');
+const twilio = require('twilio');
 const AfricasTalking = require('africastalking');
 require('dotenv').config();
 
@@ -15,7 +15,7 @@ const TWILIO_PHONE_NUMBER = process.env.TWILIO_PHONE_NUMBER;
 let atClient = null;
 const AT_USERNAME = process.env.AFRICASTALKING_USERNAME;
 const AT_API_KEY = process.env.AFRICASTALKING_API_KEY;
-const AT_SENDER_ID = process.env.AFRICASTALKING_SENDER_ID || 'PledgeHub';
+const AT_SENDER_ID = process.env.AFRICASTALKING_SENDER_ID || 'PledgedHub';
 
 if (SMS_PROVIDER === 'africastalking' && AT_USERNAME && AT_API_KEY) {
     try {
@@ -125,7 +125,7 @@ async function sendPledgeReminder(phoneNumber, pledgerName, amount, purpose, col
     const formattedAmount = formatter.format(amount);
     const dateStr = collectionDate ? new Date(collectionDate).toLocaleDateString('en-UG') : 'soon';
 
-    const message = `Hi ${pledgerName}! 👋\n\nFriendly reminder about your pledge of ${formattedAmount} for ${purpose}.\n\nCollection date: ${dateStr}\n\nThank you for your support!\n\n- PledgeHub`;
+    const message = `Hi ${pledgerName}! 👋\n\nFriendly reminder about your pledge of ${formattedAmount} for ${purpose}.\n\nCollection date: ${dateStr}\n\nThank you for your support!\n\n- PledgedHub`;
 
     return sendSMS(phoneNumber, message);
 }
@@ -146,7 +146,7 @@ async function sendThankYouMessage(phoneNumber, pledgerName, amount, purpose) {
 
     const formattedAmount = formatter.format(amount);
 
-    const message = `Thank you, ${pledgerName}! 🎉\n\nWe've received your payment of ${formattedAmount} for ${purpose}.\n\nYour contribution makes a real difference!\n\n- PledgeHub`;
+    const message = `Thank you, ${pledgerName}! 🎉\n\nWe've received your payment of ${formattedAmount} for ${purpose}.\n\nYour contribution makes a real difference!\n\n- PledgedHub`;
 
     return sendSMS(phoneNumber, message);
 }
@@ -158,7 +158,7 @@ async function sendThankYouMessage(phoneNumber, pledgerName, amount, purpose) {
  * @param {string} customMessage - Custom message to send
  */
 async function sendCustomNotification(phoneNumber, pledgerName, customMessage) {
-    const message = `Hi ${pledgerName}! 👋\n\n${customMessage}\n\n- PledgeHub`;
+    const message = `Hi ${pledgerName}! 👋\n\n${customMessage}\n\n- PledgedHub`;
     return sendSMS(phoneNumber, message);
 }
 

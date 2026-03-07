@@ -1,4 +1,4 @@
-﻿import { getViteEnv } from './getViteEnv';
+import { getViteEnv } from './getViteEnv';
 /**
  * Debug utility to check authentication state
  * Run this in browser console: import('./utils/debugAuth.js').then(m => m.checkAuth())
@@ -11,7 +11,7 @@ export function checkAuth() {
   console.log('📦 localStorage keys:', Object.keys(localStorage));
   console.log('🔑 authToken:', localStorage.getItem('authToken'));
   console.log('👤 user:', localStorage.getItem('user'));
-  console.log('🔐 pledgehub_token:', localStorage.getItem('pledgehub_token'));
+  console.log('🔐 pledgedhub_token:', localStorage.getItem('pledgedhub_token'));
 
   // Parse and display user
   try {

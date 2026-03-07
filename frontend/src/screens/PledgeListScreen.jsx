@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { fetchWithAuth } from '../utils/api';
 import Logo from '../components/Logo';
+import { uiDebug } from '../utils/debug';
 
 export default function PledgeListScreen() {
   const [pledges, setPledges] = useState([]);
@@ -14,7 +15,7 @@ export default function PledgeListScreen() {
       setError('');
       try {
         const res = await fetchWithAuth('/api/pledges');
-        console.log('API Response:', res);
+        uiDebug('[PledgeListScreen] API response:', res);
         if (res.success) {
           // API returns { success: true, data: [...pledges] } or { data: { pledges: [...] } }
           const pledgeData = Array.isArray(res.pledges)
@@ -24,7 +25,7 @@ export default function PledgeListScreen() {
               : Array.isArray(res.data?.pledges)
                 ? res.data.pledges
                 : [];
-          console.log('Pledge data:', pledgeData);
+          uiDebug('[PledgeListScreen] Pledge data:', pledgeData);
           setPledges(pledgeData);
         } else {
           setError(res.error || 'Failed to load pledges');

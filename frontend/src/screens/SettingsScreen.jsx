@@ -230,7 +230,7 @@ export default function SettingsScreen() {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `pledgehub-data-${new Date().toISOString().split('T')[0]}.json`;
+      a.download = `pledgedhub-data-${new Date().toISOString().split('T')[0]}.json`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -877,13 +877,14 @@ export default function SettingsScreen() {
                       style={{
                         flex: 1,
                         padding: '12px',
-                        background: twoFactorLoading ? '#f8d7da' : '#dc3545',
-                        color: twoFactorLoading ? '#721c24' : 'white',
+                        background: '#dc3545',
+                        color: 'white',
                         border: 'none',
                         borderRadius: '6px',
                         cursor: twoFactorLoading ? 'not-allowed' : 'pointer',
                         fontSize: '14px',
-                        fontWeight: '500'
+                        fontWeight: '500',
+                        opacity: twoFactorLoading ? 0.6 : 1,
                       }}
                     >
                       {twoFactorLoading ? 'Disabling...' : 'Disable 2FA'}

@@ -1,7 +1,17 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { loginUser, registerUser, getCurrentUser } from '../services/api';
 
-const TOKEN_KEY = 'pledgehub_token';
+const TOKEN_KEY = 'pledgedhub_token';
+const OLD_TOKEN_KEY = 'pledgehub_token';
+
+// Migrate old token key to new name (one-time migration after app rename)
+(function migrateTokenKey() {
+  const oldToken = localStorage.getItem(OLD_TOKEN_KEY);
+  if (oldToken && !localStorage.getItem(TOKEN_KEY)) {
+    localStorage.setItem(TOKEN_KEY, oldToken);
+    localStorage.removeItem(OLD_TOKEN_KEY);
+  }
+})();
 
 const AuthContext = createContext({
   user: null,

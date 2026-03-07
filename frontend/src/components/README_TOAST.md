@@ -1,4 +1,4 @@
-﻿# Toast Notification Component
+# Toast Notification Component
 
 ## Usage
 

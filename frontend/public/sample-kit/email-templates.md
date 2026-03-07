@@ -1,4 +1,4 @@
-﻿# Email Templates for Supporter Updates
+# Email Templates for Supporter Updates
 
 ## 1. Progress Update Email Template
 

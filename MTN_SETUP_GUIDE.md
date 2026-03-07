@@ -1,4 +1,4 @@
-﻿# MTN Mobile Money Integration Setup Guide
+# MTN Mobile Money Integration Setup Guide
 
 This guide will help you set up MTN Mobile Money (MoMo) payment integration for the PledgeHub system in Uganda.
 

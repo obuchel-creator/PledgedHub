@@ -1,6 +1,6 @@
 /**
  * ShareButton Component
- * Reusable social sharing component for PledgeHub
+ * Reusable social sharing component for PledgedHub
  */
 
 import React, { useState } from 'react';
@@ -38,14 +38,9 @@ const ShareButton = ({
   const shareContent = generateShareMessage(contentType, contentData);
   const url = shareUrl || generateShareUrl(window.location.pathname, 'share_button', contentId);
 
-  // Debug logging
-  console.log('🔵 ShareButton props:', { contentType, contentData, contentId, shareUrl, url });
-  console.log('🔵 ShareButton state - showDropdown:', showDropdown);
-
   // Handle share action
   const handleShare = async (channel, e) => {
     if (e) e.stopPropagation();
-    console.log('🟢 Share clicked for platform:', channel, 'URL:', url);
     // Track the share
     await trackShare(contentType, contentId, channel);
 
@@ -157,7 +152,6 @@ const ShareButton = ({
         <button
           onClick={(e) => {
             e.stopPropagation();
-            console.log('🔵 ShareButton clicked, showDropdown was:', showDropdown);
             setShowDropdown(!showDropdown);
           }}
           onKeyDown={(e) => {

@@ -1,4 +1,4 @@
-﻿# Release Automation Instructions
+# Release Automation Instructions
 
 1. Install standard-version in both backend and frontend:
    cd backend && npm install --save-dev standard-version

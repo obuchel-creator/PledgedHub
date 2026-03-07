@@ -11,7 +11,7 @@ export default function AIChatbot() {
     const path = location.pathname;
 
     if (path === '/') {
-      return "👋 Welcome to PledgeHub! I'm your AI assistant. I can help you:\n\n• Learn about pledge management\n• Understand how to create pledges\n• Get started with the platform\n• Answer questions about features\n\nHow can I assist you today?";
+      return "👋 Welcome to PledgedHub! I'm your AI assistant. I can help you:\n\n• Learn about pledge management\n• Understand how to create pledges\n• Get started with the platform\n• Answer questions about features\n\nHow can I assist you today?";
     } else if (path === '/dashboard') {
       return "� Hi! I'm your AI dashboard assistant. I can help you:\n\n• Analyze your pledge performance\n• Generate personalized reminder messages\n• Suggest collection strategies\n• Provide insights on trends\n\nWhat would you like to know about your pledges?";
     } else if (path === '/create') {
@@ -118,7 +118,7 @@ export default function AIChatbot() {
     if (path === '/') {
       return [
         { label: '🚀 How to start', prompt: 'How do I create my first pledge?' },
-        { label: '📊 See features', prompt: 'What features does PledgeHub offer?' },
+        { label: '📊 See features', prompt: 'What features does PledgedHub offer?' },
         { label: '💡 Best practices', prompt: 'What are best practices for pledge management?' },
         { label: '❓ Get help', prompt: 'How does the pledge system work?' },
       ];

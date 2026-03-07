@@ -1,4 +1,4 @@
-﻿# OAuth Integration Setup Guide
+# OAuth Integration Setup Guide
 
 ## 🔐 Real OAuth Authentication Setup
 

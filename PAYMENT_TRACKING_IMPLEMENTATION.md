@@ -1,4 +1,4 @@
-﻿# Payment Tracking & Balance Reminders Implementation
+# Payment Tracking & Balance Reminders Implementation
 
 ## ✅ Completed Features
 

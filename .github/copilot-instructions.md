@@ -1,4 +1,4 @@
-﻿
+
 # PledgeHub – AI Coding Agent Instructions
 
 A pledge management system with AI automation, SMS/email reminders, OAuth integration, and comprehensive analytics. Built for Windows development with PowerShell tooling.

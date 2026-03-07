@@ -33,7 +33,7 @@ export default function Login() {
       const response = await loginUser(payload);
       if (response && response.success && response.token) {
         login(response.token, response.user);
-        localStorage.setItem('pledgehub_token', response.token);
+        localStorage.setItem('pledgedhub_token', response.token);
         navigate('/dashboard');
       } else {
         setError(response?.error || response?.message || 'Invalid login response');

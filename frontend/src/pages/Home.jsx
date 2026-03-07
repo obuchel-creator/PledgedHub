@@ -35,7 +35,7 @@ export default function Home() {
       style={{ fontFamily: 'system-ui, sans-serif', padding: 20, maxWidth: 900, margin: '0 auto' }}
     >
       <header style={{ marginBottom: 24 }}>
-        <h1 style={{ margin: 0 }}>Welcome to PledgeHub</h1>
+        <h1 style={{ margin: 0 }}>Welcome to PledgedHub</h1>
         <p style={{ color: '#666' }}>
           Support causes, create pledges and track contributions. Quick, simple and open-source.
         </p>
@@ -62,11 +62,11 @@ export default function Home() {
       <section>
         <h2>Recent pledges</h2>
 
-        {loading && <p>Loading pledges…</p>}
+        {loading && <p>Loading pledgesï¿½</p>}
         {error && <p style={{ color: 'crimson' }}>Error: {error}</p>}
 
         {!loading && !error && pledges.length === 0 && (
-          <p>No pledges yet — be the first to create one.</p>
+          <p>No pledges yet ï¿½ be the first to create one.</p>
         )}
 
         {!loading && !error && pledges.length > 0 && (

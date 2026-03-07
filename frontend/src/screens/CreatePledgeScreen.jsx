@@ -16,6 +16,10 @@ export default function CreatePledgeScreen() {
   const [message, setMessage] = useState(null);
   const [error, setError] = useState(null);
   const [formattedAmount, setFormattedAmount] = useState('');
+  const [category, setCategory] = useState('');
+  const [showOtherModal, setShowOtherModal] = useState(false);
+  const [otherText, setOtherText] = useState('');
+  const [otherDraft, setOtherDraft] = useState('');
 
   useEffect(() => {
     loadCampaigns();
@@ -47,6 +51,34 @@ export default function CreatePledgeScreen() {
     setFormattedAmount('');
     setPurpose('');
     setCollectionDate('');
+    setCategory('');
+    setOtherText('');
+    setOtherDraft('');
+  };
+
+  const handleCategoryChange = (e) => {
+    const val = e.target.value;
+    setCategory(val);
+    if (val === 'Other') {
+      setOtherDraft(otherText);
+      setShowOtherModal(true);
+    } else {
+      setPurpose(val);
+    }
+  };
+
+  const handleOtherConfirm = () => {
+    if (otherDraft.trim()) {
+      setOtherText(otherDraft.trim());
+      setPurpose(otherDraft.trim());
+    }
+    setShowOtherModal(false);
+  };
+
+  const handleOtherCancel = () => {
+    setShowOtherModal(false);
+    setCategory('');
+    setOtherDraft('');
   };
 
   const validate = () => {
@@ -73,9 +105,9 @@ export default function CreatePledgeScreen() {
       return false;
     }
     
-    // Uganda phone format validation
+    // Uganda phone format validation — accepts 7xx, 3xx and other carriers
     const phoneClean = donorPhone.replace(/[\s\-\(\)]/g, '');
-    const ugandaPhoneRegex = /^(\+?256|0)?[7][0-9]{8}$/;
+    const ugandaPhoneRegex = /^(\+?256|0)?[0-9]{9}$/;
     if (!ugandaPhoneRegex.test(phoneClean)) {
       setError('⚠️ Please enter a valid Uganda phone number (e.g., +256 700 123456 or 0700 123456).');
       return false;
@@ -106,6 +138,7 @@ export default function CreatePledgeScreen() {
     try {
       await createPledge({
         campaign_id: campaignId || null,
+        donor_name: donor_name.trim(),
         donor_email: donorEmail.trim().toLowerCase(),
         donor_phone: donorPhone.trim() || null,
         purpose: purpose.trim() || 'General donation',
@@ -352,6 +385,31 @@ export default function CreatePledgeScreen() {
             </div>
 
             <div className="form-field">
+              <label htmlFor="category" className="form-label" style={{ fontWeight: '600', fontSize: '0.95rem' }}>
+                <span style={{ marginRight: '6px' }}>🏷️</span> Pledge Category (Optional)
+              </label>
+              <select
+                id="category"
+                name="category"
+                value={category}
+                onChange={handleCategoryChange}
+                className="input"
+                disabled={loading}
+                style={{ fontSize: '1rem', padding: '12px 16px' }}
+              >
+                <option value="">-- Select a category --</option>
+                <option value="Wedding">Wedding</option>
+                <option value="Graduation">Graduation</option>
+                <option value="Funeral/Memorial">Funeral / Memorial</option>
+                <option value="Religious">Religious / Church</option>
+                <option value="Education">Education / School Fees</option>
+                <option value="Business">Business / Investment</option>
+                <option value="Community Event">Community Event</option>
+                <option value="Other">Other (specify below)</option>
+              </select>
+            </div>
+
+            <div className="form-field">
               <label htmlFor="purpose" className="form-label" style={{ fontWeight: '600', fontSize: '0.95rem' }}>
                 <span style={{ marginRight: '6px' }}>📝</span> Purpose / Message (Optional)
               </label>
@@ -425,6 +483,95 @@ export default function CreatePledgeScreen() {
           </form>
         </section>
       </main>
+
+      {/* "Other" category popup modal */}
+      {showOtherModal && (
+        <div
+          style={{
+            position: 'fixed', inset: 0, zIndex: 9999,
+            background: 'rgba(15,23,42,0.55)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            backdropFilter: 'blur(2px)',
+          }}
+          onClick={handleOtherCancel}
+        >
+          <div
+            style={{
+              background: '#fff',
+              borderRadius: 18,
+              padding: '2rem 2rem 1.5rem',
+              minWidth: 340,
+              maxWidth: '90vw',
+              boxShadow: '0 12px 48px rgba(15,23,42,0.18)',
+              border: '1.5px solid #e5e7eb',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 style={{ margin: '0 0 0.5rem', fontSize: '1.2rem', fontWeight: 700, color: '#101427' }}>
+              Describe your purpose
+            </h3>
+            <p style={{ margin: '0 0 1.2rem', fontSize: '0.92rem', color: '#64748b' }}>
+              Tell us what this pledge is for — in your own words.
+            </p>
+            <textarea
+              autoFocus
+              value={otherDraft}
+              onChange={(e) => setOtherDraft(e.target.value)}
+              placeholder="e.g. Bride price ceremony for my cousin Maria..."
+              rows={4}
+              style={{
+                width: '100%',
+                borderRadius: 10,
+                border: '1.5px solid #cbd5e1',
+                padding: '10px 14px',
+                fontSize: '1rem',
+                fontFamily: 'inherit',
+                resize: 'vertical',
+                outline: 'none',
+                boxSizing: 'border-box',
+                marginBottom: '1.2rem',
+              }}
+              onFocus={(e) => { e.target.style.borderColor = '#2563eb'; }}
+              onBlur={(e) => { e.target.style.borderColor = '#cbd5e1'; }}
+            />
+            <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
+              <button
+                type="button"
+                onClick={handleOtherCancel}
+                style={{
+                  background: 'transparent',
+                  border: '1.5px solid #cbd5e1',
+                  borderRadius: 8,
+                  padding: '8px 20px',
+                  fontSize: '0.95rem',
+                  cursor: 'pointer',
+                  color: '#64748b',
+                  fontWeight: 500,
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleOtherConfirm}
+                disabled={!otherDraft.trim()}
+                style={{
+                  background: otherDraft.trim() ? '#2563eb' : '#93c5fd',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: 8,
+                  padding: '8px 24px',
+                  fontSize: '0.95rem',
+                  fontWeight: 600,
+                  cursor: otherDraft.trim() ? 'pointer' : 'not-allowed',
+                }}
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

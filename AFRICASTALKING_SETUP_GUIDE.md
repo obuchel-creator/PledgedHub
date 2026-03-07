@@ -1,4 +1,4 @@
-﻿# 🌍 Africa's Talking SMS Setup Guide
+# 🌍 Africa's Talking SMS Setup Guide
 
 ## Why Africa's Talking?
 

@@ -1,4 +1,4 @@
-﻿<# 
+<# 
 .SYNOPSIS
 Initialize a MySQL database from a SQL file.
 

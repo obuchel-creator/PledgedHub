@@ -151,7 +151,7 @@ export default function Sidebar({ collapsed: collapsedProp = false }) {
             O
           </div>
           <div style={titleStyle}>
-            <span style={textStyle(collapsed)}>PledgeHub</span>
+            <span style={textStyle(collapsed)}>PledgedHub</span>
           </div>
         </div>
 
@@ -162,7 +162,7 @@ export default function Sidebar({ collapsed: collapsedProp = false }) {
           title={collapsed ? 'Expand' : 'Collapse'}
           style={toggleBtnStyle}
         >
-          {collapsed ? '»' : '«'}
+          {collapsed ? 'ï¿½' : 'ï¿½'}
         </button>
       </div>
 

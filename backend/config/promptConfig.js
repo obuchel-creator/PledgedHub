@@ -1,4 +1,4 @@
-﻿/**
+/**
  * AI Prompt Configuration System
  * Easy-to-customize prompts for different contexts and audiences
  */
@@ -46,7 +46,7 @@ Requirements:
 - {motivationInstruction}
 - Use appropriate emojis (🙏 for respect, 💙 for unity, 🇺🇬 for pride)
 - Reference community/family values and collective mission
-- Include subtle mention of 'PledgeHub' (friendship/unity) values
+- Include subtle mention of 'PledgedHub' (friendship/unity) values
 - Make it personal and warm
 
 Generate ONLY the message text, nothing else:`,
@@ -137,7 +137,7 @@ Requirements:
 - {impactInstruction}
 - Use appropriate emojis (🙏 for gratitude, 💙 for community love)
 - Reference community spirit, unity, or collective mission
-- Include subtle reference to 'PledgeHub' (friendship/unity) values
+- Include subtle reference to 'PledgedHub' (friendship/unity) values
 - Make it personal, heartfelt, and community-focused
 
 Generate ONLY the message text:`,

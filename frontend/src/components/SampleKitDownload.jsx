@@ -37,7 +37,7 @@ const templates = [
 export default function SampleKitDownload() {
   return (
     <div className="sample-kit">
-      <h2>🎉 PledgeHub Sample Kit</h2>
+      <h2>🎉 PledgedHub Sample Kit</h2>
       <p>Your Complete Supporter Engagement Toolkit</p>
       <ul style={{ listStyle: 'none', padding: 0 }}>
         {templates.map(t => (
@@ -59,7 +59,7 @@ export default function SampleKitDownload() {
       </ul>
       {/* Anchor tag for ZIP download */}
       <a
-        href="/sample-templates/pledgehub-sample-kit.zip"
+        href="/sample-templates/pledgedhub-sample-kit.zip"
         download
         className="download-btn"
         style={{ display: 'block', marginTop: '2rem', fontWeight: 'bold' }}

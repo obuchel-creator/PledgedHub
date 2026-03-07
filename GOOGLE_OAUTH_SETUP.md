@@ -1,4 +1,4 @@
-﻿# 🔵 Google OAuth Setup - Step-by-Step Guide
+# 🔵 Google OAuth Setup - Step-by-Step Guide
 
 **Date**: November 5, 2025  
 **Time Required**: 15-30 minutes  

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Link, useNavigate } from 'react-router-dom';
 import '../authOutlook.css';
@@ -7,49 +7,37 @@ import Logo from '../components/Logo';
 import { useAuth } from '../context/AuthContext';
 import OAuthButtons from '../components/OAuthButtons';
 
-// More flexible phone pattern - accepts various formats
-// +256, 0256, 256, or just numbers starting with common prefixes
 const phonePattern = /^(\+?256|0)?\d{9,10}$/;
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-console.log('🟠 RegisterScreen.jsx: File loaded');
-
-console.log('🟠 RegisterScreen.jsx: File loaded');
 
 function RegisterScreen({ disableRequired = false }) {
   const navigate = useNavigate();
   const { register } = useAuth();
-  console.log('🟢 RegisterScreen: Component rendered');
-  
+
   const [form, setForm] = useState({
     firstName: '',
     lastName: '',
     phone: '',
     email: '',
-    password: '',
-    confirmPassword: '',
   });
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [status, setStatus] = useState(''); // For showing real-time status
-  
-  console.log('📊 RegisterScreen: Current form state:', form);
+  const [status, setStatus] = useState('');
+  const [generatedPassword, setGeneratedPassword] = useState('');
+  const [passwordCopied, setPasswordCopied] = useState(false);
+
+  useEffect(() => {
+    document.body.classList.add('auth-bg');
+    return () => document.body.classList.remove('auth-bg');
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    console.log('📝 Input changed:', name, '=', value);
     setForm({ ...form, [name]: value });
-    
-    // Only clear error if it's related to the field being edited
     if (error) {
       const errorLower = error.toLowerCase();
       const fieldName = name.toLowerCase();
-      
-      // Clear error if user is fixing the field that caused it
       if (
-        (errorLower.includes('password') && (fieldName === 'password' || fieldName === 'confirmpassword')) ||
         (errorLower.includes('first name') && fieldName === 'firstname') ||
         (errorLower.includes('last name') && fieldName === 'lastname') ||
         (errorLower.includes('phone') && fieldName === 'phone') ||
@@ -64,33 +52,34 @@ function RegisterScreen({ disableRequired = false }) {
     if (!form.firstName.trim()) return 'First name is required.';
     if (!form.lastName.trim()) return 'Last name is required.';
     if (!form.phone.trim()) return 'Phone number is required.';
-    if (!phonePattern.test(form.phone.trim())) return 'Phone number must be in format';
-    if (form.email && !emailPattern.test(form.email)) return 'Invalid email address';
-    if (!form.password) return 'Password is required.';
-    if (form.password.length < 6) return 'Password must be at least 6 characters.';
-    if (form.password !== form.confirmPassword) return 'Passwords do not match';
+    if (!phonePattern.test(form.phone.trim())) return 'Phone number must be in format +256XXXXXXXXX or 0XXXXXXXXX.';
+    if (form.email && !emailPattern.test(form.email)) return 'Invalid email address.';
     return '';
+  };
+
+  const handleCopyPassword = async () => {
+    try {
+      await navigator.clipboard.writeText(generatedPassword);
+      setPasswordCopied(true);
+      setTimeout(() => setPasswordCopied(false), 3000);
+    } catch {
+      // fallback — browser doesn't support clipboard API
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('🔵 RegisterScreen: handleSubmit called!');
-    console.log('📋 Form data:', form);
-    setStatus('⏳ Validating form...');
+    setStatus('Validating form...');
     const err = validate();
-    console.log('✓ Validation result:', err || 'PASSED');
     if (err) {
-      console.log('❌ Validation failed:', err);
       setError(err);
       setStatus('');
-      // Don't auto-clear validation errors - user needs to see and fix them
       return;
     }
     setLoading(true);
     setError('');
-    setStatus('⏳ Creating account...');
+    setStatus('Creating account...');
     try {
-      // Auto-generate username: firstName + last 4 digits of phone
       const phoneDigits = form.phone.replace(/\D/g, '');
       const base = form.firstName.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
       const suffix = phoneDigits.slice(-4);
@@ -99,30 +88,26 @@ function RegisterScreen({ disableRequired = false }) {
         name: (form.firstName + ' ' + form.lastName).trim(),
         email: form.email.trim() ? form.email.trim() : null,
         phone: form.phone.trim(),
-        password: form.password,
         username,
+        // No password — backend auto-generates one
       };
-      console.log('📝 RegisterScreen: Submitting registration with payload:', payload);
-      setStatus('⏳ Sending to server...');
-      // Use context's register function which handles token + user data loading
+      setStatus('Sending to server...');
       const result = await register(payload);
-      console.log('✅ RegisterScreen: Registration result:', result);
       if (result && result.token) {
-        console.log('✅ RegisterScreen: Token received and user context loaded');
-        setStatus('✅ Account created! Redirecting to dashboard...');
-        // The context's register() already called refreshUser() and set loading=false
-        // Now we can safely navigate
-        console.log('✅ RegisterScreen: Navigating to dashboard');
-        navigate('/dashboard', { replace: true });
+        if (result.generatedPassword) {
+          // Show generated password before navigating
+          setGeneratedPassword(result.generatedPassword);
+          setStatus('');
+        } else {
+          setStatus('Account created! Redirecting...');
+          navigate('/dashboard', { replace: true });
+        }
       } else {
-        // Show backend error (duplicate phone/email, password strength, etc)
-        const errorMsg = result?.error || 'Registration failed. Please try again.';
+        const errorMsg = result?.error || result?.message || 'Registration failed. Please try again.';
         setError(errorMsg);
         setStatus('');
       }
     } catch (err) {
-      // Show network/server error
-      console.error('❌ RegisterScreen: Catch error:', err);
       const msg = err?.response?.data?.error || err?.response?.data?.message || err?.message || err?.toString();
       setError(msg || 'Server error. Please try again.');
       setStatus('');
@@ -131,41 +116,115 @@ function RegisterScreen({ disableRequired = false }) {
     }
   };
 
+  // Post-registration: show the generated password exactly once
+  if (generatedPassword) {
+    return (
+      <div className="auth-bg">
+        <main>
+          <section className="auth-center-card">
+            <div style={{ width: '100%', textAlign: 'center', marginBottom: '28px' }}>
+              <Logo size="large" showText={false} />
+            </div>
+            <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+              <div style={{
+                width: 64, height: 64, borderRadius: '50%',
+                background: 'rgba(16,185,129,0.15)',
+                border: '2px solid #10b981',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                margin: '0 auto 16px', fontSize: 28,
+              }}>✓</div>
+              <h2 style={{ color: '#10b981', marginBottom: 8 }}>Account Created!</h2>
+              <p className="subtitle" style={{ color: '#e2e8f0' }}>
+                Your account is ready. A secure password has been generated for you.
+              </p>
+            </div>
+
+            <div style={{
+              background: 'rgba(245,158,11,0.1)',
+              border: '2px solid #f59e0b',
+              borderRadius: 12,
+              padding: '20px',
+              marginBottom: '16px',
+              textAlign: 'center',
+            }}>
+              <p style={{ color: '#9ca3af', fontSize: 13, marginBottom: 8 }}>Your generated password</p>
+              <p style={{
+                fontFamily: 'monospace',
+                fontSize: '1.5rem',
+                fontWeight: 700,
+                color: '#f59e0b',
+                letterSpacing: '0.12em',
+                marginBottom: 12,
+                wordBreak: 'break-all',
+              }}>{generatedPassword}</p>
+              <button
+                type="button"
+                onClick={handleCopyPassword}
+                style={{
+                  background: passwordCopied ? '#10b981' : 'rgba(245,158,11,0.2)',
+                  color: passwordCopied ? '#fff' : '#f59e0b',
+                  border: `1px solid ${passwordCopied ? '#10b981' : '#f59e0b'}`,
+                  borderRadius: 6,
+                  padding: '6px 20px',
+                  fontSize: 13,
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                }}
+              >
+                {passwordCopied ? 'Copied!' : 'Copy Password'}
+              </button>
+            </div>
+
+            <div className="auth-alert auth-alert-error" role="alert" style={{ marginBottom: 20 }}>
+              <span className="auth-alert-icon">⚠</span>
+              <span>Save this password — it will not be shown again. You can change it in Settings.</span>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => navigate('/dashboard', { replace: true })}
+              style={{ width: '100%' }}
+            >
+              I have saved my password — Continue
+            </button>
+
+            <div className="auth-meta" style={{ marginTop: 16 }}>
+              <Link to="/change-password" className="auth-inline-link">Change my password later</Link>
+            </div>
+          </section>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="auth-bg">
-      <div style={{
-        position: 'fixed',
-        top: '10px',
-        right: '10px',
-        background: '#10b981',
-        color: 'white',
-        padding: '10px 15px',
-        borderRadius: '4px',
-        zIndex: 10000,
-        fontSize: '12px',
-        fontFamily: 'monospace'
-      }}>
-        ✓ RegisterScreen LOADED
-      </div>
       <main>
         <section className="auth-center-card">
           <div style={{ width: '100%', textAlign: 'center', marginBottom: '32px' }}>
             <Logo size="large" showText={false} />
           </div>
 
+          <h2>Create your PledgedHub account</h2>
+          <p className="subtitle" style={{ color: '#e2e8f0' }}>Sign up — a secure password will be generated for you</p>
 
-          <h2>Create your PledgeHub account</h2>
-          <p className="subtitle">Sign up</p>
-
-          {/* OAuth sign up options */}
           <OAuthButtons className="mb-4" />
 
-          {error && <div className="error-message" style={{ marginBottom: '16px', padding: '12px', background: '#fee2e2', color: '#991b1b', borderRadius: '4px', fontSize: '14px' }}>{error}</div>}
-          {status && <div style={{ marginBottom: '16px', padding: '12px', background: '#e0f2fe', color: '#0c4a6e', borderRadius: '4px', fontSize: '14px', fontWeight: '500' }}>{status}</div>}
+          {error && (
+            <div className="auth-alert auth-alert-error" role="alert">
+              <span className="auth-alert-icon">⚠</span>
+              <span>{error}</span>
+            </div>
+          )}
+          {status && (
+            <div className="auth-alert auth-alert-success" role="status">
+              <span>{status}</span>
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} style={{ width: '100%' }}>
-            <div style={{ display: 'flex', gap: '12px' }}>
-              <div style={{ flex: 1 }}>
+            <div className="auth-row">
+              <div>
                 <label htmlFor="firstName">
                   First Name <span style={{ color: 'var(--error)' }}>*</span>
                 </label>
@@ -181,7 +240,7 @@ function RegisterScreen({ disableRequired = false }) {
                   required={!disableRequired}
                 />
               </div>
-              <div style={{ flex: 1 }}>
+              <div>
                 <label htmlFor="lastName">
                   Last Name <span style={{ color: 'var(--error)' }}>*</span>
                 </label>
@@ -230,119 +289,22 @@ function RegisterScreen({ disableRequired = false }) {
               />
             </div>
 
-            <div>
-              <label htmlFor="password">
-                Password <span style={{ color: 'var(--error)' }}>*</span>
-              </label>
-              <div style={{ position: 'relative', marginBottom: '20px' }}>
-                <input
-                  id="password"
-                  name="password"
-                  type={showPassword ? 'text' : 'password'}
-                  value={form.password}
-                  onChange={handleChange}
-                  autoComplete="new-password"
-                  placeholder="Password"
-                  aria-label="Password"
-                  disabled={loading}
-                  required={!disableRequired}
-                  style={{ paddingRight: '90px !important', marginBottom: '0' }}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((v) => !v)}
-                  disabled={loading}
-                  style={{
-                    position: 'absolute',
-                    right: '12px',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    background: 'transparent',
-                    border: 'none',
-                    color: '#3498db',
-                    cursor: 'pointer',
-                    fontSize: '13px',
-                    fontWeight: '600',
-                    padding: '6px 8px',
-                    whiteSpace: 'nowrap',
-                    zIndex: 1000,
-                    lineHeight: 1,
-                    height: 'auto',
-                    width: 'auto',
-                    margin: '0'
-                  }}
-                >
-                  {showPassword ? '??? Hide' : '??? Show'}
-                </button>
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor="confirmPassword">
-                Confirm Password <span style={{ color: 'var(--error)' }}>*</span>
-              </label>
-              <div style={{ position: 'relative', marginBottom: '20px' }}>
-                <input
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  value={form.confirmPassword}
-                  onChange={handleChange}
-                  autoComplete="new-password"
-                  placeholder="Confirm Password"
-                  disabled={loading}
-                  required={!disableRequired}
-                  style={{ paddingRight: '90px !important', marginBottom: '0' }}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword((v) => !v)}
-                  disabled={loading}
-                  style={{
-                    position: 'absolute',
-                    right: '12px',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    background: 'transparent',
-                    border: 'none',
-                    color: '#3498db',
-                    cursor: 'pointer',
-                    fontSize: '13px',
-                    fontWeight: '600',
-                    padding: '6px 8px',
-                    whiteSpace: 'nowrap',
-                    zIndex: 1000,
-                    lineHeight: 1,
-                    height: 'auto',
-                    width: 'auto',
-                    margin: '0'
-                  }}
-                >
-                  {showConfirmPassword ? '??? Hide' : '??? Show'}
-                </button>
-              </div>
-            </div>
-
             <button
               type="submit"
               disabled={loading}
               aria-label="Register"
-              onClick={(e) => {
-                console.log('🔴 Button onClick fired!');
-                handleSubmit(e);
-              }}
               style={{
                 cursor: loading ? 'not-allowed' : 'pointer',
                 opacity: loading ? 0.6 : 1,
               }}
             >
-              {loading ? 'Creating account...' : 'Register'}
+              {loading ? 'Creating account...' : 'Create account'}
             </button>
           </form>
 
-          <div style={{ textAlign: 'center', marginTop: '24px', fontSize: '15px', color: '#475569', fontWeight: '500' }}>
+          <div className="auth-meta">
             Already have an account?{' '}
-            <Link to="/login" style={{ color: '#3498db', fontWeight: '600', textDecoration: 'none', borderBottom: '1px solid #3498db' }}>
+            <Link to="/login" className="auth-inline-link">
               Sign in
             </Link>
           </div>
@@ -357,6 +319,3 @@ RegisterScreen.propTypes = {
 };
 
 export default RegisterScreen;
-
-
-

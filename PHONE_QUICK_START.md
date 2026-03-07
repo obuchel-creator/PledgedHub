@@ -1,4 +1,4 @@
-﻿# Phone Number Capture - Quick Start Guide
+# Phone Number Capture - Quick Start Guide
 
 ## ✅ What's Been Implemented
 

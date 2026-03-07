@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { changePassword } from '../services/api';
+import '../authOutlook.css';
 
 export default function PasswordChangeScreen() {
   const { user } = useAuth();
@@ -190,20 +191,13 @@ export default function PasswordChangeScreen() {
           >
             {message.text && (
               <div
-                className={`alert ${message.type === 'error' ? 'alert--error' : 'alert--success'}`}
+                className={`auth-alert ${
+                  message.type === 'error' ? 'auth-alert-error' : 'auth-alert-success'
+                }`}
                 role={message.type === 'error' ? 'alert' : 'status'}
-                style={{
-                  marginBottom: '1.5rem',
-                  borderRadius: '12px',
-                  padding: '1rem 1.25rem',
-                  fontWeight: '600',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.75rem',
-                  border: message.type === 'error' ? '1px solid #fecaca' : '1px solid #bbf7d0',
-                }}
+                style={{ marginBottom: '1rem', fontWeight: 600 }}
               >
-                <span style={{ fontSize: '1.25rem' }}>
+                <span className="auth-alert-icon">
                   {message.type === 'error' ? '⚠️' : '✅'}
                 </span>
                 <span>{message.text}</span>
@@ -212,20 +206,11 @@ export default function PasswordChangeScreen() {
 
             <form className="form" onSubmit={handleSubmit}>
               {/* Current Password */}
-              <div className="form-field" style={{ marginBottom: '1.5rem' }}>
-                <label
-                  htmlFor="currentPassword"
-                  style={{
-                    display: 'block',
-                    marginBottom: '0.5rem',
-                    fontWeight: '600',
-                    color: '#374151',
-                    fontSize: '0.95rem',
-                  }}
-                >
+              <div className="form-field auth-input-group">
+                <label htmlFor="currentPassword" className="auth-form-label-light">
                   Current Password *
                 </label>
-                <div style={{ position: 'relative' }}>
+                <div className="auth-password-wrap auth-password-wrap-light">
                   <input
                     id="currentPassword"
                     name="currentPassword"
@@ -236,51 +221,25 @@ export default function PasswordChangeScreen() {
                     required
                     disabled={loading}
                     placeholder="Enter your current password"
-                    style={{
-                      width: '100%',
-                      padding: '0.75rem 3rem 0.75rem 1rem',
-                      fontSize: '1rem',
-                      border: '2px solid #e5e7eb',
-                      borderRadius: '10px',
-                      transition: 'border-color 0.2s',
-                    }}
+                    className="auth-input-light auth-password-input"
                   />
                   <button
                     type="button"
                     onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                    style={{
-                      position: 'absolute',
-                      right: '1rem',
-                      top: '50%',
-                      transform: 'translateY(-50%)',
-                      background: 'none',
-                      border: 'none',
-                      cursor: 'pointer',
-                      fontSize: '1.25rem',
-                      padding: 0,
-                    }}
+                    className="auth-toggle-btn auth-toggle-btn-light"
                     aria-label={showCurrentPassword ? 'Hide password' : 'Show password'}
                   >
-                    {showCurrentPassword ? '👁️' : '👁️‍🗨️'}
+                    {showCurrentPassword ? 'Hide' : 'Show'}
                   </button>
                 </div>
               </div>
 
               {/* New Password */}
-              <div className="form-field" style={{ marginBottom: '1.5rem' }}>
-                <label
-                  htmlFor="newPassword"
-                  style={{
-                    display: 'block',
-                    marginBottom: '0.5rem',
-                    fontWeight: '600',
-                    color: '#374151',
-                    fontSize: '0.95rem',
-                  }}
-                >
+              <div className="form-field auth-input-group">
+                <label htmlFor="newPassword" className="auth-form-label-light">
                   New Password *
                 </label>
-                <div style={{ position: 'relative' }}>
+                <div className="auth-password-wrap auth-password-wrap-light">
                   <input
                     id="newPassword"
                     name="newPassword"
@@ -291,51 +250,27 @@ export default function PasswordChangeScreen() {
                     required
                     disabled={loading}
                     placeholder="Enter your new password"
-                    style={{
-                      width: '100%',
-                      padding: '0.75rem 3rem 0.75rem 1rem',
-                      fontSize: '1rem',
-                      border: `2px solid ${newPassword && !validations.minLength ? '#fca5a5' : '#e5e7eb'}`,
-                      borderRadius: '10px',
-                      transition: 'border-color 0.2s',
-                    }}
+                    className={`auth-input-light auth-password-input ${
+                      newPassword && !validations.minLength ? 'auth-input-light-error' : ''
+                    }`}
                   />
                   <button
                     type="button"
                     onClick={() => setShowNewPassword(!showNewPassword)}
-                    style={{
-                      position: 'absolute',
-                      right: '1rem',
-                      top: '50%',
-                      transform: 'translateY(-50%)',
-                      background: 'none',
-                      border: 'none',
-                      cursor: 'pointer',
-                      fontSize: '1.25rem',
-                      padding: 0,
-                    }}
+                    className="auth-toggle-btn auth-toggle-btn-light"
                     aria-label={showNewPassword ? 'Hide password' : 'Show password'}
                   >
-                    {showNewPassword ? '👁️' : '👁️‍🗨️'}
+                    {showNewPassword ? 'Hide' : 'Show'}
                   </button>
                 </div>
               </div>
 
               {/* Confirm Password */}
-              <div className="form-field" style={{ marginBottom: '2rem' }}>
-                <label
-                  htmlFor="confirmPassword"
-                  style={{
-                    display: 'block',
-                    marginBottom: '0.5rem',
-                    fontWeight: '600',
-                    color: '#374151',
-                    fontSize: '0.95rem',
-                  }}
-                >
+              <div className="form-field auth-input-group" style={{ marginBottom: '1.25rem' }}>
+                <label htmlFor="confirmPassword" className="auth-form-label-light">
                   Confirm New Password *
                 </label>
-                <div style={{ position: 'relative' }}>
+                <div className="auth-password-wrap auth-password-wrap-light">
                   <input
                     id="confirmPassword"
                     name="confirmPassword"
@@ -346,89 +281,33 @@ export default function PasswordChangeScreen() {
                     required
                     disabled={loading}
                     placeholder="Re-enter your new password"
-                    style={{
-                      width: '100%',
-                      padding: '0.75rem 3rem 0.75rem 1rem',
-                      fontSize: '1rem',
-                      border: `2px solid ${confirmPassword && !validations.passwordsMatch ? '#fca5a5' : '#e5e7eb'}`,
-                      borderRadius: '10px',
-                      transition: 'border-color 0.2s',
-                    }}
+                    className={`auth-input-light auth-password-input ${
+                      confirmPassword && !validations.passwordsMatch ? 'auth-input-light-error' : ''
+                    }`}
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    style={{
-                      position: 'absolute',
-                      right: '1rem',
-                      top: '50%',
-                      transform: 'translateY(-50%)',
-                      background: 'none',
-                      border: 'none',
-                      cursor: 'pointer',
-                      fontSize: '1.25rem',
-                      padding: 0,
-                    }}
+                    className="auth-toggle-btn auth-toggle-btn-light"
                     aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
                   >
-                    {showConfirmPassword ? '👁️' : '👁️‍🗨️'}
+                    {showConfirmPassword ? 'Hide' : 'Show'}
                   </button>
                 </div>
               </div>
 
               {/* Action Buttons */}
-              <div
-                style={{
-                  display: 'flex',
-                  gap: '1rem',
-                  paddingTop: '1.5rem',
-                  borderTop: '2px solid #f3f4f6',
-                }}
-              >
+              <div className="auth-actions-row">
                 <button
                   type="submit"
                   disabled={loading || !allValidationsPassed}
-                  style={{
-                    flex: 1,
-                    padding: '0.875rem 2rem',
-                    background:
-                      loading || !allValidationsPassed
-                        ? '#cbd5e1'
-                        : 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
-                    color: 'white',
-                    fontWeight: '700',
-                    fontSize: '1rem',
-                    border: 'none',
-                    borderRadius: '10px',
-                    boxShadow:
-                      loading || !allValidationsPassed
-                        ? 'none'
-                        : '0 4px 12px rgba(37, 99, 235, 0.3)',
-                    cursor: loading || !allValidationsPassed ? 'not-allowed' : 'pointer',
-                    transition: 'all 0.3s ease',
-                  }}
+                  className="auth-submit-btn auth-submit-btn-light auth-submit-btn-slim"
                 >
-                  {loading ? '🔄 Changing Password...' : '✓ Change Password'}
+                  {loading ? 'Changing password...' : 'Change password'}
                 </button>
                 <Link
                   to="/dashboard"
-                  style={{
-                    flex: 1,
-                    padding: '0.875rem 2rem',
-                    background: '#f3f4f6',
-                    color: '#374151',
-                    fontWeight: '700',
-                    fontSize: '1rem',
-                    border: 'none',
-                    borderRadius: '10px',
-                    textDecoration: 'none',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    transition: 'background 0.2s',
-                  }}
-                  onMouseEnter={(e) => (e.target.style.background = '#e5e7eb')}
-                  onMouseLeave={(e) => (e.target.style.background = '#f3f4f6')}
+                  className="auth-secondary-link-light"
                 >
                   Cancel
                 </Link>

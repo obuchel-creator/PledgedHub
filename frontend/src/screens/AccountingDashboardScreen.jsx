@@ -29,24 +29,74 @@ export function AccountingDashboardScreen() {
     setLoading(true);
     setAiLoading(true);
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('pledgedhub_token') || localStorage.getItem('token');
       const headers = { 'Authorization': `Bearer ${token}` };
 
-      // Fetch AI-powered dashboard data
-      const aiRes = await fetch('/api/accounting/reports/dashboard', { headers });
-      const aiData = await aiRes.json();
-      if (aiData.success) {
+      // Fetch dashboard and trial balance in parallel
+      const [dashRes, trialBalRes] = await Promise.all([
+        fetch('/api/accounting/reports/dashboard', { headers }),
+        fetch('/api/accounting/reports/trial-balance', { headers }).catch(() => ({ json: async () => ({ success: false }) }))
+      ]);
+
+      const dashData = await dashRes.json();
+      const trialBalData = await trialBalRes.json();
+
+      if (dashData.success) {
+        const bs = dashData.data.balanceSheet || null;
+        const is = dashData.data.incomeYTD || null;
+
+        // Compute key metrics from available data
+        const netIncome = is?.summary?.netIncome || 0;
+        const totalRevenue = is?.summary?.totalRevenue || 0;
+        const keyMetrics = {
+          netIncome,
+          currentRatio: bs?.liabilities?.total > 0
+            ? ((bs.assets?.total || 0) / bs.liabilities.total).toFixed(2)
+            : 'N/A',
+          debtToEquity: bs?.equity?.total > 0
+            ? ((bs.liabilities?.total || 0) / bs.equity.total).toFixed(2)
+            : 'N/A',
+          profitMargin: totalRevenue > 0
+            ? ((netIncome / totalRevenue) * 100).toFixed(1) + '%'
+            : '0%',
+        };
+
+        // Build summary with the nested structure the render uses
+        const summary = bs ? {
+          balanceSheet: bs,
+          keyMetrics,
+        } : null;
+
+        // Add computed validation to balance sheet
+        const bsWithValidation = bs ? {
+          ...bs,
+          validation: {
+            difference: Math.abs((bs.assets?.total || 0) - (bs.totalLiabilitiesAndEquity || 0)),
+          },
+        } : null;
+
+        // Normalize trial balance with validation wrapper
+        let trialBalance = null;
+        if (trialBalData.success && trialBalData.data) {
+          trialBalance = {
+            ...trialBalData.data,
+            validation: {
+              balancesDifference: trialBalData.data.difference || 0,
+            },
+          };
+        }
+
         setReports({
-          balanceSheet: aiData.data.balanceSheet,
-          incomeStatement: aiData.data.incomeYTD,
-          trialBalance: null, // You can fetch trial balance separately if needed
-          summary: aiData.data.balanceSheet, // For summary tab
-          aiInsights: aiData.data.aiInsights || [],
-          aiSuggestions: aiData.data.aiSuggestions || [],
-          aiForecast: aiData.data.aiForecast || null
+          balanceSheet: bsWithValidation,
+          incomeStatement: is,
+          trialBalance,
+          summary,
+          aiInsights: dashData.data.aiInsights || [],
+          aiSuggestions: dashData.data.aiSuggestions || [],
+          aiForecast: dashData.data.aiForecast || null,
         });
       } else {
-        setAiError(aiData.error || 'Failed to load AI dashboard data');
+        setAiError(dashData.error || 'Failed to load accounting data');
       }
     } catch (err) {
       setError('Failed to load accounting reports');
@@ -63,7 +113,7 @@ export function AccountingDashboardScreen() {
     setFinanceQueryResult(null);
     setAiError('');
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('pledgedhub_token') || localStorage.getItem('token');
       const headers = {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'

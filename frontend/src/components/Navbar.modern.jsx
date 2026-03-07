@@ -64,7 +64,7 @@ export default function Navbar() {
       <div className="navbar-container">
         {/* Logo */}
         <Link to="/" className="navbar-logo">
-          <img src={pledgeHubLogo} alt="PledgeHub Logo" className="navbar-logo-icon" style={{ height: '4.5rem', width: 'auto', verticalAlign: 'middle' }} />
+          <img src={pledgeHubLogo} alt="PledgedHub Logo" className="navbar-logo-icon" style={{ height: '4.5rem', width: 'auto', verticalAlign: 'middle' }} />
         </Link>
 
         {/* Desktop Navigation */}

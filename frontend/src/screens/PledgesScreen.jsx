@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { getPledges } from '../services/api';
 import { useNavigate } from 'react-router-dom';
 import './PledgesScreen.css';
+import { uiDebug } from '../utils/debug';
 
 export default function PledgesScreen() {
   const [pledges, setPledges] = useState([]);
@@ -24,9 +25,9 @@ export default function PledgesScreen() {
   const loadPledges = async () => {
     setLoading(true);
     try {
-      console.log('🔵 [PLEDGES SCREEN] Calling getPledges API...');
+      uiDebug('[PledgesScreen] Calling getPledges API...');
       const result = await getPledges();
-      console.log('🔵 [PLEDGES SCREEN] API Result:', result);
+      uiDebug('[PledgesScreen] API result:', result);
       
       // Accept both { data: [...] } and { data: { pledges: [...] } } and { pledges: [...] }
       let pledgesArr = [];
@@ -39,8 +40,8 @@ export default function PledgesScreen() {
           pledgesArr = result.pledges;
         }
       }
-      console.log('🔵 [PLEDGES SCREEN] Extracted pledges array:', pledgesArr);
-      console.log('🔵 [PLEDGES SCREEN] Number of pledges:', pledgesArr.length);
+      uiDebug('[PledgesScreen] Extracted pledges array:', pledgesArr);
+      uiDebug('[PledgesScreen] Number of pledges:', pledgesArr.length);
       setPledges(pledgesArr);
     } catch (err) {
       console.error('❌ [PLEDGES SCREEN] Failed to load pledges:', err);

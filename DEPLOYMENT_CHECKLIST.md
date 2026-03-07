@@ -1,4 +1,4 @@
-﻿# 🚀 DEPLOYMENT CHECKLIST - Next Steps
+# 🚀 DEPLOYMENT CHECKLIST - Next Steps
 
 **Your PledgeHub Application: From Development to Production**
 

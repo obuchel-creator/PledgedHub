@@ -1,4 +1,4 @@
-﻿# Phone Number & Multi-Channel Notifications Implementation
+# Phone Number & Multi-Channel Notifications Implementation
 
 ## Overview
 Enhanced the PledgeHub system to capture user phone numbers and enable multi-channel notifications (Email, SMS, WhatsApp) for better communication with donors.

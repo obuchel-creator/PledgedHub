@@ -105,7 +105,7 @@ async function sendPreBillingNotifications() {
     const subject = 'Billing starts in 30 days';
     const html = `
       <p>Hello,</p>
-      <p>PledgeHub billing will start on <strong>${new Date(targetDate).toLocaleDateString()}</strong>.</p>
+      <p>PledgedHub billing will start on <strong>${new Date(targetDate).toLocaleDateString()}</strong>.</p>
       <p>You are currently on the free plan. If you want to keep automation and reminders active, please pick a plan before billing begins.</p>
       <ul>
         <li>Keep your campaigns running without interruption</li>
@@ -113,7 +113,7 @@ async function sendPreBillingNotifications() {
         <li>Switch plans anytime; you will not be charged until billing starts</li>
       </ul>
       <p>If you have already chosen a plan, you can ignore this message.</p>
-      <p>Thank you for using PledgeHub.</p>
+      <p>Thank you for using PledgedHub.</p>
     `;
 
     try {
@@ -121,7 +121,7 @@ async function sendPreBillingNotifications() {
         to: recipientEmail,
         subject,
         html,
-        text: `PledgeHub billing starts on ${new Date(targetDate).toLocaleDateString()}. Choose a plan now to keep reminders and analytics active. If you already upgraded, no action is needed.`
+        text: `PledgedHub billing starts on ${new Date(targetDate).toLocaleDateString()}. Choose a plan now to keep reminders and analytics active. If you already upgraded, no action is needed.`
       });
 
       await pool.execute(

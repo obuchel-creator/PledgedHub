@@ -1,4 +1,4 @@
-﻿# Accessibility & UX Best Practices for PledgeHub
+# Accessibility & UX Best Practices for PledgeHub
 
 This project follows these accessibility (a11y) and UX guidelines:
 

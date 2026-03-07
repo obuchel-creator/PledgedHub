@@ -1,4 +1,4 @@
-﻿# Production Changes & Updates Guide
+# Production Changes & Updates Guide
 
 **How to Make Changes to Your Live Application Safely**
 

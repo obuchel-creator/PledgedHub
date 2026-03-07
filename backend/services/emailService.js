@@ -55,7 +55,7 @@ async function sendEmail({ to, subject, text, html }) {
         }
         
         const mailOptions = {
-            from: process.env.EMAIL_FROM || '"PledgeHub" <noreply@pledgehub.com>',
+            from: process.env.EMAIL_FROM || '"PledgedHub" <noreply@pledgedhub.com>',
             to,
             subject,
             text,

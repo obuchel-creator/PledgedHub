@@ -1,4 +1,4 @@
-﻿# Airtel Money Integration Setup Guide
+# Airtel Money Integration Setup Guide
 
 This guide will help you set up Airtel Money payment integration for the PledgeHub system in Uganda.
 

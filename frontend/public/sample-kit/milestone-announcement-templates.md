@@ -1,4 +1,4 @@
-﻿# Milestone Announcement Templates
+# Milestone Announcement Templates
 
 ## CELEBRATING PROGRESS & BUILDING MOMENTUM
 

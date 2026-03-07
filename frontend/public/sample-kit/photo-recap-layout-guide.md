@@ -1,4 +1,4 @@
-﻿# Photo Recap Layout & Storytelling Guide
+# Photo Recap Layout & Storytelling Guide
 
 ## VISUAL STORYTELLING TEMPLATES FOR YOUR EVENT
 

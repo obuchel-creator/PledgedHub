@@ -126,6 +126,7 @@ async function createPledge(req, res) {
         // Only allow valid pledge fields
         const payload = {
             campaign_id: typeof campaign_id !== 'undefined' ? campaign_id : null,
+            user_id: req.user?.id || null,
             donor_name: typeof donor_name === 'string' ? donor_name : 'Anonymous',
             donor_email: typeof donor_email === 'string' ? donor_email : null,
             donor_phone: typeof donor_phone === 'string' ? donor_phone : null,
@@ -243,32 +244,64 @@ async function getPledge(req, res) {
 async function listPledges(req, res) {
     try {
         console.log('🔵 [PLEDGE LIST] Request received');
-        console.log('🔵 [PLEDGE LIST] Request headers:', req.headers);
         console.log('🔵 [PLEDGE LIST] Request query:', req.query);
-        
-        const pledges = await Pledge.list();
+
+        const userRole = req.user?.role || 'donor';
+        const isAdminOrStaff = ['admin', 'superadmin', 'super_admin', 'support_staff', 'finance_admin', 'staff'].includes(userRole);
+        const campaignId = req.query.campaign_id ? parseInt(req.query.campaign_id, 10) : null;
+
+        let pledges;
+        if (isAdminOrStaff) {
+            // Admins/staff see all pledges, optionally filtered by campaign
+            pledges = await Pledge.list(campaignId ? { campaignId } : {});
+        } else if (campaignId) {
+            // Group visibility: only pledgers who have also pledged to this campaign
+            // can see other pledges in it (like Facebook friends-only posts)
+            const userId = req.user?.id;
+            if (!userId) {
+                // Unauthenticated — cannot view group pledges
+                pledges = [];
+            } else {
+                // Check if this user is a member of the campaign group (has pledged to it)
+                const memberCheck = await Pledge.list({ campaignId, userId });
+                if (memberCheck.length > 0) {
+                    // User is in the group — show all pledges for this campaign
+                    pledges = await Pledge.list({ campaignId });
+                } else {
+                    // User is not in this group — no access
+                    pledges = [];
+                }
+            }
+        } else {
+            // Regular users without a campaign filter see only their own pledges
+            const userId = req.user?.id;
+            pledges = userId ? await Pledge.list({ userId }) : [];
+        }
+
+        // Return only safe public fields when not admin and filtering by campaign
+        if (!isAdminOrStaff && campaignId) {
+            pledges = pledges.map(p => ({
+                id: p.id,
+                campaign_id: p.campaign_id,
+                donor_name: p.donor_name || 'Anonymous',
+                amount: p.amount,
+                purpose: p.purpose,
+                status: p.status,
+                created_at: p.created_at,
+            }));
+        }
+
         console.log('✅ [PLEDGE LIST] Pledges found:', pledges.length);
-        console.log('🔵 [PLEDGE LIST] Returning pledges:', JSON.stringify(pledges, null, 2));
-        
-        // Return both formats for compatibility
-        return res.status(200).json({ 
+
+        return res.status(200).json({
             success: true,
             data: pledges,
             pledges: pledges  // Legacy format
         });
     } catch (err) {
         console.error('❌ [PLEDGE LIST] Error occurred:', err);
-        console.error('❌ [PLEDGE LIST] Error stack:', err.stack);
-        console.error('❌ [PLEDGE LIST] Error details:', {
-            name: err.name,
-            message: err.message,
-            code: err.code,
-            errno: err.errno,
-            sqlState: err.sqlState,
-            sqlMessage: err.sqlMessage
-        });
-        return res.status(500).json({ 
-            error: 'Server error', 
+        return res.status(500).json({
+            error: 'Server error',
             details: {
                 message: err.message,
                 type: err.name || 'Unknown error'

@@ -1,4 +1,4 @@
-﻿# Quick Start: Testing Authentication
+# Quick Start: Testing Authentication
 
 ## 🚀 Start the Application
 

@@ -33,7 +33,7 @@ const AdvancedAnalyticsScreen = () => {
   const fetchAnalyticsData = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('pledgehub_token');
+      const token = localStorage.getItem('pledgedhub_token');
       const headers = {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
@@ -88,7 +88,7 @@ const AdvancedAnalyticsScreen = () => {
 
   const handleExport = async (type) => {
     try {
-      const token = localStorage.getItem('pledgehub_token');
+      const token = localStorage.getItem('pledgedhub_token');
       const response = await fetch(
         `/api/advanced-analytics/export?format=csv&type=${type}`,
         {
@@ -101,7 +101,7 @@ const AdvancedAnalyticsScreen = () => {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `pledgehub-${type}-${Date.now()}.csv`;
+        a.download = `pledgedhub-${type}-${Date.now()}.csv`;
         document.body.appendChild(a);
         a.click();
         a.remove();

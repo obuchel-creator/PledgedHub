@@ -1,4 +1,4 @@
-﻿# Thank You Letter Templates
+# Thank You Letter Templates
 
 ## A COMPREHENSIVE GUIDE TO EXPRESSING GRATITUDE TO YOUR SUPPORTERS
 

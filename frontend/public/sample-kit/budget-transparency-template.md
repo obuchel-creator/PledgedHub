@@ -1,4 +1,4 @@
-﻿# Budget Transparency Report Template
+# Budget Transparency Report Template
 
 ## [EVENT NAME] - Financial Summary Report
 **Date Prepared:** [Date]  

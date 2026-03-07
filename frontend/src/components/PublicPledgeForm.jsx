@@ -3,7 +3,7 @@ import axios from 'axios';
 
 export default function PublicPledgeForm() {
   const [form, setForm] = useState({
-    name: '',
+    donor_name: '',
     phone: '',
     email: '',
     amount: '',
@@ -24,9 +24,9 @@ export default function PublicPledgeForm() {
     setError('');
     setSuccess(false);
     try {
-      const res = await axios.post('/pledges', {
-        title: form.name,
-        donor_name: form.name,
+      const res = await axios.post('/api/pledges', {
+        title: form.donor_name,
+        donor_name: form.donor_name,
         donor_phone: form.phone,
         donor_email: form.email,
         amount: form.amount,
@@ -35,7 +35,7 @@ export default function PublicPledgeForm() {
       });
       if (res.data && res.data.success) {
         setSuccess(true);
-        setForm({ name: '', phone: '', email: '', amount: '', purpose: '', collection_date: '' });
+        setForm({ donor_name: '', phone: '', email: '', amount: '', purpose: '', collection_date: '' });
       } else {
         setError(res.data.error || 'Submission failed');
       }

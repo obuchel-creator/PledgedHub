@@ -1,4 +1,4 @@
-﻿# PledgeHub - API Documentation
+# PledgeHub - API Documentation
 
 Complete API reference for all AI and automation features.
 

@@ -1,5 +1,5 @@
 /**
- * Share Helpers for PledgeHub
+ * Share Helpers for PledgedHub
  * Provides URL builders and sharing functionality for multiple platforms
  */
 
@@ -160,43 +160,43 @@ export const generateShareMessage = (type, data) => {
     case 'campaign':
       return {
         title: `Support: ${data.title}`,
-        text: `🎯 Join me in supporting "${data.title}" on PledgeHub!\n\nGoal: UGX ${data.goalAmount?.toLocaleString()}\nRaised: UGX ${data.raisedAmount?.toLocaleString()}\n\nEvery contribution counts! 💪`,
-        hashtags: ['PledgeHub', 'Fundraising', 'MakeADifference'],
+        text: `🎯 Join me in supporting "${data.title}" on PledgedHub!\n\nGoal: UGX ${data.goalAmount?.toLocaleString()}\nRaised: UGX ${data.raisedAmount?.toLocaleString()}\n\nEvery contribution counts! 💪`,
+        hashtags: ['PledgedHub', 'Fundraising', 'MakeADifference'],
       };
       
     case 'pledge':
       return {
-        title: 'I made a pledge on PledgeHub!',
-        text: `✅ I just pledged UGX ${data.amount?.toLocaleString()} to "${data.campaignTitle}" on PledgeHub!\n\nJoin me in making a difference! 🌟`,
-        hashtags: ['PledgeHub', 'Giving', 'Community'],
+        title: 'I made a pledge on PledgedHub!',
+        text: `✅ I just pledged UGX ${data.amount?.toLocaleString()} to "${data.campaignTitle}" on PledgedHub!\n\nJoin me in making a difference! 🌟`,
+        hashtags: ['PledgedHub', 'Giving', 'Community'],
       };
       
     case 'achievement':
       return {
         title: 'Achievement Unlocked!',
-        text: `🏆 I achieved ${data.milestone} on PledgeHub!\n\n${data.description}\n\nJoin me in making an impact!`,
-        hashtags: ['PledgeHub', 'Achievement', 'Impact'],
+        text: `🏆 I achieved ${data.milestone} on PledgedHub!\n\n${data.description}\n\nJoin me in making an impact!`,
+        hashtags: ['PledgedHub', 'Achievement', 'Impact'],
       };
       
     case 'milestone':
       return {
         title: `Campaign Milestone Reached!`,
-        text: `🎉 "${data.campaignTitle}" just reached ${data.percentage}% of its goal on PledgeHub!\n\nHelp us reach 100%! Every pledge counts! 💚`,
-        hashtags: ['PledgeHub', 'Milestone', 'Together'],
+        text: `🎉 "${data.campaignTitle}" just reached ${data.percentage}% of its goal on PledgedHub!\n\nHelp us reach 100%! Every pledge counts! 💚`,
+        hashtags: ['PledgedHub', 'Milestone', 'Together'],
       };
       
     case 'referral':
       return {
-        title: 'Join PledgeHub',
-        text: `👋 Hey! I'm using PledgeHub to support amazing causes.\n\nJoin me and make a difference in your community! 🌍`,
-        hashtags: ['PledgeHub', 'Community', 'Impact'],
+        title: 'Join PledgedHub',
+        text: `👋 Hey! I'm using PledgedHub to support amazing causes.\n\nJoin me and make a difference in your community! 🌍`,
+        hashtags: ['PledgedHub', 'Community', 'Impact'],
       };
       
     default:
       return {
-        title: 'Check out PledgeHub',
-        text: `Discover amazing campaigns and make a difference on PledgeHub! 🚀`,
-        hashtags: ['PledgeHub'],
+        title: 'Check out PledgedHub',
+        text: `Discover amazing campaigns and make a difference on PledgedHub! 🚀`,
+        hashtags: ['PledgedHub'],
       };
   }
 };
@@ -210,7 +210,7 @@ export const trackShare = async (contentType, contentId, channel) => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('pledgehub_token')}`,
+        'Authorization': `Bearer ${localStorage.getItem('pledgedhub_token')}`,
       },
       body: JSON.stringify({
         contentType,

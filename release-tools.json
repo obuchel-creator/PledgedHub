@@ -1,4 +1,4 @@
-﻿{
+{
   "scripts": {
     "release": "standard-version"
   },

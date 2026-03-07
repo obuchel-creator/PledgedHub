@@ -20,11 +20,11 @@ export default function QuickbooksNavbar() {
         zIndex: 1000,
       }}
     >
-      {/* PledgeHub Logo and Brand */}
+      {/* PledgedHub Logo and Brand */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-        <img src={pledgeHubLogo} alt="PledgeHub" style={{ height: '56px' }} />
+        <img src={pledgeHubLogo} alt="PledgedHub" style={{ height: '56px' }} />
       </div>
-      {/* Main Nav Links - PledgeHub */}
+      {/* Main Nav Links - PledgedHub */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
         <Link to="/dashboard" style={navLinkStyle}>
           Dashboard

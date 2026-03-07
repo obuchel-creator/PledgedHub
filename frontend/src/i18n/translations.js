@@ -1,5 +1,5 @@
 /**
- * Translations for PledgeHub Application
+ * Translations for PledgedHub Application
  * Supported Languages: English (en), Luganda (lg), Swahili (sw)
  */
 
@@ -62,7 +62,7 @@ export const translations = {
     
     // Dashboard/Home
     home: {
-      title: 'Welcome to PledgeHub',
+      title: 'Welcome to PledgedHub',
       subtitle: 'Make a difference with your commitment',
       activeCampaigns: 'Active Campaigns',
       totalPledges: 'Total Pledges',
@@ -320,7 +320,7 @@ export const translations = {
     
     // Dashboard/Home - Luganda
     home: {
-      title: 'Tukwaniriza ku PledgeHub',
+      title: 'Tukwaniriza ku PledgedHub',
       subtitle: 'Kola enkyukakyuka n\'obweyamo bwo',
       activeCampaigns: 'Emirimu Egikola',
       totalPledges: 'Obweyamo Bwonna',
@@ -578,7 +578,7 @@ export const translations = {
     
     // Dashboard/Home - Swahili
     home: {
-      title: 'Karibu kwenye PledgeHub',
+      title: 'Karibu kwenye PledgedHub',
       subtitle: 'Fanya mabadiliko kwa ahadi yako',
       activeCampaigns: 'Kampeni Zinazoendelea',
       totalPledges: 'Jumla ya Ahadi',

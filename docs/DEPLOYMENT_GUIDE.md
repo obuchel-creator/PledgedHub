@@ -1,4 +1,4 @@
-﻿# PledgeHub - Deployment Guide
+# PledgeHub - Deployment Guide
 
 Complete guide for deploying the PledgeHub system with AI and automation features to production.
 

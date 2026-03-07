@@ -95,7 +95,7 @@ function generateReminderMessage(pledge, type) {
                             <p style="margin: 5px 0;"><strong>Due Date:</strong> ${collectionDate}</p>
                         </div>
                         <p>Thank you for your generous commitment!</p>
-                        <p style="color: #666; font-size: 12px; margin-top: 30px;">PledgeHub Pledge Management System</p>
+                        <p style="color: #666; font-size: 12px; margin-top: 30px;">PledgedHub Pledge Management System</p>
                     </div>
                 `
             }
@@ -117,7 +117,7 @@ function generateReminderMessage(pledge, type) {
                         </div>
                         <p>Please ensure you're ready for collection on the due date.</p>
                         <p>Thank you for your continued support!</p>
-                        <p style="color: #666; font-size: 12px; margin-top: 30px;">PledgeHub Pledge Management System</p>
+                        <p style="color: #666; font-size: 12px; margin-top: 30px;">PledgedHub Pledge Management System</p>
                     </div>
                 `
             }
@@ -138,7 +138,7 @@ function generateReminderMessage(pledge, type) {
                             <p style="margin: 5px 0;"><strong>Collection Date:</strong> ${collectionDate}</p>
                         </div>
                         <p>Thank you for keeping your commitment!</p>
-                        <p style="color: #666; font-size: 12px; margin-top: 30px;">PledgeHub Pledge Management System</p>
+                        <p style="color: #666; font-size: 12px; margin-top: 30px;">PledgedHub Pledge Management System</p>
                     </div>
                 `
             }
@@ -162,7 +162,7 @@ function generateReminderMessage(pledge, type) {
                         <p>If you've already made this payment, please disregard this message.</p>
                         <p>Otherwise, please contact us at your earliest convenience to arrange payment.</p>
                         <p>Thank you for your understanding.</p>
-                        <p style="color: #666; font-size: 12px; margin-top: 30px;">PledgeHub Pledge Management System</p>
+                        <p style="color: #666; font-size: 12px; margin-top: 30px;">PledgedHub Pledge Management System</p>
                     </div>
                 `
             }

@@ -244,41 +244,54 @@ const checkSubscriptionLimit = (actionType) => {
 router.post('/notify', async (req, res) => {
   try {
     const { email, activationDate } = req.body;
-    
+
     if (!email || !email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return res.status(400).json({ success: false, error: 'Valid email required' });
     }
-    
-    // Store in database (optional: can also send confirmation email)
+
     const { pool } = require('../config/db');
     const normalizedEmail = email.trim().toLowerCase();
-    
-    // Check if already subscribed
-    const [existing] = await pool.execute(
-      'SELECT id FROM billing_notifications WHERE email = ?',
-      [normalizedEmail]
-    );
-    
-    if (existing && existing.length > 0) {
-      return res.json({ 
-        success: true, 
-        message: 'Email already registered for notifications' 
-      });
-    }
-    
-    // Insert new notification subscription
+    const { getMonetizationStartDate } = require('../config/monetization');
+
+    // Ensure table exists before inserting
+    await pool.execute(`
+      CREATE TABLE IF NOT EXISTS billing_notifications (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        email VARCHAR(255) NOT NULL,
+        activation_date DATETIME,
+        notified TINYINT(1) DEFAULT 0,
+        notified_at DATETIME DEFAULT NULL,
+        user_id INT DEFAULT NULL,
+        last_status_change_at DATETIME DEFAULT NULL,
+        last_status_change_type VARCHAR(50) DEFAULT NULL,
+        last_notification_reason VARCHAR(100) DEFAULT NULL,
+        created_at DATETIME DEFAULT NOW(),
+        UNIQUE KEY uq_bn_email (email)
+      )
+    `).catch(() => null); // ignore if already exists
+
+    const targetDate = activationDate
+      ? new Date(activationDate)
+      : getMonetizationStartDate();
+    const finalDate = isNaN(targetDate.getTime()) ? getMonetizationStartDate() : targetDate;
+
+    // Upsert — update activation_date if already registered
     await pool.execute(
-      'INSERT INTO billing_notifications (email, activation_date, created_at) VALUES (?, ?, NOW())',
-      [normalizedEmail, activationDate || new Date(Date.now() + 1000 * 60 * 60 * 24 * 30 * 6)]
+      `INSERT INTO billing_notifications (email, activation_date)
+       VALUES (?, ?)
+       ON DUPLICATE KEY UPDATE activation_date = VALUES(activation_date)`,
+      [normalizedEmail, finalDate]
     );
-    
+
+    console.log(`[monetization] Notify registered: ${normalizedEmail}`);
+
     res.json({
       success: true,
-      message: 'Email registered. We will notify you before billing starts.'
+      message: 'You are on the list. We will email you one month before billing starts.',
     });
   } catch (error) {
-    console.error('Notify error:', error);
-    res.status(500).json({ success: false, error: 'Could not save notification' });
+    console.error('[monetization] notify error:', error.message);
+    res.status(500).json({ success: false, error: 'Server error. Please try again.' });
   }
 });
 

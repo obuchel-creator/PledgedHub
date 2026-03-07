@@ -359,7 +359,7 @@ async function handleHelpRequest(context) {
   if (aiService.isAIAvailable()) {
     try {
       const prompt = `
-You are a helpful chatbot for PledgeHub, a pledge management system.
+You are a helpful chatbot for PledgedHub, a pledge management system.
 
 Generate a helpful response in ${LANGUAGES[context.language]} that explains:
 1. How to check pledge status (send pledge number)
@@ -391,10 +391,10 @@ Keep it simple and friendly, maximum 5 sentences.
  */
 function handleGreeting(context) {
   const greetings = {
-    en: "Hello! 👋 I'm PledgeHub Bot. I can help you:\n\n1. Check your pledge status\n2. Make payments\n3. Get help\n\nWhat would you like to do?",
-    lg: "Oli otya! 👋 Nze PledgeHub Bot. Nsobola okukuyamba:\n\n1. Okukebera pledge yo\n2. Okusasula\n3. Okufuna obuyambi\n\nOyagala kikusoose ki?",
-    rny: "Agandi! 👋 Ninyowe PledgeHub Bot. Ninsobora kukugambaho:\n\n1. Okureeba pledge yawe\n2. Okurihira\n3. Okubona obuyambi\n\nOryenda eki?",
-    ateso: "Yoga noi! 👋 Arai PledgeHub Bot. Aiyariki:\n\n1. Ilolon pledge yong\n2. Iwari\n3. Iboro ayamb\n\nIdokin nae?"
+    en: "Hello! 👋 I'm PledgedHub Bot. I can help you:\n\n1. Check your pledge status\n2. Make payments\n3. Get help\n\nWhat would you like to do?",
+    lg: "Oli otya! 👋 Nze PledgedHub Bot. Nsobola okukuyamba:\n\n1. Okukebera pledge yo\n2. Okusasula\n3. Okufuna obuyambi\n\nOyagala kikusoose ki?",
+    rny: "Agandi! 👋 Ninyowe PledgedHub Bot. Ninsobora kukugambaho:\n\n1. Okureeba pledge yawe\n2. Okurihira\n3. Okubona obuyambi\n\nOryenda eki?",
+    ateso: "Yoga noi! 👋 Arai PledgedHub Bot. Aiyariki:\n\n1. Ilolon pledge yong\n2. Iwari\n3. Iboro ayamb\n\nIdokin nae?"
   };
 
   return {
@@ -427,7 +427,7 @@ async function handleUnclearIntent(message, context) {
   if (aiService.isAIAvailable()) {
     try {
       const prompt = `
-You are a helpful chatbot for PledgeHub pledge management system.
+You are a helpful chatbot for PledgedHub pledge management system.
 
 User said: "${message}"
 Language: ${LANGUAGES[context.language]}
@@ -550,10 +550,10 @@ function translate(key, language, params = {}) {
       ateso: `📊 Pledge #${params.pledgeId} Akilokit\n\nSente: UGX ${params.amount}\nElosit: UGX ${params.balance}\nAkilokit: ${params.status}\nAre: ${params.dueDate}\n\nBo iwari, atinyi: PAY ${params.pledgeId} [TELEFON_YONG]`
     },
     help_message: {
-      en: "🤖 PledgeHub Bot Help\n\n📱 Check Status:\nSend your pledge number\nExample: 123\n\n💰 Make Payment:\nSend: PAY [ID] [PHONE]\nExample: PAY 123 256772345678\n\n📞 Call Support:\n0800-753343 (FREE)",
-      lg: "🤖 Obuyambi bwa PledgeHub Bot\n\n📱 Kebera Embeera:\nTuma namba ya pledge yo\nEky'okulabirako: 123\n\n💰 Sasula:\nTuma: PAY [ID] [SIMU]\nEky'okulabirako: PAY 123 256772345678\n\n📞 Tubira:\n0800-753343 (YA BWEREERE)",
-      rny: "🤖 Omugasho gwa PledgeHub Bot\n\n📱 Reeba Embeera:\nTuma nimero ya pledge yawe\nOmugambo: 123\n\n💰 Rihira:\nTuma: PAY [ID] [SIMU]\nOmugambo: PAY 123 256772345678\n\n📞 Tungira:\n0800-753343 (YA BWEREERE)",
-      ateso: "🤖 Ayamb ka PledgeHub Bot\n\n📱 Lolo Akilokit:\nAtinyi numero ka pledge yong\nAsidai: 123\n\n💰 Iwari:\nAtinyi: PAY [ID] [TELEFON]\nAsidai: PAY 123 256772345678\n\n📞 Kakan:\n0800-753343 (YABO)"
+      en: "🤖 PledgedHub Bot Help\n\n📱 Check Status:\nSend your pledge number\nExample: 123\n\n💰 Make Payment:\nSend: PAY [ID] [PHONE]\nExample: PAY 123 256772345678\n\n📞 Call Support:\n0800-753343 (FREE)",
+      lg: "🤖 Obuyambi bwa PledgedHub Bot\n\n📱 Kebera Embeera:\nTuma namba ya pledge yo\nEky'okulabirako: 123\n\n💰 Sasula:\nTuma: PAY [ID] [SIMU]\nEky'okulabirako: PAY 123 256772345678\n\n📞 Tubira:\n0800-753343 (YA BWEREERE)",
+      rny: "🤖 Omugasho gwa PledgedHub Bot\n\n📱 Reeba Embeera:\nTuma nimero ya pledge yawe\nOmugambo: 123\n\n💰 Rihira:\nTuma: PAY [ID] [SIMU]\nOmugambo: PAY 123 256772345678\n\n📞 Tungira:\n0800-753343 (YA BWEREERE)",
+      ateso: "🤖 Ayamb ka PledgedHub Bot\n\n📱 Lolo Akilokit:\nAtinyi numero ka pledge yong\nAsidai: 123\n\n💰 Iwari:\nAtinyi: PAY [ID] [TELEFON]\nAsidai: PAY 123 256772345678\n\n📞 Kakan:\n0800-753343 (YABO)"
     },
     unclear: {
       en: "I'm not sure what you mean. I can help you:\n\n1. Check pledge status (send pledge number)\n2. Make payment (send PAY [ID] [PHONE])\n3. Get help (send HELP)\n\nOr call 0800-753343",

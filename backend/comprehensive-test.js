@@ -1,4 +1,4 @@
-﻿// Comprehensive test of core PledgeHub features
+// Comprehensive test of core PledgeHub features
 const http = require('http');
 
 class PledgeHubTester {

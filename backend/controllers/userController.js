@@ -80,10 +80,10 @@ async function getUser(req, res) {
 async function listUsers(req, res) {
                 console.log('=== /api/users route handler called ===');
             // Direct DB check for debugging
-            const db = require('../config/db');
+            const { pool: debugPool } = require('../config/db');
             try {
-                const [countRows] = await db.execute('SELECT COUNT(*) as count FROM users');
-                const [sampleRows] = await db.execute('SELECT id, username, email, phone_number FROM users LIMIT 5');
+                const [countRows] = await debugPool.execute('SELECT COUNT(*) as count FROM users');
+                const [sampleRows] = await debugPool.execute('SELECT id, username, email, phone_number FROM users LIMIT 5');
                 console.log('[DEBUG] Direct DB user count:', countRows);
                 console.log('[DEBUG] Direct DB sample users:', sampleRows);
             } catch (err) {
@@ -282,16 +282,17 @@ async function updateUserRole(req, res) {
         }
 
         // Check if requesting user is superadmin
-        if (!req.user || req.user.role !== 'superadmin') {
-            return res.status(403).json({ 
-                error: 'Forbidden: Only superadmins can change user roles' 
+        const isSuperAdmin = req.user && (req.user.role === 'superadmin' || req.user.role === 'super_admin');
+        if (!isSuperAdmin) {
+            return res.status(403).json({
+                error: 'Forbidden: Only superadmins can change user roles'
             });
         }
 
         // Prevent changing own role (security measure)
         if (req.user.id === parseInt(targetUserId)) {
-            return res.status(400).json({ 
-                error: 'Cannot change your own role' 
+            return res.status(400).json({
+                error: 'Cannot change your own role'
             });
         }
 
@@ -300,11 +301,11 @@ async function updateUserRole(req, res) {
             return res.status(400).json({ error: 'New role required' });
         }
 
-        // Validate role
-        const validRoles = ['donor', 'staff', 'admin', 'superadmin'];
+        // Validate role (support both old and new role names)
+        const validRoles = ['donor', 'creator', 'staff', 'support_staff', 'finance_admin', 'admin', 'superadmin', 'super_admin'];
         if (!validRoles.includes(role)) {
-            return res.status(400).json({ 
-                error: `Invalid role. Must be one of: ${validRoles.join(', ')}` 
+            return res.status(400).json({
+                error: `Invalid role. Must be one of: ${validRoles.join(', ')}`
             });
         }
 
@@ -350,20 +351,23 @@ async function updateUserRole(req, res) {
  */
 async function listAllUsers(req, res) {
     try {
-        // Check if requesting user is admin or superadmin
-        if (!req.user || (req.user.role !== 'admin' && req.user.role !== 'superadmin')) {
-            return res.status(403).json({ 
-                error: 'Forbidden: Admin or Superadmin access required' 
+        // Check if requesting user is admin or superadmin (support both old and new role names)
+        const isAdmin = req.user && (
+            req.user.role === 'admin' || req.user.role === 'superadmin' || req.user.role === 'super_admin'
+        );
+        if (!req.user || !isAdmin) {
+            return res.status(403).json({
+                error: 'Forbidden: Admin or Superadmin access required'
             });
         }
 
-        // For admin or superadmin, always show all users, including deleted if requested, but default to all
+        // Respect the includeDeleted query param from the frontend; default to false
+        const includeDeleted = req.query.includeDeleted === 'true';
         const search = req.query.search || '';
-        // If admin or superadmin, ignore limit/offset/includeDeleted for full list (or set a high limit)
         const users = await User.listAll({
-            includeDeleted: true, // always include all for admin/superadmin
+            includeDeleted,
             search,
-            limit: 1000, // show up to 1000 users
+            limit: 1000,
             offset: 0
         });
 

@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import { chatWithAI, getAISuggestions, getAIInsights } from '../services/api';
+import { uiDebug } from '../utils/debug';
 
 export default function AIChatbot() {
   const location = useLocation();
@@ -13,7 +14,7 @@ export default function AIChatbot() {
     const path = location.pathname;
 
     const messages = {
-      '/': "👋 Welcome to PledgeHub! I'm your AI assistant. I can help you:\n\n• Learn about pledge management\n• Understand how to create pledges\n• Get started with the platform\n• Answer questions about features\n\nHow can I assist you today?",
+      '/': "👋 Welcome to PledgedHub! I'm your AI assistant. I can help you:\n\n• Learn about pledge management\n• Understand how to create pledges\n• Get started with the platform\n• Answer questions about features\n\nHow can I assist you today?",
       '/dashboard':
         "📊 Hi! I'm your AI dashboard assistant. I can help you:\n\n• Analyze your pledge performance\n• Generate personalized reminder messages\n• Suggest collection strategies\n• Provide insights on trends\n\nWhat would you like to know about your pledges?",
       '/create':
@@ -101,7 +102,7 @@ export default function AIChatbot() {
                 .join('\n')}`;
             }
           } catch (error) {
-            console.log('Could not fetch insights:', error.message);
+            uiDebug('Could not fetch insights:', error.message);
           }
         } else if (input.toLowerCase().includes('suggest')) {
           try {
@@ -113,7 +114,7 @@ export default function AIChatbot() {
                 .join('\n')}`;
             }
           } catch (error) {
-            console.log('Could not fetch suggestions:', error.message);
+            uiDebug('Could not fetch suggestions:', error.message);
           }
         }
       } else {
@@ -151,7 +152,7 @@ export default function AIChatbot() {
     const actions = {
       '/': [
         { label: '🚀 Get Started', prompt: 'How do I create my first pledge?', icon: '🚀' },
-        { label: '📊 Features', prompt: 'What features does PledgeHub offer?', icon: '📊' },
+        { label: '📊 Features', prompt: 'What features does PledgedHub offer?', icon: '📊' },
         {
           label: '💡 Best Practices',
           prompt: 'What are best practices for pledge management?',

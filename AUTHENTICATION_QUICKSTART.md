@@ -20,7 +20,7 @@ Frontend will run on: `http://localhost:5174`
 
 ## 🔐 Default Admin Credentials
 
-**Email**: `admin@pledgehub.com`  
+**Email**: `admin@pledgedhub.com`  
 **Password**: `Admin@2024`
 
 ⚠️ **Important**: Change this password immediately after first login!

@@ -59,7 +59,7 @@ PledgeHub now includes comprehensive social sharing functionality across WhatsAp
   contentType="campaign|pledge|achievement|milestone|referral"
   contentData={{ title, goalAmount, raisedAmount, etc. }}
   contentId={123}
-  shareUrl="https://pledgehub.com/campaigns/123"
+  shareUrl="https://pledgedhub.com/campaigns/123"
   style="button|inline|dropdown"
   size="small|medium|large"
 />
@@ -251,7 +251,7 @@ import { isMobileDevice } from '../utils/shareHelpers';
 All shared URLs include UTM parameters:
 
 ```
-https://pledgehub.com/campaigns/123?utm_source=whatsapp&utm_medium=social_share&campaign_id=123
+https://pledgedhub.com/campaigns/123?utm_source=whatsapp&utm_medium=social_share&campaign_id=123
 ```
 
 **Parameters:**

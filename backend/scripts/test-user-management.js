@@ -10,7 +10,7 @@ async function testUserManagement() {
         // Step 1: Login as admin
         console.log('\n1️⃣  Login as admin...');
         const loginResponse = await axios.post(`${API_BASE}/auth/login`, {
-            email: 'admin@pledgehub.com',
+            email: 'admin@pledgedhub.com',
             password: 'Admin@2024'
         });
         

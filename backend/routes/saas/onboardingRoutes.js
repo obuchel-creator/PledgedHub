@@ -78,10 +78,10 @@ router.post('/signup', async (req, res) => {
           <h2>Welcome to PledgeHub, ${name}!</h2>
           <p>Your account has been created successfully.</p>
           <p><strong>Organization:</strong> ${organizationName}</p>
-          <p><strong>Your subdomain:</strong> ${subdomain}.pledgehub.com</p>
+          <p><strong>Your subdomain:</strong> ${subdomain}.pledgedhub.com</p>
           <p><strong>Trial ends:</strong> ${new Date(trialEndsAt).toLocaleDateString()}</p>
-          <p>Get started by logging in at: <a href="https://${subdomain}.pledgehub.com">https://${subdomain}.pledgehub.com</a></p>
-          <p>Need help? Check our documentation or contact support at support@pledgehub.com</p>
+          <p>Get started by logging in at: <a href="https://${subdomain}.pledgedhub.com">https://${subdomain}.pledgedhub.com</a></p>
+          <p>Need help? Check our documentation or contact support at support@pledgedhub.com</p>
           <br>
           <p>Best regards,<br>The PledgeHub Team</p>
         `
@@ -108,7 +108,7 @@ router.post('/signup', async (req, res) => {
         email,
         role: 'admin'
       },
-      redirectUrl: `https://${subdomain}.pledgehub.com/dashboard`
+      redirectUrl: `https://${subdomain}.pledgedhub.com/dashboard`
     });
 
   } catch (error) {

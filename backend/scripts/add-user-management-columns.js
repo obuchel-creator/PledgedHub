@@ -53,11 +53,11 @@ async function runMigration() {
             console.log('  ✅ role column added');
             
             // Set existing admin user(s) to admin role if they exist
-            console.log('  🔧 Setting admin role for admin@pledgehub.com...');
+            console.log('  🔧 Setting admin role for admin@pledgedhub.com...');
             await pool.execute(`
                 UPDATE users 
                 SET role = 'admin' 
-                WHERE email = 'admin@pledgehub.com'
+                WHERE email = 'admin@pledgedhub.com'
             `);
             console.log('  ✅ Admin role set');
         } else {

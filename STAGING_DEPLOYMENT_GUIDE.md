@@ -112,7 +112,7 @@ npm run preview
 #### 3.1 Authentication Test
 ```bash
 # Test login endpoint
-curl -X POST http://staging.pledgehub.com/api/login \
+curl -X POST http://staging.pledgedhub.com/api/login \
   -H "Content-Type: application/json" \
   -d '{"email":"test@test.com","password":"password123"}'
 # Expected: 200 with JWT token
@@ -121,12 +121,12 @@ curl -X POST http://staging.pledgehub.com/api/login \
 #### 3.2 RBAC Test
 ```bash
 # Test donor access (should succeed)
-curl -X GET http://staging.pledgehub.com/api/pledges \
+curl -X GET http://staging.pledgedhub.com/api/pledges \
   -H "Authorization: Bearer DONOR_TOKEN"
 # Expected: 200
 
 # Test donor access to finance routes (should fail)
-curl -X GET http://staging.pledgehub.com/api/payouts/admin/pending \
+curl -X GET http://staging.pledgedhub.com/api/payouts/admin/pending \
   -H "Authorization: Bearer DONOR_TOKEN"
 # Expected: 403 Forbidden
 ```
@@ -134,11 +134,11 @@ curl -X GET http://staging.pledgehub.com/api/payouts/admin/pending \
 #### 3.3 Route Protection Test
 ```bash
 # Test protected route without auth (should fail)
-curl -X GET http://staging.pledgehub.com/api/pledges
+curl -X GET http://staging.pledgedhub.com/api/pledges
 # Expected: 401 Unauthorized
 
 # Test protected route with invalid token (should fail)
-curl -X GET http://staging.pledgehub.com/api/pledges \
+curl -X GET http://staging.pledgedhub.com/api/pledges \
   -H "Authorization: Bearer INVALID_TOKEN"
 # Expected: 401 or 403
 ```

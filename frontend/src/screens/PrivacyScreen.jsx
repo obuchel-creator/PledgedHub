@@ -39,13 +39,13 @@ export default function PrivacyScreen() {
         </div>
         <div style={{ background: 'white', borderRadius: '16px', padding: '32px', marginBottom: '24px', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)' }}>
           <h2 style={{ color: '#1a202c', fontSize: '1.75rem', fontWeight: '700', marginBottom: '16px', margin: '0 0 16px 0' }}>Your Rights</h2>
-          <p style={{ color: '#4a5568', lineHeight: '1.7', fontSize: '1rem', marginBottom: '12px' }}>You have the right to access, correct, delete, or port your data. Contact us at privacy@PledgeHub.com to exercise these rights.</p>
+          <p style={{ color: '#4a5568', lineHeight: '1.7', fontSize: '1rem', marginBottom: '12px' }}>You have the right to access, correct, delete, or port your data. Contact us at privacy@pledgedhub.com to exercise these rights.</p>
         </div>
         <div style={{ background: 'white', borderRadius: '16px', padding: '32px', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)' }}>
           <h2 style={{ color: '#1a202c', fontSize: '1.75rem', fontWeight: '700', marginBottom: '16px', margin: '0 0 16px 0' }}>Contact Us</h2>
           <div style={{ padding: '20px', background: 'rgba(139, 92, 246, 0.08)', borderRadius: '12px' }}>
             <p style={{ margin: '0 0 8px', color: '#1a202c', fontWeight: '600' }}>PledgeHub Support</p>
-            <p style={{ margin: '0', color: '#4a5568' }}>Email: privacy@PledgeHub.com</p>
+            <p style={{ margin: '0', color: '#4a5568' }}>Email: privacy@pledgedhub.com</p>
           </div>
         </div>
       </div>

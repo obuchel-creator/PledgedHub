@@ -67,7 +67,7 @@ export default function TermsScreen() {
           <h2 style={{ color: '#1a202c', fontSize: '1.75rem', fontWeight: '700', marginBottom: '16px', margin: '0 0 16px 0' }}>Contact Information</h2>
           <div style={{ padding: '20px', background: 'rgba(139, 92, 246, 0.08)', borderRadius: '12px' }}>
             <p style={{ margin: '0 0 8px', color: '#1a202c', fontWeight: '600' }}>PledgeHub Legal</p>
-            <p style={{ margin: '0', color: '#4a5568' }}>Email: legal@PledgeHub.com</p>
+            <p style={{ margin: '0', color: '#4a5568' }}>Email: legal@pledgedhub.com</p>
           </div>
         </div>
       </div>

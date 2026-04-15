@@ -15,7 +15,7 @@ const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
  * Extract tenant from request
  * Methods (priority order):
  * 1. X-Tenant-ID header (for mobile apps, testing)
- * 2. Subdomain (tenant.pledgehub.com)
+ * 2. Subdomain (tenant.pledgedhub.com)
  * 3. Custom domain (customdomain.com)
  */
 async function extractTenant(req, res, next) {
@@ -41,7 +41,7 @@ async function extractTenant(req, res, next) {
 
       const parts = hostname.split('.');
       
-      // Check for subdomain (e.g., acme.pledgehub.com or acme.localhost)
+      // Check for subdomain (e.g., acme.pledgedhub.com or acme.localhost)
       if (parts.length >= 2 && parts[0] !== 'www' && parts[0] !== 'api' && parts[0] !== 'admin') {
         tenantIdentifier = parts[0];
         identifierType = 'subdomain';
@@ -91,7 +91,7 @@ async function extractTenant(req, res, next) {
       return res.status(403).json({ 
         error: 'Account suspended',
         details: 'This account has been suspended. Please contact billing.',
-        contact: 'support@pledgehub.com'
+        contact: 'support@pledgedhub.com'
       });
     }
 
@@ -99,7 +99,7 @@ async function extractTenant(req, res, next) {
       return res.status(403).json({ 
         error: 'Account cancelled',
         details: 'This account has been cancelled. Contact support to reactivate.',
-        contact: 'support@pledgehub.com'
+        contact: 'support@pledgedhub.com'
       });
     }
 

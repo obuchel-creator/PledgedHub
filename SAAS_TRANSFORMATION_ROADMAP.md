@@ -56,8 +56,8 @@ Week 1-2 Checklist:
 ```
 
 **Deliverables:**
-- [ ] New orgs can signup at `pledgehub.com/signup`
-- [ ] Access via `{tenant}.pledgehub.com`
+- [ ] New orgs can signup at `pledgedhub.com/signup`
+- [ ] Access via `{tenant}.pledgedhub.com`
 - [ ] Credit card payment via Stripe
 - [ ] Usage dashboard shows limits
 - [ ] Email notifications work
@@ -179,9 +179,9 @@ Weeks 7-12 Checklist:
 ### MVP (Multi-Tenant)
 ```
 ┌────────────────────────────┐
-│  acme.pledgehub.com        │
-│  corp.pledgehub.com        │ ─────┐
-│  ngo.pledgehub.com         │      │
+│  acme.pledgedhub.com        │
+│  corp.pledgedhub.com        │ ─────┐
+│  ngo.pledgedhub.com         │      │
 └────────────────────────────┘      │
                                     ▼
                             ┌───────────────┐
@@ -322,7 +322,7 @@ Weeks 7-12 Checklist:
 - [ ] Write Terms of Service & Privacy Policy
 - [ ] Create help documentation
 - [ ] Record demo videos
-- [ ] Set up status page (status.pledgehub.com)
+- [ ] Set up status page (status.pledgedhub.com)
 - [ ] Configure email deliverability (SPF, DKIM)
 - [ ] Test payment flows (Stripe test mode)
 

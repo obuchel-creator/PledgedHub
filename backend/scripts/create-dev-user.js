@@ -14,7 +14,7 @@ const DEV_USER = {
     name: 'Dev User',
     username: 'devuser',
     phone: '+256700000000',
-    email: 'dev@pledgehub.com',
+    email: 'dev@pledgedhub.com',
     password: 'devpass123',
     role: 'admin'
 };
@@ -76,7 +76,7 @@ async function createDevUser() {
         
         console.log('💡 You can now login with these credentials!');
         console.log('   Login endpoint: POST http://localhost:5001/api/auth/login');
-        console.log('   Body: { "identifier": "dev@pledgehub.com", "password": "devpass123" }\n');
+        console.log('   Body: { "identifier": "dev@pledgedhub.com", "password": "devpass123" }\n');
         
     } catch (error) {
         console.error('❌ Error creating development user:', error.message);

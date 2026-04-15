@@ -18,7 +18,7 @@ export default class GlobalErrorBoundary extends React.Component {
 
   handleReport = () => {
     const errorDetails = `Error: ${this.state.error?.toString()}`;
-    const mailto = `mailto:support@pledgehub.com?subject=App%20Error%20Report&body=${encodeURIComponent(errorDetails)}`;
+    const mailto = `mailto:support@pledgedhub.com?subject=App%20Error%20Report&body=${encodeURIComponent(errorDetails)}`;
     window.open(mailto, '_blank');
   };
 

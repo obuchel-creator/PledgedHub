@@ -191,7 +191,7 @@ node scripts/test-saas-isolation.js
 ```
 ┌─────────────────────────────────────┐
 │  User Request                       │
-│  acme.pledgehub.com/api/pledges    │
+│  acme.pledgedhub.com/api/pledges    │
 └──────────────┬──────────────────────┘
                │
                ▼

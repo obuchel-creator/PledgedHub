@@ -30,7 +30,7 @@ Creates a test user with known credentials for development:
 node backend/scripts/create-dev-user.js
 ```
 **Credentials created:**
-- **Email**: `dev@pledgehub.com`
+- **Email**: `dev@pledgedhub.com`
 - **Username**: `devuser`
 - **Password**: `devpass123`
 - **Role**: `admin`
@@ -63,7 +63,7 @@ POST http://localhost:5001/api/auth/login
 
 # Request body
 {
-  "identifier": "dev@pledgehub.com",
+  "identifier": "dev@pledgedhub.com",
   "password": "devpass123"
 }
 ```
@@ -91,7 +91,7 @@ This will skip ALL rate limiting checks entirely.
 ## Verification Checklist
 
 ✅ **Security service updated** with development mode detection
-✅ **Dev user created** (dev@pledgehub.com / devpass123)
+✅ **Dev user created** (dev@pledgedhub.com / devpass123)
 ✅ **Backend restarted** with lenient security settings
 ✅ **Development mode confirmed** (console shows warning)
 ✅ **Helper scripts created** for IP management
@@ -99,7 +99,7 @@ This will skip ALL rate limiting checks entirely.
 ## Next Steps
 
 1. **Try logging in** with the dev user credentials:
-   - Email: `dev@pledgehub.com`
+   - Email: `dev@pledgedhub.com`
    - Password: `devpass123`
 
 2. **If you still have issues**, run the clear security blocks script:
@@ -145,4 +145,4 @@ In production, all strict security measures will be enforced automatically.
 
 **Status**: ✅ ALL FIXES APPLIED AND VERIFIED
 **Server Status**: ✅ Running with development security mode
-**Ready to Login**: ✅ YES - Use dev@pledgehub.com / devpass123
+**Ready to Login**: ✅ YES - Use dev@pledgedhub.com / devpass123

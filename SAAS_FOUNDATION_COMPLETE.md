@@ -136,7 +136,7 @@ app.use('/api/pledges',
    - View invoice history
 
 ### Phase 5: Super Admin Portal (Low Priority)
-Dashboard at `admin.pledgehub.com` for platform management:
+Dashboard at `admin.pledgedhub.com` for platform management:
 - View all tenants
 - Platform-wide analytics (MRR, churn, LTV)
 - Suspend/reactivate tenants
@@ -217,7 +217,7 @@ Invoke-RestMethod -Uri "http://localhost:5001/api/saas/signup" -Method POST -Bod
     "email": "admin@acme.com",
     "role": "admin"
   },
-  "redirectUrl": "https://acme.pledgehub.com/dashboard"
+  "redirectUrl": "https://acme.pledgedhub.com/dashboard"
 }
 ```
 

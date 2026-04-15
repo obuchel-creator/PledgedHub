@@ -379,8 +379,8 @@ _"We used Layout #2 (Timeline Storytelling) for our post-event recap. People lov
 Created by the **PledgeHub Management System**
 
 For questions, support, or feedback:
-- 📧 Email: support@pledgehub.com
-- 🌐 Website: www.pledgehub.com
+- 📧 Email: support@pledgedhub.com
+- 🌐 Website: www.pledgedhub.com
 - 📱 WhatsApp: [Your Support Number]
 
 ---

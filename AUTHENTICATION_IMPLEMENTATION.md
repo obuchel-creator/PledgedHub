@@ -15,7 +15,7 @@ This document summarizes the role-based authentication system that has been impl
 1. ✅ Added `role` column to `users` table: `ENUM('admin', 'staff', 'donor')` with default `'donor'`
 2. ✅ Added `email`, `password_hash`, and `name` columns (if missing)
 3. ✅ Created default admin user with credentials:
-   - **Email**: `admin@pledgehub.com`
+   - **Email**: `admin@pledgedhub.com`
    - **Password**: `Admin@2024`
    - ⚠️ **IMPORTANT**: Change password immediately after first login
 4. ✅ Added index on `role` column for performance
@@ -170,7 +170,7 @@ app.use('/api/campaigns', authenticateToken, requireAdmin, campaignRoutes);
 - ✅ Configure AI settings
 
 **Default Account**:
-- Email: `admin@pledgehub.com`
+- Email: `admin@pledgedhub.com`
 - Password: `Admin@2024`
 
 ### Staff Role
@@ -206,7 +206,7 @@ app.use('/api/campaigns', authenticateToken, requireAdmin, campaignRoutes);
 ### Step 1: Login as Admin
 1. Navigate to: `http://localhost:5174/login`
 2. Enter credentials:
-   - Email: `admin@pledgehub.com`
+   - Email: `admin@pledgedhub.com`
    - Password: `Admin@2024`
 3. Click "Sign In"
 4. ✅ Should redirect to home page with authenticated session

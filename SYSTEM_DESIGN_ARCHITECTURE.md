@@ -713,7 +713,7 @@ Environment: development
 
 ### Staging Environment (Optional)
 ```
-staging.pledgehub.com
+staging.pledgedhub.com
   ├── React Frontend (Vite build)
   ├── Express Backend
   └── MySQL Database
@@ -721,7 +721,7 @@ staging.pledgehub.com
 
 ### Production Environment
 ```
-pledgehub.com
+pledgedhub.com
   ├── Frontend: AWS S3 + CloudFront
   ├── Backend: AWS EC2 or App Runner
   ├── Database: AWS RDS (MySQL)

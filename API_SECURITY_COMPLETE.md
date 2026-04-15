@@ -206,7 +206,7 @@ cron.schedule('0 9,17 * * *', async () => {
 ```javascript
 // 1. User logs in
 POST /api/auth/login
-Body: { email: "admin@pledgehub.com", password: "Admin@2024" }
+Body: { email: "admin@pledgedhub.com", password: "Admin@2024" }
 Response: { token: "eyJhbGc...", user: {...} }
 
 // 2. Store token in localStorage (frontend)
@@ -390,7 +390,7 @@ curl -X POST http://localhost:5001/api/campaigns \
 # Login as admin
 TOKEN=$(curl -X POST http://localhost:5001/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email":"admin@pledgehub.com","password":"Admin@2024"}' \
+  -d '{"email":"admin@pledgedhub.com","password":"Admin@2024"}' \
   | jq -r '.token')
 
 # Create campaign (should succeed)

@@ -397,7 +397,7 @@ Your application will:
 ## 🆘 Support
 
 For questions:
-- Email: support@pledgehub.com
+- Email: support@pledgedhub.com
 - Docs: /docs/monetization
 - API: /api/monetization/status
 

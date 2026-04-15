@@ -35,14 +35,14 @@ async function setupTestUsers() {
       {
         name: 'Admin User',
         username: 'admin',
-        email: 'admin@pledgehub.com',
+        email: 'admin@pledgedhub.com',
         password: 'admin123',
         role: 'admin'
       },
       {
         name: 'Staff User',
         username: 'staff',
-        email: 'staff@pledgehub.com',
+        email: 'staff@pledgedhub.com',
         password: 'staff123',
         role: 'staff'
       }

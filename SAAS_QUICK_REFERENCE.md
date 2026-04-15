@@ -275,7 +275,7 @@ export function getTenantFromUrl() {
   const parts = hostname.split('.');
   
   if (parts.length >= 2 && parts[0] !== 'www') {
-    return parts[0];  // e.g., "acme" from "acme.pledgehub.com"
+    return parts[0];  // e.g., "acme" from "acme.pledgedhub.com"
   }
   
   return null;
@@ -315,7 +315,7 @@ function SignupScreen() {
       {available === false && <span>❌ Not available</span>}
       {available === true && <span>✅ Available</span>}
       
-      <span>.pledgehub.com</span>
+      <span>.pledgedhub.com</span>
     </form>
   );
 }

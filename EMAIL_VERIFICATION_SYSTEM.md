@@ -79,7 +79,7 @@ Professional card-based UI with:
 6. Frontend shows: "✅ Pledge submitted! Check your email to verify your pledge."
 
 ### Verifying Email
-1. User receives email from noreply@pledgehub.com
+1. User receives email from noreply@pledgedhub.com
 2. Email has yellow button "Verify My Pledge"
 3. User clicks button → redirected to `/verify-pledge?token={token}`
 4. VerifyPledgeScreen handles verification

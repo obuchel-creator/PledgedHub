@@ -200,7 +200,7 @@ async function migrateExistingData() {
         'default',
         'professional', // Give existing users professional plan
         'active',
-        'admin@pledgehub.com'
+        'admin@pledgedhub.com'
       ]
     );
     
@@ -254,7 +254,7 @@ async function migrateExistingData() {
     console.log('✅ Assigned all usage stats to default tenant');
     
     console.log('\n🎉 Data migration completed successfully!');
-    console.log(`\nDefault tenant subdomain: default.pledgehub.com`);
+    console.log(`\nDefault tenant subdomain: default.pledgedhub.com`);
     console.log('Existing users can access via: http://default.localhost:5001\n');
     
   } catch (error) {

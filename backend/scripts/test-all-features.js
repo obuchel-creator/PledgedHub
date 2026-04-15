@@ -98,18 +98,18 @@ async function runTests() {
         throw new Error('Cannot authenticate test user, aborting tests.');
     }
 
-    // --- Ensure test user has staff role ---
-    log('yellow', 'Ensuring test user has staff role...');
+    // --- Ensure test user has elevated role ---
+    log('yellow', 'Ensuring test user has super_admin role...');
     try {
         const connection = await mysql.createConnection(dbConfig);
         await connection.execute(
-            "UPDATE users SET role = 'admin' WHERE email = ? OR username = ?",
+            "UPDATE users SET role = 'super_admin' WHERE email = ? OR username = ?",
             [TEST_USER.email, TEST_USER.username]
         );
         await connection.end();
-        log('green', 'Test user promoted to admin.');
+        log('green', 'Test user promoted to super_admin.');
     } catch (err) {
-        log('red', 'Failed to promote test user to admin: ' + err.message);
+        log('red', 'Failed to promote test user to super_admin: ' + err.message);
         throw err;
     }
 

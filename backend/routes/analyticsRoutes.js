@@ -6,74 +6,6 @@ const { requireStaff } = require('../middleware/authMiddleware');
 const { authenticateToken } = require('../middleware/authMiddleware');
 const db = require('../config/db');
 
-// PUBLIC ENDPOINT - Platform-wide aggregate statistics (no auth required)
-// GET /api/analytics/platform-stats
-router.get('/platform-stats', async (req, res) => {
-    try {
-        const { pool } = require('../config/db');
-        
-        // Get aggregate statistics across ALL tenants/organizations
-        const [pledgeStats] = await pool.execute(`
-            SELECT 
-                COUNT(DISTINCT id) as totalPledges,
-                COUNT(DISTINCT donor_name) as totalDonors,
-                SUM(amount) as totalAmount,
-                SUM(CASE WHEN status = 'paid' OR payment_status = 'completed' THEN amount ELSE 0 END) as totalCollected,
-                COUNT(CASE WHEN status = 'pending' OR status = 'unpaid' THEN 1 END) as pendingPledges
-            FROM pledges
-            WHERE deleted = 0
-        `);
-
-        const [campaignStats] = await pool.execute(`
-            SELECT COUNT(DISTINCT id) as totalCampaigns
-            FROM campaigns
-            WHERE deleted = 0
-        `);
-
-        const [tenantStats] = await pool.execute(`
-            SELECT COUNT(DISTINCT id) as totalOrganizations
-            FROM tenants
-        `);
-
-        const stats = pledgeStats[0];
-        const totalAmount = parseFloat(stats.totalAmount) || 0;
-        const totalCollected = parseFloat(stats.totalCollected) || 0;
-        const collectionRate = totalAmount > 0 
-            ? Math.round((totalCollected / totalAmount) * 100) 
-            : 0;
-
-        res.json({
-            success: true,
-            data: {
-                totalPledges: parseInt(stats.totalPledges) || 0,
-                totalDonors: parseInt(stats.totalDonors) || 0,
-                totalAmount: totalAmount,
-                totalCollected: totalCollected,
-                pendingPledges: parseInt(stats.pendingPledges) || 0,
-                totalCampaigns: parseInt(campaignStats[0].totalCampaigns) || 0,
-                totalOrganizations: parseInt(tenantStats[0].totalOrganizations) || 0,
-                collectionRate: collectionRate
-            }
-        });
-    } catch (err) {
-        console.error('Platform stats error:', err);
-        res.status(500).json({ 
-            success: false, 
-            error: 'Failed to fetch platform statistics',
-            data: {
-                totalPledges: 0,
-                totalDonors: 0,
-                totalAmount: 0,
-                totalCollected: 0,
-                pendingPledges: 0,
-                totalCampaigns: 0,
-                totalOrganizations: 0,
-                collectionRate: 0
-            }
-        });
-    }
-});
-
 // DRILL-DOWN ANALYTICS ENDPOINTS
 // GET /api/analytics/drilldown/by-purpose
 router.get('/drilldown/by-purpose', requireStaff, async (req, res) => {
@@ -126,8 +58,9 @@ router.get('/drilldown/by-status', requireStaff, async (req, res) => {
 router.get('/top-donors', requireStaff, async (req, res) => {
     try {
         const { start, end } = req.query;
-        const data = await analyticsService.getTopDonors(10, start, end);
-        res.json({ success: true, data });
+        const limit = parseInt(req.query.limit) || 10;
+        const data = await analyticsService.getTopDonors(limit, start, end);
+        res.json({ success: true, limit, data });
     } catch (err) {
         res.status(500).json({ success: false, error: err.message });
     }
@@ -149,7 +82,15 @@ router.get('/at-risk', requireStaff, async (req, res) => {
     try {
         const { start, end } = req.query;
         const data = await analyticsService.getAtRiskPledgesDetailed(start, end);
-        res.json({ success: true, data });
+
+        const total = Array.isArray(data) ? data.length : 0;
+        const byRiskLevel = (Array.isArray(data) ? data : []).reduce((acc, pledge) => {
+            const key = pledge?.riskLevel || 'UNKNOWN';
+            acc[key] = (acc[key] || 0) + 1;
+            return acc;
+        }, {});
+
+        res.json({ success: true, total, byRiskLevel, data });
     } catch (err) {
         res.status(500).json({ success: false, error: err.message });
     }
@@ -240,65 +181,6 @@ router.get('/overview', simpleAuth, async (req, res) => {
 });
 
 /**
- * GET /api/analytics/trends
- * Get pledge trends over time
- * Query params: period ('week'|'month'|'year')
- */
-router.get('/trends', simpleAuth, async (req, res) => {
-    try {
-        const { period = 'month' } = req.query;
-        
-        if (!['week', 'month', 'year'].includes(period)) {
-            return res.status(400).json({
-                success: false,
-                error: 'Invalid period. Use: week, month, or year'
-            });
-        }
-        
-        const trends = await analyticsService.getPledgeTrends(period);
-        
-        res.json({
-            success: true,
-            period,
-            data: trends
-        });
-    } catch (error) {
-        console.error('Trends failed:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Failed to get trends',
-            details: error.message
-        });
-    }
-});
-
-/**
- * GET /api/analytics/top-donors
- * Get top donors by contribution
- * Query params: limit (number, default 10)
- */
-router.get('/top-donors', simpleAuth, async (req, res) => {
-    try {
-        const limit = parseInt(req.query.limit) || 10;
-        
-        const donors = await analyticsService.getTopDonors(limit);
-        
-        res.json({
-            success: true,
-            limit,
-            data: donors
-        });
-    } catch (error) {
-        console.error('Top donors failed:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Failed to get top donors',
-            details: error.message
-        });
-    }
-});
-
-/**
  * GET /api/analytics/by-status
  * Get pledges grouped by status
  */
@@ -360,41 +242,6 @@ router.get('/upcoming', simpleAuth, async (req, res) => {
         res.status(500).json({
             success: false,
             error: 'Failed to get upcoming collections',
-            details: error.message
-        });
-    }
-});
-
-/**
- * GET /api/analytics/at-risk
- * Get at-risk pledges (overdue or approaching deadline)
- */
-router.get('/at-risk', simpleAuth, async (req, res) => {
-    try {
-        const pledges = await analyticsService.getAtRiskPledges();
-        
-        // Group by risk level
-        const byRisk = {
-            high: pledges.filter(p => p.riskLevel === 'high'),
-            medium: pledges.filter(p => p.riskLevel === 'medium'),
-            low: pledges.filter(p => p.riskLevel === 'low')
-        };
-        
-        res.json({
-            success: true,
-            total: pledges.length,
-            byRiskLevel: {
-                high: byRisk.high.length,
-                medium: byRisk.medium.length,
-                low: byRisk.low.length
-            },
-            data: pledges
-        });
-    } catch (error) {
-        console.error('At-risk pledges failed:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Failed to get at-risk pledges',
             details: error.message
         });
     }

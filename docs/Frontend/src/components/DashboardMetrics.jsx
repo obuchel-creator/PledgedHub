@@ -10,10 +10,17 @@ function DashboardMetrics({ pledges, payments }) {
   // Calculate metrics
   const totalPledges = pledges.length;
   const totalAmount = pledges.reduce((sum, p) => sum + (parseFloat(p.amount) || 0), 0);
-  const paidAmount = payments.reduce((sum, p) => p.status === 'completed' ? sum + (parseFloat(p.amount) || 0) : sum, 0);
+  const paidAmount = payments.reduce((sum, p) => {
+    const status = String(p?.status ?? p?.payment_status ?? '').toLowerCase();
+    const isCollected = status === 'completed' || status === 'success' || status === 'paid';
+    return isCollected ? sum + (parseFloat(p.amount) || 0) : sum;
+  }, 0);
   const collectionRate = totalAmount > 0 ? Math.round((paidAmount / totalAmount) * 100) : 0;
-  const overduePledges = pledges.filter(p => p.status === 'overdue').length;
-  const pendingPledges = pledges.filter(p => p.status === 'pending' || p.status === 'active').length;
+  const overduePledges = pledges.filter(p => String(p?.status || '').toLowerCase() === 'overdue').length;
+  const pendingPledges = pledges.filter(p => {
+    const status = String(p?.status || '').toLowerCase();
+    return status === 'pending' || status === 'active' || status === 'unpaid';
+  }).length;
 
   return (
     <div className="dashboard-metrics">

@@ -3,7 +3,7 @@
 Complete API reference for all AI and automation features.
 
 **Base URL**: `http://localhost:5001`  
-**Authentication**: Simple token-based (temporary) - See [Authentication](#authentication)
+**Authentication**: JWT Bearer token - See [Authentication](#authentication)
 
 ---
 
@@ -21,18 +21,31 @@ Complete API reference for all AI and automation features.
 
 ## Authentication
 
-Currently using `simpleAuth` middleware (temporary, open access for development).
+Most endpoints require a valid JWT access token.
+
+**How to get a token**:
+- Register/login via `POST /api/auth/register` and `POST /api/auth/login`.
+- Use the returned `token` as a Bearer token.
+
+**RBAC note**: Many routes are role-protected (e.g. staff/admin). Common roles include: `donor`, `creator`, `support_staff`, `finance_admin`, `super_admin`.
+
+**Public endpoints** (no auth):
+- Auth bootstrap routes under `/api/auth/*`
+- Guest fundraising routes under `/api/public/*`
+- `GET /api/analytics/platform-stats`
 
 **Headers Required**:
 ```http
 Authorization: Bearer <token>
 ```
 
-For production, replace with proper JWT validation.
+Unless an endpoint is explicitly documented as public, assume authentication is required.
 
 ---
 
 ## AI Integration API
+
+All `/api/ai/*` endpoints require authentication + staff access.
 
 ### GET /api/ai/status
 Check if AI service is available.
@@ -40,17 +53,12 @@ Check if AI service is available.
 **Response**:
 ```json
 {
+  "success": true,
   "available": true,
-  "provider": "gemini",
+  "provider": "Google Gemini",
   "model": "gemini-pro",
   "tier": "FREE",
-  "dailyLimit": 1500,
-  "features": [
-    "Enhanced message generation",
-    "Pledge data analysis",
-    "Smart suggestions",
-    "Thank you messages"
-  ]
+  "message": "AI features are active and ready"
 }
 ```
 
@@ -62,14 +70,11 @@ Generate an AI-enhanced message.
 **Request Body**:
 ```json
 {
-  "pledgeData": {
-    "donorName": "John Doe",
-    "amount": 500000,
-    "purpose": "School fees support",
-    "collectionDate": "2025-11-15"
-  },
-  "messageType": "reminder",
-  "tone": "friendly"
+  "pledgeId": 1,
+  "type": "3_days",
+  "tone": "friendly",
+  "language": "English",
+  "maxLength": 160
 }
 ```
 
@@ -77,9 +82,14 @@ Generate an AI-enhanced message.
 ```json
 {
   "success": true,
-  "message": "Hi John! 😊 Hope you're doing well...",
-  "source": "ai",
-  "enhanced": true
+  "message": "Hi John! 🙏 Your pledge of UGX 500,000 for School fees support is due in 3 days (15/11/2025). We really appreciate your support!",
+  "aiGenerated": true,
+  "pledge": {
+    "id": 1,
+    "donor_name": "John Doe",
+    "amount": 500000,
+    "purpose": "School fees support"
+  }
 }
 ```
 
@@ -91,10 +101,9 @@ Generate personalized thank you message.
 **Request Body**:
 ```json
 {
-  "donorName": "Grace Namukasa",
-  "amount": 1500000,
-  "purpose": "Community center construction",
-  "tone": "warm"
+  "pledgeId": 5,
+  "tone": "warm",
+  "includeImpact": true
 }
 ```
 
@@ -102,8 +111,13 @@ Generate personalized thank you message.
 ```json
 {
   "success": true,
-  "message": "Dear Grace, we are deeply grateful for your generous contribution...",
-  "source": "ai"
+  "message": "Dear Grace, thank you so much for your generous payment of UGX 1,500,000! Your support makes a real difference. 🙏💙",
+  "aiGenerated": true,
+  "pledge": {
+    "id": 5,
+    "donor_name": "Grace Namukasa",
+    "amount": 1500000
+  }
 }
 ```
 
@@ -116,17 +130,23 @@ Analyze pledge data and generate insights.
 ```json
 {
   "success": true,
-  "insights": {
-    "summary": "13 total pledges with 23% collection rate",
-    "patterns": [
-      "Most pledges are for community development projects",
-      "Higher completion rate for pledges under UGX 1M"
-    ],
-    "recommendations": [
-      "Send reminders 3-5 days before due date",
-      "Focus on pledges over UGX 500K"
-    ]
-  }
+  "available": true,
+  "insights": [
+    {
+      "type": "info",
+      "title": "Collection Rate",
+      "message": "Your collection rate is 23%. Consider prioritizing overdue follow-ups."
+    }
+  ],
+  "summary": {
+    "total": 13,
+    "totalAmount": 18600300,
+    "paid": 3,
+    "pending": 7,
+    "overdue": 0,
+    "collectionRate": 23
+  },
+  "timestamp": "2025-11-05T08:09:35.417Z"
 }
 ```
 
@@ -139,18 +159,72 @@ Get actionable improvement suggestions.
 ```json
 {
   "success": true,
+  "stats": {
+    "total": 13,
+    "paid": 3,
+    "pending": 7,
+    "overdue": 0,
+    "totalAmount": 18600300,
+    "pendingAmount": 15700300,
+    "collectionRate": 23
+  },
   "suggestions": [
     {
-      "category": "collection_timing",
-      "suggestion": "Send reminders during business hours",
+      "title": "Send Timely Reminders",
+      "description": "Use automated reminders 7 days and 3 days before due date",
       "priority": "high"
     },
     {
-      "category": "donor_engagement",
-      "suggestion": "Thank donors within 24 hours of payment",
+      "title": "Follow Up on Overdue",
+      "description": "Contact overdue donors within 3 days",
       "priority": "medium"
     }
-  ]
+  ],
+  "aiGenerated": true,
+  "timestamp": "2025-11-05T08:09:35.417Z"
+}
+```
+
+---
+
+### POST /api/ai/chat
+Ask general questions (includes a built-in fallback when AI is unavailable).
+
+**Request Body**:
+```json
+{
+  "message": "How do I send reminders?",
+  "context": "Dashboard"
+}
+```
+
+**Response**:
+```json
+{
+  "success": true,
+  "message": "You can send reminders from the dashboard by clicking on individual pledges...",
+  "aiGenerated": false,
+  "fallback": true
+}
+```
+
+---
+
+### POST /api/ai/finance-query
+Ask finance/accounting questions.
+
+**Request Body**:
+```json
+{
+  "question": "What is our pending amount this month?"
+}
+```
+
+**Response**:
+```json
+{
+  "success": true,
+  "response": "Here is a summary of pending amounts for the month..."
 }
 ```
 
@@ -170,15 +244,19 @@ Test AI functionality with sample data.
 ```json
 {
   "success": true,
-  "aiAvailable": true,
-  "testMessage": "AI test successful",
-  "sampleOutput": "Hi Test User, this is a sample AI-generated message..."
+  "message": "AI is working! 🎉",
+  "sampleMessage": "Hi John Doe, friendly reminder: your pledge of UGX 100,000 for Church Building Fund is due in 7 days...",
+  "provider": "Google Gemini",
+  "model": "gemini-pro",
+  "tier": "FREE (1,500 requests/day)"
 }
 ```
 
 ---
 
 ## Message Generation API
+
+All `/api/messages/*` endpoints require authentication + staff access.
 
 ### GET /api/messages/templates
 View all available message templates.
@@ -193,16 +271,21 @@ View all available message templates.
       "tones": ["friendly", "professional", "urgent"]
     },
     "thankYou": {
-      "tones": ["warm", "formal", "enthusiastic"]
+      "tones": ["warm", "professional", "casual"]
     },
     "followUp": {
-      "approaches": ["gentle", "firm"]
+      "approaches": ["gentle", "standard", "firm"]
     },
     "confirmation": {
-      "styles": ["brief", "detailed"]
+      "styles": ["standard", "detailed"]
     }
   },
-  "totalTemplates": 12
+  "features": {
+    "aiGeneration": true,
+    "multiLanguage": ["English", "Luganda"],
+    "customization": true,
+    "bulkGeneration": true
+  }
 }
 ```
 
@@ -215,8 +298,10 @@ Generate a reminder message.
 ```json
 {
   "pledgeId": 1,
+  "type": "3_days",
   "tone": "friendly",
-  "reminderType": "3_days"
+  "useAI": true,
+  "language": "English"
 }
 ```
 
@@ -225,15 +310,17 @@ Generate a reminder message.
 {
   "success": true,
   "message": {
-    "subject": "Friendly Reminder: Your Pledge",
-    "text": "Hi John! Just a gentle reminder...",
-    "html": "<html><body style='font-family: Arial'>...</body></html>",
-    "source": "template"
+    "text": "Hi John! 🙏 Your pledge of UGX 500,000 for School fees support is due in 3 days (15 November 2025). We really appreciate your support!",
+    "html": "<div style=\"font-family: Arial, sans-serif; padding: 20px;\">...",
+    "source": "ai",
+    "tone": "friendly",
+    "type": "3_days"
   },
   "pledge": {
     "id": 1,
-    "donorName": "John Doe",
-    "amount": 500000
+    "donor_name": "John Doe",
+    "amount": 500000,
+    "collection_date": "2025-11-15"
   }
 }
 ```
@@ -256,10 +343,15 @@ Generate thank you message.
 {
   "success": true,
   "message": {
-    "subject": "Thank You for Your Generous Support",
-    "text": "Dear Grace, your contribution makes a real difference...",
-    "html": "<html>...</html>",
-    "source": "template"
+    "text": "Dear Grace, thank you so much for your generous payment of UGX 1,500,000 for Community center construction! 🙏💙",
+    "html": "<div style=\"font-family: Arial, sans-serif; padding: 20px;\">...",
+    "source": "template",
+    "tone": "warm"
+  },
+  "pledge": {
+    "id": 5,
+    "donor_name": "Grace Namukasa",
+    "amount": 1500000
   }
 }
 ```
@@ -273,7 +365,8 @@ Generate follow-up message.
 ```json
 {
   "pledgeId": 3,
-  "approach": "gentle"
+  "approach": "gentle",
+  "useAI": false
 }
 ```
 
@@ -282,10 +375,17 @@ Generate follow-up message.
 {
   "success": true,
   "message": {
-    "subject": "Following Up on Your Pledge",
-    "text": "Hi Robert, we wanted to check in...",
-    "html": "<html>...</html>",
-    "source": "template"
+    "text": "Hi Robert, we wanted to check in about your pledge of UGX 250,000 for your pledge. Is everything okay?",
+    "html": "<div style=\"font-family: Arial, sans-serif; padding: 20px;\">...",
+    "source": "template",
+    "approach": "gentle",
+    "daysOverdue": 2
+  },
+  "pledge": {
+    "id": 3,
+    "donor_name": "Robert",
+    "amount": 250000,
+    "collection_date": "2025-11-01"
   }
 }
 ```
@@ -308,10 +408,16 @@ Generate confirmation message.
 {
   "success": true,
   "message": {
-    "subject": "Pledge Confirmation",
-    "text": "Dear Tom, this confirms your pledge of UGX 600,000...",
-    "html": "<html>...</html>",
-    "source": "template"
+    "text": "Dear Tom, This confirms your pledge:\n\n💰 Amount: UGX 600,000\n📋 Purpose: School fees\n📅 Due Date: 15 November 2025\n\nThank you for your generous support!",
+    "html": "<div style=\"font-family: Arial, sans-serif; padding: 20px;\">...",
+    "source": "template",
+    "style": "detailed"
+  },
+  "pledge": {
+    "id": 2,
+    "donor_name": "Tom",
+    "amount": 600000,
+    "collection_date": "2025-11-15"
   }
 }
 ```
@@ -328,7 +434,9 @@ Generate messages for multiple pledges.
   "messageType": "reminder",
   "options": {
     "tone": "professional",
-    "reminderType": "due_today"
+    "reminderType": "due_today",
+    "useAI": true,
+    "language": "English"
   }
 }
 ```
@@ -337,16 +445,19 @@ Generate messages for multiple pledges.
 ```json
 {
   "success": true,
-  "generated": 4,
-  "failed": 0,
-  "messages": [
+  "total": 4,
+  "successCount": 4,
+  "failureCount": 0,
+  "results": [
     {
       "pledgeId": 1,
-      "donorName": "John Doe",
+      "success": true,
       "message": {
-        "subject": "Pledge Reminder",
-        "text": "...",
-        "html": "..."
+        "text": "Dear John Doe, This is to notify you that your pledge...",
+        "html": "<div style=\"font-family: Arial, sans-serif; padding: 20px;\">...",
+        "source": "template",
+        "tone": "professional",
+        "type": "due_today"
       }
     }
   ]
@@ -356,6 +467,30 @@ Generate messages for multiple pledges.
 ---
 
 ## Analytics Dashboard API
+
+All `/api/analytics/*` endpoints require authentication + staff access, except `GET /api/analytics/platform-stats` which is public.
+
+### GET /api/analytics/platform-stats
+Public platform-wide aggregate statistics.
+
+**Response**:
+```json
+{
+  "success": true,
+  "data": {
+    "totalPledges": 0,
+    "totalDonors": 0,
+    "totalAmount": 0,
+    "totalCollected": 0,
+    "pendingPledges": 0,
+    "totalCampaigns": 0,
+    "totalOrganizations": 0,
+    "collectionRate": 0
+  }
+}
+```
+
+---
 
 ### GET /api/analytics/overview
 Get overall statistics.
@@ -367,16 +502,45 @@ Get overall statistics.
   "data": {
     "totalPledges": 13,
     "uniqueDonors": 11,
+    "counts": {
+      "paid": 3,
+      "pending": 7,
+      "cancelled": 0,
+      "overdue": 0
+    },
+    "amounts": {
+      "total": 18600300,
+      "paid": 2900000,
+      "pending": 15700300,
+      "overdue": 0
+    },
+    "collectionRate": 23
+  }
+}
+```
+
+---
+
+### GET /api/analytics/summary
+Summary KPIs for a date range.
+
+**Query Parameters**:
+- `start`: `YYYY-MM-DD` (optional)
+- `end`: `YYYY-MM-DD` (optional)
+
+**Example**: `GET /api/analytics/summary?start=2025-10-01&end=2025-10-31`
+
+**Response**:
+```json
+{
+  "success": true,
+  "data": {
+    "totalPledges": 13,
     "totalAmount": 18600300,
-    "paidAmount": 2900000,
-    "pendingAmount": 15700300,
-    "collectionRate": 23,
-    "averagePledge": 1430792,
-    "statusCounts": {
-      "active": 7,
-      "completed": 3,
-      "pending": 3
-    }
+    "paid": 3,
+    "pending": 7,
+    "overdue": 0,
+    "collectionRate": 23
   }
 }
 ```
@@ -387,23 +551,44 @@ Get overall statistics.
 Get time-based trends.
 
 **Query Parameters**:
-- `period`: `week`, `month`, or `year` (default: `month`)
+- `start`: `YYYY-MM-DD` (optional)
+- `end`: `YYYY-MM-DD` (optional)
 
-**Example**: `GET /api/analytics/trends?period=month`
+**Example**: `GET /api/analytics/trends?start=2025-10-01&end=2025-10-31`
 
 **Response**:
 ```json
 {
   "success": true,
-  "period": "month",
   "data": [
     {
-      "period": "2025-10",
-      "pledgeCount": 13,
-      "totalAmount": 18600300,
-      "paidAmount": 2900000,
-      "collectionRate": 23,
-      "label": "Oct 2025"
+      "month": "2025-10",
+      "pledges": 13,
+      "amount": 18600300
+    }
+  ]
+}
+```
+
+---
+
+### GET /api/analytics/campaigns
+Campaign performance for a date range.
+
+**Query Parameters**:
+- `start`: `YYYY-MM-DD` (optional)
+- `end`: `YYYY-MM-DD` (optional)
+
+**Response**:
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "campaign": "Back to School",
+      "pledges": 10,
+      "amount": 7500000,
+      "paid": 6
     }
   ]
 }
@@ -416,8 +601,10 @@ Get top donors leaderboard.
 
 **Query Parameters**:
 - `limit`: Number of donors to return (default: `10`)
+- `start`: `YYYY-MM-DD` (optional)
+- `end`: `YYYY-MM-DD` (optional)
 
-**Example**: `GET /api/analytics/top-donors?limit=5`
+**Example**: `GET /api/analytics/top-donors?limit=5&start=2025-10-01&end=2025-10-31`
 
 **Response**:
 ```json
@@ -461,15 +648,15 @@ Get pledge distribution by status.
   "data": {
     "active": {
       "count": 7,
-      "amount": 15700000
+      "totalAmount": 15700000
     },
     "completed": {
       "count": 3,
-      "amount": 2900000
+      "totalAmount": 2900000
     },
     "pending": {
       "count": 3,
-      "amount": 300
+      "totalAmount": 300
     }
   }
 }
@@ -512,22 +699,18 @@ Get upcoming collections (next 30 days).
 ```json
 {
   "success": true,
-  "daysAhead": 30,
-  "data": {
-    "count": 7,
-    "totalExpected": 15700000,
-    "collections": [
-      {
-        "id": 4,
-        "donorName": "Sarah Nakato",
-        "amount": 2500000,
-        "purpose": "Medical equipment",
-        "collectionDate": "2025-11-10",
-        "daysUntilDue": 5,
-        "status": "active"
-      }
-    ]
-  }
+  "count": 1,
+  "data": [
+    {
+      "id": 4,
+      "donorName": "Sarah Nakato",
+      "amount": 2500000,
+      "purpose": "Medical equipment",
+      "collectionDate": "2025-11-10",
+      "status": "active",
+      "daysUntilDue": 0
+    }
+  ]
 }
 ```
 
@@ -540,22 +723,15 @@ Get pledges at risk (overdue or approaching with no contact).
 ```json
 {
   "success": true,
-  "data": {
-    "count": 0,
-    "riskLevels": {
-      "high": 0,
-      "medium": 0,
-      "low": 0
-    },
-    "pledges": []
-  }
+  "total": 0,
+  "byRiskLevel": {
+    "CRITICAL": 0,
+    "HIGH": 0,
+    "MEDIUM": 0
+  },
+  "data": []
 }
 ```
-
-**Risk Levels**:
-- **High**: Overdue by 7+ days
-- **Medium**: Overdue by 1-6 days
-- **Low**: Due within 7 days, no recent contact
 
 ---
 
@@ -566,12 +742,20 @@ Get AI-powered insights (if AI available).
 ```json
 {
   "success": true,
-  "insights": {
-    "available": true,
-    "analysis": "Based on 13 pledges with 23% collection rate...",
-    "patterns": [...],
-    "recommendations": [...]
-  }
+  "available": true,
+  "data": {
+    "stats": { "totalPledges": 13 },
+    "recentTrend": [],
+    "atRiskCount": 0,
+    "atRiskAmount": 0
+  },
+  "recommendations": [
+    {
+      "type": "info",
+      "title": "At-Risk Pledges",
+      "message": "0 pledges need immediate attention"
+    }
+  ]
 }
 ```
 
@@ -584,23 +768,22 @@ Get complete dashboard data (all-in-one).
 ```json
 {
   "success": true,
-  "generatedAt": "2025-11-05T08:09:35.417Z",
-  "dashboard": {
-    "overview": { ... },
-    "trends": [ ... ],
-    "topDonors": [ ... ],
-    "statusBreakdown": { ... },
-    "purposeAnalysis": [ ... ],
-    "upcomingCollections": { ... },
-    "atRiskPledges": { ... },
-    "insights": { ... }
-  }
+  "overview": { "totalPledges": 13 },
+  "trends": [],
+  "topDonors": [],
+  "byStatus": {},
+  "byPurpose": [],
+  "upcoming": [],
+  "atRisk": [],
+  "generatedAt": "2025-11-05T08:09:35.417Z"
 }
 ```
 
 ---
 
 ## Automated Reminders API
+
+All `/api/reminders/*` endpoints require authentication + admin access.
 
 ### GET /api/reminders/status
 Check reminder job status.
@@ -609,19 +792,82 @@ Check reminder job status.
 ```json
 {
   "success": true,
-  "cronJobs": {
-    "dailyReminders": {
-      "schedule": "0 9 * * *",
-      "timezone": "Africa/Kampala",
-      "running": true,
-      "nextRun": "2025-11-06T09:00:00Z"
+  "jobs": [
+    {
+      "name": "Daily Reminders",
+      "schedule": "9:00 AM daily",
+      "running": true
     },
-    "eveningReminders": {
-      "schedule": "0 17 * * *",
-      "timezone": "Africa/Kampala",
-      "running": true,
-      "nextRun": "2025-11-05T17:00:00Z"
+    {
+      "name": "Evening Reminders",
+      "schedule": "5:00 PM daily",
+      "running": true
     }
+  ]
+}
+```
+
+---
+
+### GET /api/reminders/test
+Run reminders manually.
+
+**Response**:
+```json
+{
+  "success": true,
+  "message": "Reminders processed successfully",
+  "results": {
+    "timestamp": "2025-11-05T08:09:35.417Z",
+    "reminders": [
+      {
+        "type": "7_days",
+        "processed": 2,
+        "successful": 2,
+        "failed": 0
+      }
+    ]
+  }
+}
+```
+
+---
+
+### GET /api/reminders/closures/preview
+Preview campaign closures (dry-run).
+
+**Response**:
+```json
+{
+  "success": true,
+  "preview": {
+    "processed": 0,
+    "messagesSent": 0,
+    "errors": 0
+  }
+}
+```
+
+---
+
+### POST /api/reminders/closures/run
+Run campaign closures.
+
+**Request Body**:
+```json
+{
+  "dryRun": false
+}
+```
+
+**Response**:
+```json
+{
+  "success": true,
+  "result": {
+    "processed": 1,
+    "messagesSent": 10,
+    "errors": 0
   }
 }
 ```
@@ -636,35 +882,42 @@ Get pledges needing reminders.
 {
   "success": true,
   "reminders": {
-    "7_days": 2,
-    "3_days": 1,
-    "due_today": 1,
-    "overdue": 0,
-    "total": 4
-  },
-  "pledges": [
-    {
-      "id": 4,
-      "donorName": "Sarah Nakato",
-      "amount": 2500000,
-      "collectionDate": "2025-11-12",
-      "reminderType": "7_days",
-      "lastReminderSent": null
+    "sevenDays": {
+      "count": 2,
+      "pledges": [
+        {
+          "id": 4,
+          "donor_name": "Sarah Nakato",
+          "amount": 2500000,
+          "collection_date": "2025-11-12"
+        }
+      ]
+    },
+    "threeDays": {
+      "count": 1,
+      "pledges": []
+    },
+    "dueToday": {
+      "count": 1,
+      "pledges": []
+    },
+    "overdue": {
+      "count": 0,
+      "pledges": []
     }
-  ]
+  }
 }
 ```
 
 ---
 
-### POST /api/reminders/send
+### POST /api/reminders/send/:pledgeId
 Manually trigger reminder for a pledge.
 
 **Request Body**:
 ```json
 {
-  "pledgeId": 4,
-  "reminderType": "3_days"
+  "type": "3_days"
 }
 ```
 
@@ -672,13 +925,15 @@ Manually trigger reminder for a pledge.
 ```json
 {
   "success": true,
-  "sent": true,
-  "pledge": {
-    "id": 4,
-    "donorName": "Sarah Nakato",
-    "email": "sarah@example.com"
-  },
-  "message": "Reminder sent successfully"
+  "message": "Reminder sent",
+  "result": {
+    "pledgeId": 4,
+    "type": "3_days",
+    "sms": { "sent": true },
+    "email": { "sent": false },
+    "gracePeriod": false,
+    "monetizationPhase": "LAUNCH"
+  }
 }
 ```
 
@@ -719,14 +974,9 @@ All API endpoints follow a consistent error response format:
 
 ## Rate Limits
 
-**AI API (Google Gemini)**:
-- **Daily Limit**: 1,500 requests
-- **Tier**: FREE
-- **Recommended**: Cache AI responses, use templates as fallback
+Many routes apply rate limiting middleware. Exact limits can vary by environment/config.
 
-**General API**:
-- No rate limits currently (development)
-- Production: Implement rate limiting (e.g., 100 requests/minute per IP)
+AI usage also depends on the upstream provider quota; use `GET /api/ai/status` to check availability.
 
 ---
 
@@ -736,23 +986,28 @@ All API endpoints follow a consistent error response format:
 
 **Test AI Status**:
 ```bash
-curl -X GET http://localhost:5001/api/ai/status
+curl -X GET http://localhost:5001/api/ai/status \
+  -H "Authorization: Bearer <JWT>"
 ```
 
 **Generate Reminder**:
 ```bash
 curl -X POST http://localhost:5001/api/messages/reminder \
+  -H "Authorization: Bearer <JWT>" \
   -H "Content-Type: application/json" \
   -d '{
     "pledgeId": 1,
+    "type": "3_days",
     "tone": "friendly",
-    "reminderType": "3_days"
+    "useAI": true,
+    "language": "English"
   }'
 ```
 
 **Get Analytics Overview**:
 ```bash
-curl -X GET http://localhost:5001/api/analytics/overview
+curl -X GET http://localhost:5001/api/analytics/overview \
+  -H "Authorization: Bearer <JWT>"
 ```
 
 ### Using Test Scripts
@@ -780,6 +1035,8 @@ Import the following endpoints into Postman:
    - POST {{baseUrl}}/api/ai/thank-you
    - GET {{baseUrl}}/api/ai/insights
    - GET {{baseUrl}}/api/ai/suggestions
+  - POST {{baseUrl}}/api/ai/chat
+  - POST {{baseUrl}}/api/ai/finance-query
    - POST {{baseUrl}}/api/ai/test
 
 2. **Message Generation**
@@ -791,20 +1048,26 @@ Import the following endpoints into Postman:
    - POST {{baseUrl}}/api/messages/bulk
 
 3. **Analytics**
+  - GET {{baseUrl}}/api/analytics/platform-stats
    - GET {{baseUrl}}/api/analytics/overview
-   - GET {{baseUrl}}/api/analytics/trends?period=month
-   - GET {{baseUrl}}/api/analytics/top-donors?limit=10
+  - GET {{baseUrl}}/api/analytics/summary?start=YYYY-MM-DD&end=YYYY-MM-DD
+  - GET {{baseUrl}}/api/analytics/trends?start=YYYY-MM-DD&end=YYYY-MM-DD
+  - GET {{baseUrl}}/api/analytics/campaigns?start=YYYY-MM-DD&end=YYYY-MM-DD
+  - GET {{baseUrl}}/api/analytics/top-donors?limit=10&start=YYYY-MM-DD&end=YYYY-MM-DD
    - GET {{baseUrl}}/api/analytics/by-status
    - GET {{baseUrl}}/api/analytics/by-purpose
    - GET {{baseUrl}}/api/analytics/upcoming
-   - GET {{baseUrl}}/api/analytics/at-risk
+  - GET {{baseUrl}}/api/analytics/at-risk?start=YYYY-MM-DD&end=YYYY-MM-DD
    - GET {{baseUrl}}/api/analytics/insights
    - GET {{baseUrl}}/api/analytics/dashboard
 
 4. **Reminders**
+  - GET {{baseUrl}}/api/reminders/test
    - GET {{baseUrl}}/api/reminders/status
+  - GET {{baseUrl}}/api/reminders/closures/preview
+  - POST {{baseUrl}}/api/reminders/closures/run
    - GET {{baseUrl}}/api/reminders/upcoming
-   - POST {{baseUrl}}/api/reminders/send
+  - POST {{baseUrl}}/api/reminders/send/:pledgeId
 
 **Environment Variable**:
 ```

@@ -34,6 +34,7 @@ const reminderRoutes = require('./routes/reminderRoutes');
 const aiRoutes = require('./routes/aiRoutes');
 const messageRoutes = require('./routes/messageRoutes');
 const analyticsRoutes = require('./routes/analyticsRoutes');
+const publicAnalyticsRoutes = require('./routes/publicAnalyticsRoutes');
 const advancedAnalyticsRoutes = require('./routes/advancedAnalyticsRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const paymentSettingsRoutes = require('./routes/paymentSettingsRoutes');
@@ -190,6 +191,9 @@ app.use('/api/feedback', feedbackRoutes);
 app.use('/api/simple-payment', securityService.rateLimiters.payment, simplePaymentRoutes);
 app.use('/api/public', publicRoutes); // Guest fundraising routes (NO AUTH)
 app.use('/api/deployment', deploymentRoutes); // Monetization phase info (PUBLIC)
+
+// Public analytics (no authentication required)
+app.use('/api/analytics', securityService.rateLimiters.api, publicAnalyticsRoutes);
 
 // Mobile money payment webhook callbacks (PUBLIC - must be BEFORE authenticated /api/payments routes)
 // Webhook endpoints that receive callbacks from MTN and Airtel servers

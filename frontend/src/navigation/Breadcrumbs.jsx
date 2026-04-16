@@ -16,16 +16,25 @@ export default function Breadcrumbs({
 }) {
   if (typeof window === 'undefined') return null;
 
+  const baseHref = import.meta.env.BASE_URL;
   const raw = window.location.pathname || '/';
+
+  // Strip the app base path (GitHub Pages subpath) from the URL before building crumbs.
+  const baseNoTrail = (baseHref || '/').replace(/\/+$/, '') || '/';
+  const withoutBase =
+    baseNoTrail !== '/' && (raw === baseNoTrail || raw.startsWith(baseNoTrail + '/'))
+      ? raw.slice(baseNoTrail.length) || '/'
+      : raw;
+
   // strip trailing slashes and ensure leading slash
-  const path = raw.replace(/\/+$/, '') || '/';
+  const path = withoutBase.replace(/\/+$/, '') || '/';
   const parts = path === '/' ? [] : path.replace(/^\//, '').split('/');
 
   // build cumulative hrefs
   const crumbs = [
-    { label: baseLabel, href: '/' },
+    { label: baseLabel, href: baseHref },
     ...parts.map((p, i) => {
-      const href = '/' + parts.slice(0, i + 1).join('/');
+      const href = baseHref + parts.slice(0, i + 1).join('/');
       return { label: humanize(p), href };
     }),
   ];

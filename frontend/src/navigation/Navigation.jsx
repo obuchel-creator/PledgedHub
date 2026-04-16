@@ -51,7 +51,7 @@ export default function Navigation() {
         }}
       >
         <a
-          href="/"
+          href={import.meta.env.BASE_URL}
           style={{
             fontWeight: 700,
             fontSize: '1rem',
@@ -104,19 +104,19 @@ export default function Navigation() {
         }}
       >
         <li role="none" style={{ margin: isMobile ? '0.25rem 1rem' : 0 }}>
-          <a role="menuitem" href="/dashboard" style={{ textDecoration: 'none', color: '#0366d6' }}>
+          <a role="menuitem" href={`${import.meta.env.BASE_URL}dashboard`} style={{ textDecoration: 'none', color: '#0366d6' }}>
             Dashboard
           </a>
         </li>
 
         <li role="none" style={{ margin: isMobile ? '0.25rem 1rem' : 0 }}>
-          <a role="menuitem" href="/fundraise" style={{ textDecoration: 'none', color: '#0366d6' }}>
+          <a role="menuitem" href={`${import.meta.env.BASE_URL}fundraise`} style={{ textDecoration: 'none', color: '#0366d6' }}>
             Fundraise
           </a>
         </li>
 
         <li role="none" style={{ margin: isMobile ? '0.25rem 1rem' : 0 }}>
-          <a role="menuitem" href="/about" style={{ textDecoration: 'none', color: '#0366d6' }}>
+          <a role="menuitem" href={`${import.meta.env.BASE_URL}about`} style={{ textDecoration: 'none', color: '#0366d6' }}>
             About
           </a>
         </li>
@@ -124,14 +124,14 @@ export default function Navigation() {
         {!user && (
           <>
             <li role="none" style={{ margin: isMobile ? '0.25rem 1rem' : 0 }}>
-              <a role="menuitem" href="/login" style={{ textDecoration: 'none', color: '#0366d6' }}>
+              <a role="menuitem" href={`${import.meta.env.BASE_URL}login`} style={{ textDecoration: 'none', color: '#0366d6' }}>
                 Login
               </a>
             </li>
             <li role="none" style={{ margin: isMobile ? '0.25rem 1rem' : 0 }}>
               <a
                 role="menuitem"
-                href="/register"
+                href={`${import.meta.env.BASE_URL}register`}
                 style={{ textDecoration: 'none', color: '#0366d6' }}
               >
                 Register

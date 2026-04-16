@@ -56,7 +56,7 @@ export default function QuickbooksNavbar() {
           ❓
         </span>
         <img
-          src="/avatar.png"
+          src={`${import.meta.env.BASE_URL}avatar.png`}
           alt="User"
           style={{ height: '32px', width: '32px', borderRadius: '50%' }}
         />

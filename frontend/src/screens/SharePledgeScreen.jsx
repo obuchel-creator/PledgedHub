@@ -46,7 +46,7 @@ export default function SharePledgeScreen() {
         
         <button 
           className="action-card primary"
-          onClick={() => window.location.href = '/donate'}
+          onClick={() => window.location.href = `${import.meta.env.BASE_URL}donate`}
         >
           <span className="action-icon">💝</span>
           <span className="action-label">Donate / Support</span>
@@ -55,7 +55,7 @@ export default function SharePledgeScreen() {
 
         <button 
           className="action-card secondary"
-          onClick={() => window.location.href = '/explore'}
+          onClick={() => window.location.href = `${import.meta.env.BASE_URL}explore`}
         >
           <span className="action-icon">🔍</span>
           <span className="action-label">Explore Platform</span>
@@ -64,7 +64,7 @@ export default function SharePledgeScreen() {
 
         <button 
           className="action-card secondary"
-          onClick={() => window.location.href = '/register'}
+          onClick={() => window.location.href = `${import.meta.env.BASE_URL}register`}
         >
           <span className="action-icon">✨</span>
           <span className="action-label">Create Account</span>

@@ -1,35 +1,37 @@
 import React from 'react';
 import '../styles/SampleKit.css';
 
+const baseUrl = import.meta.env.BASE_URL;
+
 const templates = [
   {
     name: 'Email Templates',
-    file: '/api/sample-kit/download/email-templates.md',
+    file: `${baseUrl}sample-templates/email-templates.md`,
     emoji: '📧'
   },
   {
     name: 'Social Media Templates',
-    file: '/api/sample-kit/download/social-media-templates.md',
+    file: `${baseUrl}sample-templates/social-media-templates.md`,
     emoji: '📱'
   },
   {
     name: 'Budget Transparency Template',
-    file: '/api/sample-kit/download/budget-transparency.md',
+    file: `${baseUrl}sample-templates/budget-transparency.md`,
     emoji: '💰'
   },
   {
     name: 'Photo Recap Layout Guide',
-    file: '/api/sample-kit/download/photo-recap-layout.md',
+    file: `${baseUrl}sample-templates/photo-recap-layout.md`,
     emoji: '📸'
   },
   {
     name: 'Thank You Letter Templates',
-    file: '/api/sample-kit/download/thank-you-letters.md',
+    file: `${baseUrl}sample-templates/thank-you-letters.md`,
     emoji: '💌'
   },
   {
     name: 'Milestone Announcement Templates',
-    file: '/api/sample-kit/download/milestone-announcements.md',
+    file: `${baseUrl}sample-templates/milestone-announcements.md`,
     emoji: '🎯'
   }
 ];
@@ -59,7 +61,7 @@ export default function SampleKitDownload() {
       </ul>
       {/* Anchor tag for ZIP download */}
       <a
-        href="/sample-templates/pledgehub-sample-kit.zip"
+        href={`${baseUrl}sample-templates/pledgehub-sample-kit.zip`}
         download
         className="download-btn"
         style={{ display: 'block', marginTop: '2rem', fontWeight: 'bold' }}

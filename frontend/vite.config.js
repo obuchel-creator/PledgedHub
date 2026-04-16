@@ -4,7 +4,7 @@ import autoprefixer from 'autoprefixer'
 
 // Minimal Vite config for a React (ESM) app with Edge compatibility
 export default defineConfig({
-    base: '/',
+    base: process.env.VITE_BASE || '/',
     plugins: [react()],
     css: {
         postcss: {

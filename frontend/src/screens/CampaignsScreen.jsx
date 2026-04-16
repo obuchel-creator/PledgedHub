@@ -284,7 +284,7 @@ const CampaignsScreen = () => {
                         raisedAmount: raised,
                       }}
                       contentId={campaign.id}
-                      shareUrl={`${window.location.origin}/campaigns/${campaign.id}`}
+                      shareUrl={new URL(`campaigns/${campaign.id}`, new URL(import.meta.env.BASE_URL, window.location.origin)).toString()}
                       style="button"
                       size="medium"
                       className="btn-primary"

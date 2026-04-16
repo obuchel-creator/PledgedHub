@@ -52,7 +52,7 @@ export default function CookieConsent() {
       <div style={{ fontSize: '1.05rem', color: '#2563eb', fontWeight: 500 }}>
         This website uses cookies to enhance your experience. See our{' '}
         <a
-          href="/privacy"
+          href={`${import.meta.env.BASE_URL}privacy`}
           style={{ color: '#2563eb', textDecoration: 'underline' }}
           target="_blank"
           rel="noopener noreferrer"

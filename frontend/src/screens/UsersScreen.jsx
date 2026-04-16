@@ -269,7 +269,7 @@ export default function UsersScreen() {
         <p style={{ fontSize: '1.1rem', color: '#64748b', marginBottom: '2rem' }}>
           You don't have permission to view this page. User management is restricted to administrators only.
         </p>
-        <a href="/dashboard" style={{
+        <a href={`${import.meta.env.BASE_URL}dashboard`} style={{
           display: 'inline-block',
           padding: '0.75rem 2rem',
           background: '#16a34a',

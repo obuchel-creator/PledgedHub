@@ -180,7 +180,7 @@ export default function OAuthCallbackScreen() {
               {error || 'Something went wrong. Please try again.'}
             </p>
             <a
-              href="/login"
+              href={`${import.meta.env.BASE_URL}login`}
               style={{
                 color: '#1a73e8',
                 textDecoration: 'none',

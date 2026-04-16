@@ -45,7 +45,8 @@ const OAuthButtons = ({ className = '' }) => {
 
       <div className="oauth-fallback">
         <p>
-          <a href="/register">Create an account</a> or <a href="/login">sign in with email</a>
+          <a href={`${import.meta.env.BASE_URL}register`}>Create an account</a> or{' '}
+          <a href={`${import.meta.env.BASE_URL}login`}>sign in with email</a>
         </p>
       </div>
 

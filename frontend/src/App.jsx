@@ -54,7 +54,7 @@ import UsersScreen from './screens/UsersScreen';
 function App() {
   // Removed debug log
   return (
-    <Router>
+    <Router basename={import.meta.env.BASE_URL}>
       <Navbar />
       <div style={{ minHeight: 'calc(100vh - 60px - 48px)', display: 'flex', flexDirection: 'column' }}>
         <div style={{ flex: 1 }}>
@@ -211,7 +211,7 @@ function App() {
             <p style={{ fontSize: '1.1rem', color: '#64748b', marginBottom: '2rem' }}>
               You don't have permission to access this page. Please contact your administrator if you believe this is an error.
             </p>
-            <a href="/dashboard" style={{
+            <a href={`${import.meta.env.BASE_URL}dashboard`} style={{
               display: 'inline-block',
               padding: '0.75rem 2rem',
               background: '#16a34a',

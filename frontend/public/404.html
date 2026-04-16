@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Redirecting…</title>
+    <script>
+      (function () {
+        var l = window.location;
+        var parts = l.pathname.split('/').filter(Boolean);
+
+        // GitHub Pages project sites are served from /<repo>/
+        // Custom domains (root) are served from /
+        var first = parts[0] || '';
+        var isRepoBase = first && first.indexOf('.') === -1 && first.toLowerCase() !== '404.html';
+        var base = isRepoBase ? '/' + first + '/' : '/';
+
+        var restParts = isRepoBase ? parts.slice(1) : parts;
+        var restPath = restParts.join('/');
+
+        var encodedSearch = l.search ? l.search.slice(1).replace(/&/g, '~and~') : '';
+        var newUrl = base + '?/' + restPath + (encodedSearch ? '&' + encodedSearch : '') + l.hash;
+
+        l.replace(newUrl);
+      })();
+    </script>
+  </head>
+  <body></body>
+</html>

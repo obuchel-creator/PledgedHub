@@ -240,7 +240,7 @@ function HomeScreen() {
             <br />
             Streamline campaigns, payments, and reminders—all in one powerful platform.
           </p>
-          <a href="/explore" className="home-hero__cta">Explore Features</a>
+          <a href={`${import.meta.env.BASE_URL}explore`} className="home-hero__cta">Explore Features</a>
         </section>
 
         {/* Stats Section */}
@@ -314,11 +314,26 @@ function HomeScreen() {
                   </div>
                   <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem', flexWrap: 'wrap' }}>
                     <Link to={`/campaign/${c.id}`} className="btn btn-secondary" style={{ fontSize: '0.95rem', padding: '0.5rem 1rem', borderRadius: '8px', background: orgColor, color: '#fff', border: 'none', textDecoration: 'none' }} title="View campaign details">View</Link>
-                    <ShareButton url={window.location.origin + '/campaign/' + c.id} contentType="campaign" />
+                    <ShareButton
+                      url={new URL(`campaign/${c.id}`, new URL(import.meta.env.BASE_URL, window.location.origin)).toString()}
+                      contentType="campaign"
+                    />
                     {/* Integrations: WhatsApp, Email, Payment */}
-                    <a href={`https://wa.me/?text=Support%20${encodeURIComponent(c.title)}%20at%20${window.location.origin}/campaign/${c.id}`} target="_blank" rel="noopener noreferrer" title="Share on WhatsApp" style={{ color: orgColor, fontSize: 20, marginLeft: 4 }}><FaWhatsapp /></a>
-                    <a href={`mailto:?subject=Support%20${encodeURIComponent(c.title)}&body=Check%20out%20this%20campaign:%20${window.location.origin}/campaign/${c.id}`} target="_blank" rel="noopener noreferrer" title="Share via Email" style={{ color: orgColor, fontSize: 20, marginLeft: 4 }}><FaEnvelope /></a>
-                    <a href={`/pay/${c.id}`} title="Make a payment" style={{ color: orgColor, fontSize: 20, marginLeft: 4 }}><FaMoneyBillWave /></a>
+                    <a
+                      href={`https://wa.me/?text=Support%20${encodeURIComponent(c.title)}%20at%20${new URL(`campaign/${c.id}`, new URL(import.meta.env.BASE_URL, window.location.origin)).toString()}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      title="Share on WhatsApp"
+                      style={{ color: orgColor, fontSize: 20, marginLeft: 4 }}
+                    ><FaWhatsapp /></a>
+                    <a
+                      href={`mailto:?subject=Support%20${encodeURIComponent(c.title)}&body=Check%20out%20this%20campaign:%20${new URL(`campaign/${c.id}`, new URL(import.meta.env.BASE_URL, window.location.origin)).toString()}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      title="Share via Email"
+                      style={{ color: orgColor, fontSize: 20, marginLeft: 4 }}
+                    ><FaEnvelope /></a>
+                    <a href={`${import.meta.env.BASE_URL}pay/${c.id}`} title="Make a payment" style={{ color: orgColor, fontSize: 20, marginLeft: 4 }}><FaMoneyBillWave /></a>
                   </div>
                 </div>
               );

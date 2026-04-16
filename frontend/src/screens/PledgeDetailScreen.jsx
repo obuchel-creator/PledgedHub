@@ -974,7 +974,7 @@ export default function PledgeDetailScreen(props) {
                   campaignTitle: pledge?.campaign_title || pledge?.title,
                 }}
                 contentId={pledge?.id}
-                shareUrl={`${window.location.origin}/share/pledge/${pledge?.id}`}
+                shareUrl={new URL(`share/pledge/${pledge?.id}`, new URL(import.meta.env.BASE_URL, window.location.origin)).toString()}
                 style="button"
                 size="medium"
               />

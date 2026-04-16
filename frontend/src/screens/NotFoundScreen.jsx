@@ -30,7 +30,7 @@ const NotFoundScreen = () => {
         Please check the URL or return to the homepage.
       </p>
       <a
-        href="/"
+        href={import.meta.env.BASE_URL}
         style={{
           display: 'inline-block',
           background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',

@@ -27,7 +27,7 @@ export function SignInScreen() {
       const data = await response.json();
       if (data.success) {
         localStorage.setItem('token', data.token);
-        window.location.href = '/dashboard';
+        window.location.href = `${import.meta.env.BASE_URL}dashboard`;
       } else {
         setError(data.error || 'Sign in failed');
       }
@@ -114,13 +114,13 @@ export function SignInScreen() {
           </form>
 
           <div className="auth-footer">
-            <a href="/forgot-password" className="form-link">Forgot Password?</a>
+            <a href={`${import.meta.env.BASE_URL}forgot-password`} className="form-link">Forgot Password?</a>
           </div>
 
           <div className="auth-footer">
             <p className="auth-footer-text">
               Don't have an account?{' '}
-              <a href="/signup" className="auth-footer-link">Sign up</a>
+              <a href={`${import.meta.env.BASE_URL}signup`} className="auth-footer-link">Sign up</a>
             </p>
           </div>
         </div>
@@ -173,7 +173,7 @@ export function SignUpScreen() {
       if (data.success) {
         setSuccess('Account created successfully! Redirecting...');
         setTimeout(() => {
-          window.location.href = '/signin';
+          window.location.href = `${import.meta.env.BASE_URL}signin`;
         }, 2000);
       } else {
         setError(data.error || 'Sign up failed');
@@ -309,7 +309,7 @@ export function SignUpScreen() {
           <div className="auth-footer">
             <p className="auth-footer-text">
               Already have an account?{' '}
-              <a href="/signin" className="auth-footer-link">Sign In</a>
+              <a href={`${import.meta.env.BASE_URL}signin`} className="auth-footer-link">Sign In</a>
             </p>
           </div>
         </div>
@@ -406,7 +406,7 @@ export function ForgotPasswordScreen() {
           <div className="auth-footer">
             <p className="auth-footer-text">
               Remember your password?{' '}
-              <a href="/signin" className="auth-footer-link">Sign In</a>
+              <a href={`${import.meta.env.BASE_URL}signin`} className="auth-footer-link">Sign In</a>
             </p>
           </div>
         </div>

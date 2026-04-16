@@ -41,7 +41,10 @@ const ReferralShare = ({ style = 'card' }) => {
   }, [user]);
 
   const referralCode = user?.id || 'user123';
-  const referralUrl = `${window.location.origin}/register?ref=${referralCode}`;
+  const referralUrl = new URL(
+    `register?ref=${encodeURIComponent(referralCode)}`,
+    new URL(import.meta.env.BASE_URL, window.location.origin)
+  ).toString();
 
   if (style === 'compact') {
     return (

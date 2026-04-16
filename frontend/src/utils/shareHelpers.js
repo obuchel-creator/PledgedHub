@@ -7,17 +7,18 @@
  * Generate shareable URLs with tracking parameters
  */
 export const generateShareUrl = (path, source, campaignId = null) => {
-  const baseUrl = window.location.origin;
-  const url = new URL(path, baseUrl);
-  
+  const baseUrl = new URL(import.meta.env.BASE_URL, window.location.origin);
+  const normalizedPath = String(path || '').replace(/^\/+/, '');
+  const url = new URL(normalizedPath, baseUrl);
+
   // Add tracking parameters
   url.searchParams.set('utm_source', source);
   url.searchParams.set('utm_medium', 'social_share');
-  
+
   if (campaignId) {
     url.searchParams.set('campaign_id', campaignId);
   }
-  
+
   return url.toString();
 };
 

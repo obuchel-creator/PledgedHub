@@ -136,7 +136,7 @@ export default function AboutScreen() {
             <p>
               Ready to get started?
             </p>
-            <a href="/register" className="btn btn-primary">
+            <a href={`${import.meta.env.BASE_URL}register`} className="btn btn-primary">
               Create your account
             </a>
           </div>

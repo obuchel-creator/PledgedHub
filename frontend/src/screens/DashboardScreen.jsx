@@ -184,7 +184,7 @@ function Dashboard() {
                       milestone: `${pledges.length} Pledges`,
                       description: `I've successfully collected ${pledges.length} pledges on PledgeHub! 🎉`,
                     }}
-                    shareUrl={`${window.location.origin}/dashboard`}
+                    shareUrl={new URL('dashboard', new URL(import.meta.env.BASE_URL, window.location.origin)).toString()}
                     style="button"
                     size="medium"
                   />

@@ -144,10 +144,10 @@ export default function Navbar() {
                     </Link>
                   )}
 
-                  <a href="/help" className="navbar-dropdown-item" onClick={() => setShowUserMenu(false)}>
+                  <Link to="/help" className="navbar-dropdown-item" onClick={() => setShowUserMenu(false)}>
                     <span>❓</span>
                     <span>Help & Support</span>
-                  </a>
+                  </Link>
 
                   <div className="navbar-dropdown-divider"></div>
 
